@@ -92,7 +92,6 @@ function player.updateFrame(self, dt)
 end
 
 function player.update(self, dt, cam_p, w, h)
-  self.p.i.y= self.p.f.y-100
   self.screen.w= w
   self.screen.h= h
   self.mov= (dt * self.vel * 100)
@@ -149,7 +148,8 @@ end
 
 function player.calc_new_floor_position(self, new_y)
   if self.p.f.y==-100 then self.p.y= new_y end
-  if self.p.y<=new_y+10 or self.p.f.y==-100 then self.p.f.y= new_y end
+  if (self.p.y<=new_y+10 or self.p.f.y==-100) then self.p.f.y= new_y end
+  if self.p.y>=new_y then self.p.i.y= new_y-100 end
 end
 
 function player.draw(self)
