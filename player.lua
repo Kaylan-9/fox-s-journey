@@ -147,6 +147,11 @@ function player.update(self, dt, cam_p, w, h)
 
 end
 
+function player.calc_new_floor_position(self, new_y)
+  if self.p.f.y==-100 then self.p.y= new_y end
+  if self.p.y<=new_y+10 or self.p.f.y==-100 then self.p.f.y= new_y end
+end
+
 function player.draw(self)
   love.graphics.draw(self.img.obj, self.quads[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.img.size.w/2, self.img.size.h/2)
   love.graphics.draw(expression.img.obj, expression.quads[expression.frame], 0, self.screen.h-(expression.img.size.h*1.5), 0, 1.5, 1.5)

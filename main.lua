@@ -24,11 +24,8 @@ end
 function love.update(dt)
   map:update(dt, w, h, player.p.x, player.vel, player.s.x)
   player:update(dt, map.cam.p, w, h)
-  if player.p.f.y==-100 then 
-    values= map:positionPlayer(player.p, player.img.size.h, player.s.x, h)
-    player.p.y= values.y
-    player.p.f.y= values.y 
-  end
+  values= map:positionPlayer(player.p, player.img.size.h, player.s.x, h)
+  player:calc_new_floor_position(values.y)
 end
 
 function love.draw()         
