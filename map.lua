@@ -39,7 +39,8 @@ function map.load(self, filename, w, h)
   end
   file:close()                      
   self.dimensions= {
-    w = #self.matriz[1]*self.props.objs.size.w
+    w= #self.matriz[1]*self.props.objs.size.w,
+    h= #self.matriz*self.props.objs.size.h,
   }
   self.cam.p.i.x= self.screen.w/2
   self.cam.p.f.x= self.dimensions.w-self.screen.w
@@ -83,9 +84,9 @@ function map.draw(self)
   for i = 1, #self.matriz, 1 do                             
     for j = 1, #self.matriz[i], 1 do                           
       if (self.matriz[i][j] == "T") then                 
-        love.graphics.draw(self.objs.stone, (j-1)*self.props.objs.size.w-self.cam.p.x, (i-1)*self.props.objs.size.h, 0)  
+        love.graphics.draw(self.objs.stone, (j-1)*self.props.objs.size.w-self.cam.p.x, map.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0)  
       elseif (self.matriz[i][j] == "G") then             
-        love.graphics.draw(self.objs.grass, (j-1)*self.props.objs.size.w-self.cam.p.x, (i-1)*self.props.objs.size.w, 0) 
+        love.graphics.draw(self.objs.grass, (j-1)*self.props.objs.size.w-self.cam.p.x, map.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0) 
       end
     end
   end

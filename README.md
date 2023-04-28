@@ -26,5 +26,6 @@
   <li> Correr;</li>
   <li> Movimentação de câmera;</li>
   <li> Pulo e queda;</li>
+  <li> Tela cheia e minimização (alterna entre modos por meio da tecla F11 do teclado);</li>
 </ul>
 </strong>
