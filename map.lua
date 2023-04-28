@@ -29,6 +29,25 @@ map.props.objs= {
   }
 }
 
+local sky= {
+  s= {},
+  img= {
+    obj= love.graphics.newImage("tilesetOpenGameBackground.png"),
+    size= {}
+  }
+}
+function map.loadBackground(self)
+  sky.img.size.w= sky.img.obj:getWidth()
+  sky.img.size.h= sky.img.obj:getHeight()
+  if self.screen.w>self.screen.h then
+    sky.s.x= self.screen.w/sky.img.size.w
+    sky.s.y= sky.s.x
+  else
+    sky.s.x= self.screen.h/sky.img.size.h
+    sky.s.y= sky.s.x
+  end
+end
+
 function map.load(self, filename, w, h)  
   self.screen.w= w   
   self.screen.h= h   
@@ -44,6 +63,7 @@ function map.load(self, filename, w, h)
   }
   self.cam.p.i.x= self.screen.w/2
   self.cam.p.f.x= self.dimensions.w-self.screen.w
+  self:loadBackground()
 end
 
 function map.update(self, dt, w, h, player_px, player_vel, player_dir)
@@ -63,6 +83,7 @@ function map.update(self, dt, w, h, player_px, player_vel, player_dir)
       if self.cam.p.x<0 then self.cam.p.x = self.cam.p.x - self.cam.p.x end
     end
   end
+  self:loadBackground()
 end
 
 function map.positionPlayer(self, position, player_h, player_sx)
@@ -81,6 +102,7 @@ function map.positionPlayer(self, position, player_h, player_sx)
 end
 
 function map.draw(self)
+  love.graphics.draw(sky.img.obj, 0, 0, 0, sky.s.x, sky.s.y)  
   for i = 1, #self.matriz, 1 do                             
     for j = 1, #self.matriz[i], 1 do                           
       if (self.matriz[i][j] == "T") then                 

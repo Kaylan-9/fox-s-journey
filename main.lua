@@ -5,7 +5,6 @@ local w, h, values
 
 
 function love.load()  
-  love.graphics.setBackgroundColor(75/255, 190/255, 230/255)                          
   fullscreen= love.window.setFullscreen(true)
   w, h = love.graphics:getDimensions()
   map:load('map.txt', w, h)   
