@@ -132,7 +132,9 @@ function player.update(self, dt, cam_p, w, h)
         self.p.x= self.p.x-self.mov 
       end
       self.s.x= -math.abs(self.s.x)
-    elseif love.keyboard.isDown("right", "d") then
+    end
+    
+    if love.keyboard.isDown("right", "d") then
       if 
         (self.p.x>=0 and self.p.x<(w/2)+self.vel) or
         (cam_p.f.x-cam_p.x==0 and self.p.x<w-(self.vel*2))       
@@ -148,8 +150,8 @@ end
 
 function player.calc_new_floor_position(self, new_y)
   if self.p.f.y==-100 then self.p.y= new_y end
-  if (self.p.y<=new_y+10 or self.p.f.y==-100) then self.p.f.y= new_y end
-  if self.p.y>=new_y then self.p.i.y= new_y-100 end
+  if (self.p.y<=new_y+10 or self.p.f.y==-50) then self.p.f.y= new_y end
+  if self.p.y>=new_y then self.p.i.y= new_y-50 end
 end
 
 function player.draw(self)

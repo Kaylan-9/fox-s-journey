@@ -1,7 +1,6 @@
 local map= {
   objs= {
     grass = love.graphics.newImage('grass.png'),   
-    sky = love.graphics.newImage("sky.png"),            
     stone = love.graphics.newImage("stone.png")   
   },
   matriz= {},
@@ -86,12 +85,12 @@ function map.update(self, dt, w, h, player_px, player_vel, player_dir)
   self:loadBackground()
 end
 
-function map.positionPlayer(self, position, player_h, player_sx)
+function map.positionCharacter(self, position, character_h, character_sx)
   local j = math.ceil((self.cam.p.x+position.x)/self.props.objs.size.w)
   local newy
   for i=1, #map.matriz, 1 do
     if map.matriz[i][j]=='G' then
-      newy= self.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((player_h*player_sx)/2)
+      newy= self.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2)
       break
     end 
   end
