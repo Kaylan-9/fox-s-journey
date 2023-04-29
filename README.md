@@ -15,7 +15,7 @@
 <ul>
   <li> "midi.png" e "sprMidiF.png". Autoria de: http://kyrodianlegends.com/license Additional credit for the faces: http://foxboy83.com. Disponível em: &lthttps://opengameart.org/content/midi-waffle&gt ;</li>
   <li> "tilesetOpenGameBackground.png". Autoria de: Paulina Riva. Disponível em: &lthttps://opengameart.org/content/sky-background&gt ;</li>
-   
+  <li> "skeletonBase.png". Autoria de: MoikMellah. Disponível em: &lthttps://opengameart.org/content/mv-platformer-skeleton&gt ;</li>
 </ul>
 
 <br>
