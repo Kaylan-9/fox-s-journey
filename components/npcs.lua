@@ -32,7 +32,7 @@ function npcs.create_option(self, name, imgname, frame_n)
     frame_n= frame_n
   }
   self.options[i].img= {}
-  self.options[i].img.obj= love.graphics.newImage(imgname)
+  self.options[i].img.obj= love.graphics.newImage("assets/graphics/"..imgname)
   self.options[i].img.size= {}
   self.options[i].img.size.w= self.options[i].img.obj:getWidth()
   self.options[i].img.size.h= self.options[i].img.obj:getHeight()

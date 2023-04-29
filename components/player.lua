@@ -31,13 +31,13 @@ local expression= {
   frame= 1
 }
 
-player.img.obj= love.graphics.newImage('midi.png')
+player.img.obj= love.graphics.newImage('assets/graphics/midi.png')
 player.img.size= {
   w= (player.img.obj:getWidth()/16)-0.25,
   h= 32.35
 }
 
-expression.img.obj= love.graphics.newImage('sprMidiF.png')
+expression.img.obj= love.graphics.newImage('assets/graphics/sprMidiF.png')
 expression.img.size= {
   w= (expression.img.obj:getWidth()/4)-1,
   h= (expression.img.obj:getHeight()/3)

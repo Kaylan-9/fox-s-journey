@@ -1,7 +1,7 @@
 local map= {
   objs= {
-    grass = love.graphics.newImage('grass.png'),   
-    stone = love.graphics.newImage("stone.png")   
+    grass = love.graphics.newImage('assets/graphics/grass.png'),   
+    stone = love.graphics.newImage("assets/graphics/stone.png")   
   },
   matriz= {},
   props= {
@@ -31,7 +31,7 @@ map.props.objs= {
 local sky= {
   s= {},
   img= {
-    obj= love.graphics.newImage("tilesetOpenGameBackground.png"),
+    obj= love.graphics.newImage("assets/graphics/tilesetOpenGameBackground.png"),
     size= {}
   }
 }

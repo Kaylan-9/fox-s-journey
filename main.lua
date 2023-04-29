@@ -1,14 +1,14 @@
 local fullscreen, fstype= love.window.getFullscreen()
-local map= require('map')
-local player= require('player')
-local npcs= require('npcs')
+local map= require('components.map')
+local player= require('components.player')
+local npcs= require('components.npcs')
 local w, h
 
 
 function love.load()  
   fullscreen= love.window.setFullscreen(true)
   w, h = love.graphics:getDimensions()
-  map:load('map.txt', w, h)   
+  map:load('assets/maps/map.txt', w, h)   
   player:load(w, h)
   npcs:load(w, h)
 end
