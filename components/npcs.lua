@@ -18,15 +18,9 @@ function npcs.separate_into_frames(self, i, size)
   end
 end
 
-function npcs.create_option(self, name, imgname, frame_n)
+function npcs.create_option(self, name, imgname, frame_n, frame_positions)
   local i= #self.options+1
   self.options[i]= {
-    p= {
-      x= math.random(30, _G.screen.w-30), 
-      y= 0,
-      i= {y= -100},
-      f= {y= -100}
-    },
     s= {
       x= 2.5,
       y= 2.5
@@ -35,7 +29,8 @@ function npcs.create_option(self, name, imgname, frame_n)
     frame= 1,
     frames= {},
     name= name,
-    frame_n= frame_n
+    frame_n= frame_n,
+    frame_positions= frame_positions
   }
   self.options[i].img= {}
   self.options[i].img.obj= love.graphics.newImage("assets/graphics/"..imgname)
@@ -49,18 +44,27 @@ function npcs.create_option(self, name, imgname, frame_n)
   self:separate_into_frames(i, self.options[i].size)
 end
 
-function npcs.create_npc(self, n_option)
+function npcs.create_npc(self, n_option, goto_player, vel, positions)
   if(self.options[n_option]~=nil) then
-    self.on_the_screen[#self.on_the_screen+1]= self.options[n_option]
+    local option= self.options[n_option]
+    self.on_the_screen[#self.on_the_screen+1]= option
+    self.on_the_screen[#self.on_the_screen].goto_player= goto_player
+    self.on_the_screen[#self.on_the_screen].vel= vel
+    self.on_the_screen[#self.on_the_screen].acc= 0
+    self.on_the_screen[#self.on_the_screen].p= positions
+    self.on_the_screen[#self.on_the_screen].p.i= {y=-100}
+    self.on_the_screen[#self.on_the_screen].p.f= {y=-100}
   end
 end 
 
 function npcs.load_options(self)
-  self:create_option('esqueleto', "skeletonBase.png", {w= 10, h= 6})
+  self:create_option('esqueleto', "skeletonBase.png", {w= 10, h= 6}, {
+    walking= {i=2, f=7}
+  })
 end
 
 function npcs.load_npcs_on_screen(self)
-  self:create_npc(1)
+  self:create_npc(1, true, 2, {x=30, y=-100})
 end
 
 function npcs.draw_npcs_on_canvas(self)
@@ -89,7 +93,44 @@ function npcs.load(self)
   self:load_npcs_on_screen()
 end
 
-function npcs.update(self) end
+function npcs.updateFrame(self, i, dt)
+  if self.on_the_screen[i].reached_the_player==false then
+    self.on_the_screen[i].acc= self.on_the_screen[i].acc+(dt * math.random(1, 5))
+    if self.on_the_screen[i].acc>=0.5 then
+      self.on_the_screen[i].frame= self.on_the_screen[i].frame + 1
+      self.on_the_screen[i].acc= 0
+    end
+    if 
+      self.on_the_screen[i].goto_player==true and 
+      (self.on_the_screen[i].frame<self.on_the_screen[i].frame_positions.walking.i or
+      self.on_the_screen[i].frame>self.on_the_screen[i].frame_positions.walking.f) 
+    then
+      self.on_the_screen[i].frame= self.on_the_screen[i].frame_positions.walking.i
+    end
+  end
+end
+
+function npcs.update(self, dt, player)
+  for i=1, #self.on_the_screen do
+    if self.on_the_screen[i].goto_player==true then
+      
+      self.on_the_screen[i].mov= (dt * self.on_the_screen[i].vel * 100)
+      if (self.on_the_screen[i].p.x>=player.p.x+player.size.w) then
+        self:updateFrame(i, dt)
+        self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)
+        self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
+        self.on_the_screen[i].reached_the_player= false
+      elseif (self.on_the_screen[i].p.x<=player.p.x-player.size.w) then
+        self:updateFrame(i, dt)
+        self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)
+        self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x + self.on_the_screen[i].mov)
+        self.on_the_screen[i].reached_the_player= false
+      else
+        self.on_the_screen[i].reached_the_player= true
+      end
+    end
+  end
+end
 
 function npcs.draw(self)
   self:draw_npcs_on_canvas()

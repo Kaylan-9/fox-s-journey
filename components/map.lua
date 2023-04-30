@@ -10,6 +10,7 @@ local map= {
     }
   },
   cam= {
+    active= false,
     acc= 0,
     p= {
       x= 0,
@@ -68,14 +69,20 @@ function map.update(self, dt, player_px, player_vel, player_dir)
     (player_px>=(_G.screen.w/2)-40-player_vel and player_px<=(_G.screen.w/2)+40+player_vel)
   then 
     self.cam.acc= (dt * player_vel * 100)
+    self.cam.active= true
     if love.keyboard.isDown("right", "d") then
       self.cam.p.x = self.cam.p.x + self.cam.acc
-      if self.cam.p.x+_G.screen.w-self.dimensions.w>0 then self.cam.p.x = self.cam.p.x - (self.cam.p.x+_G.screen.w-self.dimensions.w) end
+      if self.cam.p.x+_G.screen.w-self.dimensions.w>0 then 
+        self.cam.acc= (self.cam.p.x+_G.screen.w-self.dimensions.w) 
+        self.cam.p.x= self.cam.p.x - self.cam.acc
+      end
     end
     if love.keyboard.isDown("left", "a") then
       self.cam.p.x = self.cam.p.x - self.cam.acc
-      if self.cam.p.x<0 then self.cam.p.x = self.cam.p.x - self.cam.p.x end
+      if self.cam.p.x<0 then self.cam.p.x = 0 end
     end
+  else
+    self.cam.active= false
   end
   self:loadBackground()
 end
@@ -85,7 +92,7 @@ function map.positionCharacter(self, position, character_h, character_sx)
   local newy
   for i=1, #map.matriz, 1 do
     if map.matriz[i][j]=='G' then
-      newy= _G.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2)
+      newy= _G.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2.2)
       break
     end 
   end
