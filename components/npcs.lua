@@ -1,13 +1,19 @@
 local npcs={
   options= {},
   on_the_screen= {},
-  screen= {}
 }
 
 function npcs.separate_into_frames(self, i, size) 
   for j=1, self.options[i].frame_n.w do 
     for k=1, self.options[i].frame_n.h do 
-      self.options[i].frames[j+((k-1)*self.options[i].frame_n.w)]= love.graphics.newQuad((j-1)*size.w, (k-1)*size.h, size.w, size.h, self.options[i].img.obj)
+      self.options[i].frames[j+((k-1)*self.options[i].frame_n.w)]= love.graphics.newQuad(
+        (j-1)*size.w,
+        (k-1)*size.h,
+        size.w,
+        size.h,
+        self.options[i].img.size.w,
+        self.options[i].img.size.h
+      )
     end
   end
 end
@@ -16,7 +22,7 @@ function npcs.create_option(self, name, imgname, frame_n)
   local i= #self.options+1
   self.options[i]= {
     p= {
-      x= math.random(30, self.screen.w-30), 
+      x= math.random(30, _G.screen.w-30), 
       y= 0,
       i= {y= -100},
       f= {y= -100}
@@ -78,21 +84,12 @@ function npcs.calc_new_floor_position(self, i, new_y)
   if self.on_the_screen[i].p.f.y==-100 then self.on_the_screen[i].p.y= new_y end
 end
 
-function npcs.load(self, w, h)
-  self.screen= {
-    w= w,
-    h= h
-  }
+function npcs.load(self)
   self:load_options()
   self:load_npcs_on_screen()
 end
 
-function npcs.update(self, w, h)
-  self.screen= {
-    w= w,
-    h= h
-  }
-end
+function npcs.update(self) end
 
 function npcs.draw(self)
   self:draw_npcs_on_canvas()

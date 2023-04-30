@@ -17,8 +17,7 @@ local map= {
       i= {x= 0},
       f= {x= 0}
     }
-  },
-  screen= {}
+  }
 }
 
 map.props.objs= {
@@ -38,18 +37,16 @@ local sky= {
 function map.loadBackground(self)
   sky.img.size.w= sky.img.obj:getWidth()
   sky.img.size.h= sky.img.obj:getHeight()
-  if self.screen.w>self.screen.h then
-    sky.s.x= self.screen.w/sky.img.size.w
+  if _G.screen.w>_G.screen.h then
+    sky.s.x= _G.screen.w/sky.img.size.w
     sky.s.y= sky.s.x
   else
-    sky.s.x= self.screen.h/sky.img.size.h
+    sky.s.x= _G.screen.h/sky.img.size.h
     sky.s.y= sky.s.x
   end
 end
 
-function map.load(self, filename, w, h)  
-  self.screen.w= w   
-  self.screen.h= h   
+function map.load(self, filename)  
   local file = io.open(filename)    
   for line in file:lines() do       
     self.matriz[#self.matriz + 1] = {}                    
@@ -60,22 +57,20 @@ function map.load(self, filename, w, h)
     w= #self.matriz[1]*self.props.objs.size.w,
     h= #self.matriz*self.props.objs.size.h,
   }
-  self.cam.p.i.x= self.screen.w/2
-  self.cam.p.f.x= self.dimensions.w-self.screen.w
+  self.cam.p.i.x= _G.screen.w/2
+  self.cam.p.f.x= self.dimensions.w-_G.screen.w
   self:loadBackground()
 end
 
-function map.update(self, dt, w, h, player_px, player_vel, player_dir)
-  self.screen.w= w
-  self.screen.h= h
+function map.update(self, dt, player_px, player_vel, player_dir)
   if 
     (player_px+self.cam.p.x>=self.cam.p.i.x and self.cam.p.f.x-self.cam.p.x>=-1) and
-    (player_px>=(self.screen.w/2)-40-player_vel and player_px<=(self.screen.w/2)+40+player_vel)
+    (player_px>=(_G.screen.w/2)-40-player_vel and player_px<=(_G.screen.w/2)+40+player_vel)
   then 
     self.cam.acc= (dt * player_vel * 100)
     if love.keyboard.isDown("right", "d") then
       self.cam.p.x = self.cam.p.x + self.cam.acc
-      if self.cam.p.x+self.screen.w-self.dimensions.w>0 then self.cam.p.x = self.cam.p.x - (self.cam.p.x+self.screen.w-self.dimensions.w) end
+      if self.cam.p.x+_G.screen.w-self.dimensions.w>0 then self.cam.p.x = self.cam.p.x - (self.cam.p.x+_G.screen.w-self.dimensions.w) end
     end
     if love.keyboard.isDown("left", "a") then
       self.cam.p.x = self.cam.p.x - self.cam.acc
@@ -90,7 +85,7 @@ function map.positionCharacter(self, position, character_h, character_sx)
   local newy
   for i=1, #map.matriz, 1 do
     if map.matriz[i][j]=='G' then
-      newy= self.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2)
+      newy= _G.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2)
       break
     end 
   end
@@ -105,9 +100,9 @@ function map.draw(self)
   for i = 1, #self.matriz, 1 do                             
     for j = 1, #self.matriz[i], 1 do                           
       if (self.matriz[i][j] == "T") then                 
-        love.graphics.draw(self.objs.stone, (j-1)*self.props.objs.size.w-self.cam.p.x, map.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0)  
+        love.graphics.draw(self.objs.stone, (j-1)*self.props.objs.size.w-self.cam.p.x, _G.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0)  
       elseif (self.matriz[i][j] == "G") then             
-        love.graphics.draw(self.objs.grass, (j-1)*self.props.objs.size.w-self.cam.p.x, map.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0) 
+        love.graphics.draw(self.objs.grass, (j-1)*self.props.objs.size.w-self.cam.p.x, _G.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0) 
       end
     end
   end

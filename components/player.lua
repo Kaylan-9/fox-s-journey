@@ -21,7 +21,6 @@ local player= {
     i= {y= -100},
     f= {y= -100}
   },
-  screen= {}
 }
 
 local expression= {
@@ -33,28 +32,48 @@ local expression= {
 
 player.img.obj= love.graphics.newImage('assets/graphics/midi.png')
 player.img.size= {
-  w= (player.img.obj:getWidth()/16)-0.25,
+  w= player.img.obj:getWidth(),
+  h= player.img.obj:getHeight()
+}
+player.size= {
+  w= (player.img.size.w/16)-0.25,
   h= 32.35
 }
 
 expression.img.obj= love.graphics.newImage('assets/graphics/sprMidiF.png')
 expression.img.size= {
-  w= (expression.img.obj:getWidth()/4)-1,
-  h= (expression.img.obj:getHeight()/3)
+  w= expression.img.obj:getWidth(),
+  h= expression.img.obj:getHeight()
+}
+expression.size= {
+  w= (expression.img.size.w/4)-1,
+  h= (expression.img.size.h/3)
 }
 
-function player.load(self, w, h) 
-  self.screen.w= w
-  self.screen.h= h
+function player.load(self) 
   for i=1, 16, 1 do 
     for j=1, 15, 1 do 
-      player.quads[i+((j-1)*16)]= love.graphics.newQuad((i-1)*player.img.size.w, (j-1)*player.img.size.h, player.img.size.w, player.img.size.h, player.img.obj)
+      self.quads[i+((j-1)*16)]= love.graphics.newQuad(
+        (i-1)*self.size.w, 
+        (j-1)*self.size.h,
+        self.size.w,
+        self.size.h,
+        self.img.size.w,
+        self.img.size.h
+      )
     end
   end
 
   for i=1, 3, 1 do 
     for j=1, 4, 1 do 
-      expression.quads[i+((j-1)*4)]= love.graphics.newQuad((i-1)*expression.img.size.w, (j-1)*expression.img.size.h, expression.img.size.w, expression.img.size.h, expression.img.obj)
+      expression.quads[i+((j-1)*4)]= love.graphics.newQuad(
+        (i-1)*expression.size.w,
+        (j-1)*expression.size.h,
+        expression.size.w,
+        expression.size.h, 
+        expression.img.size.w, 
+        expression.img.size.h
+      )
     end
   end
 end
@@ -91,9 +110,7 @@ function player.updateFrame(self, dt)
   end
 end
 
-function player.update(self, dt, cam_p, w, h)
-  self.screen.w= w
-  self.screen.h= h
+function player.update(self, dt, cam_p)
   self.mov= (dt * self.vel * 100)
   self:updateFrame(dt)
 
@@ -127,7 +144,7 @@ function player.update(self, dt, cam_p, w, h)
     if love.keyboard.isDown("left", "a") then
       if 
         (self.p.x>=self.vel*2 and cam_p.x==0) or 
-        (self.p.x<w+40+self.vel and self.p.x>(self.screen.w/2)+40+self.vel)
+        (self.p.x<_G.screen.w+40+self.vel and self.p.x>(_G.screen.w/2)+40+self.vel)
       then 
         self.p.x= self.p.x-self.mov 
       end
@@ -136,8 +153,8 @@ function player.update(self, dt, cam_p, w, h)
     
     if love.keyboard.isDown("right", "d") then
       if 
-        (self.p.x>=0 and self.p.x<(w/2)+self.vel) or
-        (cam_p.f.x-cam_p.x==0 and self.p.x<w-(self.vel*2))       
+        (self.p.x>=0 and self.p.x<(_G.screen.w/2)+self.vel) or
+        (cam_p.f.x-cam_p.x==0 and self.p.x<_G.screen.w-(self.vel*2))       
       then 
         self.p.x= self.p.x+self.mov 
       end
@@ -155,8 +172,8 @@ function player.calc_new_floor_position(self, new_y)
 end
 
 function player.draw(self)
-  love.graphics.draw(self.img.obj, self.quads[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.img.size.w/2, self.img.size.h/2)
-  love.graphics.draw(expression.img.obj, expression.quads[expression.frame], 0, self.screen.h-(expression.img.size.h*1.5), 0, 1.5, 1.5)
+  love.graphics.draw(self.img.obj, self.quads[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.size.w/2, self.size.h/2)
+  love.graphics.draw(expression.img.obj, expression.quads[expression.frame], 0, _G.screen.h-(expression.size.h*1.5), 0, 1.5, 1.5)
   love.graphics.print(self.jump.reached and 'queda: verdadeiro' or 'queda: falso', 0, 0)
   love.graphics.print('altura atual: '..self.p.y, 0, 15)
   love.graphics.print('altura máxima: '..self.p.i.y, 0, 30)
