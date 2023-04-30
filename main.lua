@@ -6,6 +6,7 @@ function _G.screen.change_resolution(self)
   self.w, self.h = love.graphics:getDimensions()
 end
 
+local balloon= require('components.balloon')
 local map= require('components.map')
 local player= require('components.player')
 local npcs= require('components.npcs')
@@ -15,6 +16,7 @@ function love.load()
   map:load('assets/maps/map.txt')   
   player:load()
   npcs:load()
+  balloon:load()
 end
 
 function love.keypressed(key)
@@ -57,6 +59,7 @@ function love.update(dt)
   map:update(dt, player.p.x, player.vel, player.s.x)
   player:update(dt, map.cam.p)
   npcs:update(dt, {p=player.p, size=player.size}, map.cam.p.x)
+  balloon:update()
   repositioning_characters_on_the_yaxis()
 end
 
@@ -64,4 +67,5 @@ function love.draw()
   map:draw() 
   player:draw()
   npcs:draw(map.cam.p.x)
+  balloon:draw()
 end
