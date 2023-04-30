@@ -167,8 +167,8 @@ end
 
 function player.calc_new_floor_position(self, new_y)
   if self.p.f.y==-100 then self.p.y= new_y end
-  if (self.p.y<=new_y+10 or self.p.f.y==-50) then self.p.f.y= new_y end
-  if self.p.y>=new_y then self.p.i.y= new_y-50 end
+  if (self.p.y<=new_y+10 or self.p.f.y==-75) then self.p.f.y= new_y end
+  if self.p.y>=new_y then self.p.i.y= new_y-75 end
 end
 
 function player.draw(self)

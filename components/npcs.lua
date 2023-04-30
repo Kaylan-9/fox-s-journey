@@ -64,15 +64,15 @@ function npcs.load_options(self)
 end
 
 function npcs.load_npcs_on_screen(self)
-  self:create_npc(1, true, 2, {x=30, y=-100})
+  self:create_npc(1, true, 3, {x=30, y=-100})
 end
 
-function npcs.draw_npcs_on_canvas(self)
+function npcs.draw_npcs_on_canvas(self, cam_px)
   for i=1, #self.on_the_screen do
     love.graphics.draw(
       self.on_the_screen[i].img.obj,
       self.on_the_screen[i].frames[self.on_the_screen[i].frame],
-      self.on_the_screen[i].p.x,
+      self.on_the_screen[i].p.x-cam_px,
       self.on_the_screen[i].p.y,
       self.on_the_screen[i].angle,
       self.on_the_screen[i].s.x,
@@ -110,17 +110,16 @@ function npcs.updateFrame(self, i, dt)
   end
 end
 
-function npcs.update(self, dt, player)
+function npcs.update(self, dt, player, cam_px)
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i].goto_player==true then
-      
       self.on_the_screen[i].mov= (dt * self.on_the_screen[i].vel * 100)
-      if (self.on_the_screen[i].p.x>=player.p.x+player.size.w) then
+      if (self.on_the_screen[i].p.x-cam_px>=player.p.x+player.size.w) then
         self:updateFrame(i, dt)
         self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)
         self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
         self.on_the_screen[i].reached_the_player= false
-      elseif (self.on_the_screen[i].p.x<=player.p.x-player.size.w) then
+      elseif (self.on_the_screen[i].p.x-cam_px<=player.p.x-player.size.w) then
         self:updateFrame(i, dt)
         self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)
         self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x + self.on_the_screen[i].mov)
@@ -132,9 +131,10 @@ function npcs.update(self, dt, player)
   end
 end
 
-function npcs.draw(self)
-  self:draw_npcs_on_canvas()
+function npcs.draw(self, cam_px)
+  self:draw_npcs_on_canvas(cam_px)
   love.graphics.print(self.on_the_screen[1].frame, 0, 75)
+  love.graphics.print(self.on_the_screen[1].p.x, 0, 90)
 end
 
 return npcs

@@ -27,22 +27,6 @@ function love.keyreleased(key)
   player:keyreleased(key)
 end
 
-local function readjustment_p_relation_cam()
-  if 
-    map.cam.active==true and 
-    ((love.keyboard.isDown("right", "d") and not love.keyboard.isDown("left", "a")) or
-    (love.keyboard.isDown("left", "a") and not love.keyboard.isDown("right", "d")))
-  then
-    for i=1, #npcs.on_the_screen do
-      if player.s.x<0 then
-        npcs.on_the_screen[i].p.x= npcs.on_the_screen[i].p.x + map.cam.acc
-      elseif player.s.x>0 then
-        npcs.on_the_screen[i].p.x= npcs.on_the_screen[i].p.x - map.cam.acc
-      end
-    end
-  end
-end
-
 local function repositioning_characters_on_the_yaxis()
   --npcs
   for i=1, #npcs.on_the_screen do
@@ -50,6 +34,7 @@ local function repositioning_characters_on_the_yaxis()
       i,
       map:positionCharacter(
         npcs.on_the_screen[i].p, 
+        (npcs.on_the_screen[i].p.x),
         npcs.on_the_screen[i].size.h,
         npcs.on_the_screen[i].s.x
       ).y
@@ -60,6 +45,7 @@ local function repositioning_characters_on_the_yaxis()
   player:calc_new_floor_position(
     map:positionCharacter(
       player.p, 
+      (map.cam.p.x+player.p.x),
       player.size.h, 
       player.s.x
     ).y
@@ -70,13 +56,12 @@ end
 function love.update(dt)
   map:update(dt, player.p.x, player.vel, player.s.x)
   player:update(dt, map.cam.p)
-  npcs:update(dt, {p=player.p, size=player.size})
+  npcs:update(dt, {p=player.p, size=player.size}, map.cam.p.x)
   repositioning_characters_on_the_yaxis()
-  readjustment_p_relation_cam()
 end
 
 function love.draw()         
   map:draw() 
   player:draw()
-  npcs:draw()
+  npcs:draw(map.cam.p.x)
 end

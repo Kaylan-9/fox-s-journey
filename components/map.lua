@@ -49,11 +49,13 @@ end
 
 function map.load(self, filename)  
   local file = io.open(filename)    
-  for line in file:lines() do       
-    self.matriz[#self.matriz + 1] = {}                    
-    for j = 1, #line, 1 do self.matriz[#self.matriz][j] = line:sub(j,j) end                
+  if file~=nil then
+    for line in file:lines() do       
+      self.matriz[#self.matriz + 1] = {}                    
+      for j = 1, #line, 1 do self.matriz[#self.matriz][j] = line:sub(j,j) end                
+    end
+    file:close()                      
   end
-  file:close()                      
   self.dimensions= {
     w= #self.matriz[1]*self.props.objs.size.w,
     h= #self.matriz*self.props.objs.size.h,
@@ -87,10 +89,10 @@ function map.update(self, dt, player_px, player_vel, player_dir)
   self:loadBackground()
 end
 
-function map.positionCharacter(self, position, character_h, character_sx)
-  local j = math.ceil((self.cam.p.x+position.x)/self.props.objs.size.w)
+function map.positionCharacter(self, position, imaginary_px, character_h, character_sx)
+  local j = math.ceil((imaginary_px)/self.props.objs.size.w)
   local newy
-  for i=1, #map.matriz, 1 do
+  for i=1, #map.matriz do
     if map.matriz[i][j]=='G' then
       newy= _G.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2.2)
       break
