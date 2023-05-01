@@ -65,7 +65,7 @@ end
 
 function love.draw()         
   map:draw() 
-  player:draw()
   npcs:draw(map.cam.p.x)
+  player:draw()
   balloon:draw()
 end
