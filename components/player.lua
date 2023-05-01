@@ -5,7 +5,7 @@ local player= {
   angle= math.rad(0),
   vel= 1,
   mov= 0,
-  s= {x= 2.5, y= 2.5},
+  s= {x= 3, y= 3},
   acc= 0,
   ctrls= {
     'a', 's', 'w', 'd',
@@ -36,8 +36,8 @@ player.img.size= {
   h= player.img.obj:getHeight()
 }
 player.size= {
-  w= (player.img.size.w/16)-0.25,
-  h= 32.35
+  w= (player.img.size.w/16)-0.40,
+  h= (player.img.size.h/15)+0.15
 }
 
 expression.img.obj= love.graphics.newImage('assets/graphics/sprMidiF.png')
@@ -100,8 +100,8 @@ function player.updateFrame(self, dt)
   pressed.jump= love.keyboard.isDown("up", "w")
 
   if pressed.mov or pressed.run or pressed.jump or (self.jump.reached==true) or (love.keyboard.isDown("up", "w")==false and self.p.y<self.p.f.y) then
-    self.acc= self.acc+(dt * math.random(1, 5))
-    if self.acc>=0.5 then
+    self.acc= self.acc+(dt * math.random(1, 3))
+    if self.acc>=0.35 then
       self.frame= self.frame + 1
       self.acc= 0
     end
@@ -117,8 +117,11 @@ function player.update(self, dt, cam_p)
   if self.p.y>=self.p.f.y then self.jump.reached= false
   elseif self.p.y<=self.p.i.y then self.jump.reached= true
   end
+
   if (self.jump.reached==true) or (love.keyboard.isDown("up", "w")==false and self.p.y<self.p.f.y) then 
-    self.p.y= self.p.y + (dt * 1 * 100) 
+    local d_between_iy_fy= (self.p.f.y-self.p.i.y)
+    local d_between_iy_y= (self.p.y-self.p.i.y)
+    self.p.y= self.p.y + (dt * (math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy)))+0.1) * 100)
     if (self.frame<11 or self.frame>(11+5)) then self.frame=11 end
   end
 
@@ -126,13 +129,15 @@ function player.update(self, dt, cam_p)
     if (self.frame<8 or self.frame>(8+2)) and self.jump.reached==false then self.frame=8 end
 
     if self.jump.reached==false then
-      self.p.y= self.p.y - (dt * 1 * 100)
+      local d_between_iy_fy= (self.p.f.y-self.p.i.y)
+      local d_between_iy_y= (self.p.y-self.p.i.y)
+      self.p.y= self.p.y - (dt * math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy))) * 0.75 * 100)
     end
   end
 
   if love.keyboard.isDown("right", "d", "left", "a") and self.pressed then
-    self.vel= love.keyboard.isDown("space") and 5 or 3
-    
+    self.vel= love.keyboard.isDown("space") and 6 or 4
+
     if love.keyboard.isDown("up", "w") then
       if (self.frame<8 or self.frame>(8+2)) and self.jump.reached==false then self.frame=8 end
     elseif love.keyboard.isDown("space") then 
@@ -140,17 +145,17 @@ function player.update(self, dt, cam_p)
     else 
       if self.frame<17 or self.frame>(17+7) then self.frame= 17 end
     end
-    
+
     if love.keyboard.isDown("left", "a") then
       if 
         (self.p.x>=self.vel*2 and cam_p.x==0) or 
         (self.p.x<_G.screen.w+40+self.vel and self.p.x>(_G.screen.w/2)+40+self.vel)
       then 
-        self.p.x= self.p.x-self.mov 
+        self.p.x= self.p.x-self.mov
       end
       self.s.x= -math.abs(self.s.x)
     end
-    
+
     if love.keyboard.isDown("right", "d") then
       if 
         (self.p.x>=0 and self.p.x<(_G.screen.w/2)+self.vel) or
@@ -167,7 +172,7 @@ end
 
 function player.calc_new_floor_position(self, new_y)
   if self.p.f.y==-100 then self.p.y= new_y end
-  if (self.p.y<=new_y+10 or self.p.f.y==-75) then self.p.f.y= new_y end
+  if ((self.p.y<=new_y+15) or self.p.f.y==-100) then self.p.f.y= new_y end
   if self.p.y>=new_y then self.p.i.y= new_y-75 end
 end
 
