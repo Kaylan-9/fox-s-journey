@@ -1,6 +1,8 @@
+local Tileset= require('components.tileset')
+
 local player= {
   img= {},
-  quads= {},
+  tileset= Tileset('assets/graphics/midi.png', {x=16, y=15}),
   pressed= false,
   angle= math.rad(0),
   vel= 1,
@@ -30,16 +32,6 @@ local expression= {
   frame= 1
 }
 
-player.img.obj= love.graphics.newImage('assets/graphics/midi.png')
-player.img.size= {
-  w= player.img.obj:getWidth(),
-  h= player.img.obj:getHeight()
-}
-player.size= {
-  w= (player.img.size.w/16)-0.40,
-  h= (player.img.size.h/15)+0.15
-}
-
 expression.img.obj= love.graphics.newImage('assets/graphics/sprMidiF.png')
 expression.img.size= {
   w= expression.img.obj:getWidth(),
@@ -51,19 +43,6 @@ expression.size= {
 }
 
 function player.load(self) 
-  for i=1, 16, 1 do 
-    for j=1, 15, 1 do 
-      self.quads[i+((j-1)*16)]= love.graphics.newQuad(
-        (i-1)*self.size.w, 
-        (j-1)*self.size.h,
-        self.size.w,
-        self.size.h,
-        self.img.size.w,
-        self.img.size.h
-      )
-    end
-  end
-
   for i=1, 3, 1 do 
     for j=1, 4, 1 do 
       expression.quads[i+((j-1)*4)]= love.graphics.newQuad(
@@ -177,7 +156,7 @@ function player.calc_new_floor_position(self, new_y)
 end
 
 function player.draw(self)
-  love.graphics.draw(self.img.obj, self.quads[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.size.w/2, self.size.h/2)
+  love.graphics.draw(self.tileset.obj, self.tileset.tiles[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.tileset.tileSize.w/2, self.tileset.tileSize.h/2)
   love.graphics.draw(expression.img.obj, expression.quads[expression.frame], 0, _G.screen.h-(expression.size.h*1.5), 0, 1.5, 1.5)
   love.graphics.print(self.jump.reached and 'queda: verdadeiro' or 'queda: falso', 0, 0)
   love.graphics.print('altura atual: '..self.p.y, 0, 15)

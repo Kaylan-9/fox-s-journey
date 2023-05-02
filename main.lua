@@ -48,7 +48,7 @@ local function repositioning_characters_on_the_yaxis()
     map:positionCharacter(
       player.p, 
       (map.cam.p.x+player.p.x),
-      player.size.h, 
+      player.tileset.tileSize.h, 
       player.s.x
     ).y
   )
@@ -58,7 +58,7 @@ end
 function love.update(dt)
   map:update(dt, player.p.x, player.vel, player.s.x)
   player:update(dt, map.cam.p)
-  npcs:update(dt, {p=player.p, size=player.size}, map.cam.p.x)
+  npcs:update(dt, {p=player.p, size=player.tileset.tileSize}, map.cam.p.x)
   balloon:update()
   repositioning_characters_on_the_yaxis()
 end
