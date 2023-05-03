@@ -48,7 +48,7 @@ function map.load(self, filename)
     file:close()
   end
   self.dimensions= {
-    w= #self.matriz[1]*self.tileset.tileSize.w,
+    w= #self.matriz[#self.matriz]*32,
     h= #self.matriz*self.tileset.tileSize.h,
   }
   self.cam.p.i.x= (_G.screen.w/2)
@@ -56,20 +56,16 @@ function map.load(self, filename)
   background:load()
 end
 
-local t, tt, ttt
 function map:cam_movement(dt, player)
-  t=(player.p.x>self.cam.p.i.x)
-  tt=self.cam.p.x<self.cam.p.f.x
-  ttt=(self.cam.p.x+player.p.x)
-
-  if ((player.p.x>self.cam.p.i.x) and (self.cam.p.x<self.cam.p.f.x)) then
+  self.cam.active= ((player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
+  if self.cam.active==true then
     self.cam.active= true
     self.cam.acc= (dt * player.vel * 100)
 
     if love.keyboard.isDown("right", "d") then
       self.cam.p.x = self.cam.p.x + self.cam.acc
-      if self.cam.p.x<self.cam.p.f.x then
-        self.cam.acc= self.cam.p.x+self.cam.p.f.x
+      if self.cam.p.x+player.p.x>self.cam.p.f.x then
+        self.cam.acc= (self.cam.p.x+player.p.x)-self.cam.p.f.x+1
         self.cam.p.x= self.cam.p.x-self.cam.acc
       end
     end
@@ -78,8 +74,6 @@ function map:cam_movement(dt, player)
       self.cam.p.x = self.cam.p.x-self.cam.acc
       if self.cam.p.x<0 then self.cam.p.x = 0 end
     end
-  else
-    self.cam.active= false
   end
 end
 
@@ -105,11 +99,7 @@ end
 
 function map.draw(self)
   love.graphics.draw(background.img.obj, 0, 0, 0, background.s.x, background.s.y)  
-
-  love.graphics.print(t and 'v' or 'f', 100, 420)
-  love.graphics.print(tt and 'v' or 'f', 100, 435)
-  love.graphics.print(self.cam.p.f.x, 100, 450)
-  love.graphics.print(ttt, 100, 465)
+  love.graphics.print(self.cam.active and 'v' or 'f', 100, 450)
 
   for i = 1, #self.matriz, 1 do                             
     for j = 1, #self.matriz[i], 1 do                           

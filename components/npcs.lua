@@ -22,8 +22,8 @@ function npcs.create_option(self, name, imgname, frame_n, frame_positions)
   local i= #self.options+1
   self.options[i]= {
     s= {
-      x= 5,
-      y= 5
+      x= 2.5,
+      y= 2.5
     },
     angle= 0,
     frame= 1,
@@ -133,7 +133,6 @@ end
 
 function npcs.draw(self, cam_px)
   self:draw_npcs_on_canvas(cam_px)
-  love.graphics.print(self.on_the_screen[1].frame, 0, 75)
   love.graphics.print(self.on_the_screen[1].p.x, 0, 90)
 end
 

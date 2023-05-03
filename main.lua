@@ -9,13 +9,13 @@ end
 local balloon= require('components.balloon')
 local map= require('components.map')
 local player= require('components.player')
--- local npcs= require('components.npcs')
+local npcs= require('components.npcs')
 
 function love.load()  
   _G.screen:change_resolution()
   map:load('assets/maps/map.txt')   
   player:load()
-  -- npcs:load()
+  npcs:load()
   balloon:load()
 end
 
@@ -31,17 +31,17 @@ end
 
 local function repositioning_characters_on_the_yaxis()
   --npcs
-  -- for i=1, #npcs.on_the_screen do
-  --   npcs:calc_new_floor_position(
-  --     i,
-  --     map:positionCharacter(
-  --       npcs.on_the_screen[i].p, 
-  --       (npcs.on_the_screen[i].p.x),
-  --       npcs.on_the_screen[i].size.h,
-  --       npcs.on_the_screen[i].s.x
-  --     ).y
-  --   )
-  -- end
+  for i=1, #npcs.on_the_screen do
+    npcs:calc_new_floor_position(
+      i,
+      map:positionCharacter(
+        npcs.on_the_screen[i].p, 
+        (npcs.on_the_screen[i].p.x),
+        npcs.on_the_screen[i].size.h,
+        npcs.on_the_screen[i].s.x
+      ).y
+    )
+  end
 
   --player
   player:calc_new_floor_position(
@@ -58,14 +58,14 @@ end
 function love.update(dt)
   map:update(dt, {p=player.p, vel=player.vel})
   player:update(dt, map.cam)
-  -- npcs:update(dt, {p=player.p, size=player.tileset.tileSize}, map.cam.p.x)
+  npcs:update(dt, {p=player.p, size=player.tileset.tileSize}, map.cam.p.x)
   balloon:update()
   repositioning_characters_on_the_yaxis()
 end
 
 function love.draw()         
   map:draw() 
-  -- npcs:draw(map.cam.p.x)
+  npcs:draw(map.cam.p.x)
   player:draw()
   balloon:draw()
 end
