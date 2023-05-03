@@ -1,14 +1,6 @@
+local Tileset= require('components.tileset')
 local map= {
-  objs= {
-    grass = love.graphics.newImage('assets/graphics/grass.png'),   
-    stone = love.graphics.newImage("assets/graphics/stone.png")   
-  },
   matriz= {},
-  props= {
-    objs= {
-      size= {}
-    }
-  },
   cam= {
     active= false,
     acc= 0,
@@ -21,80 +13,87 @@ local map= {
   }
 }
 
-map.props.objs= {
-  size= {
-    w= map.objs.grass:getWidth(),
-    h= map.objs.grass:getHeight()
-  }
-}
-
-local sky= {
+local background= {
   s= {},
   img= {
     obj= love.graphics.newImage("assets/graphics/tilesetOpenGameBackground.png"),
     size= {}
   }
 }
-function map.loadBackground(self)
-  sky.img.size.w= sky.img.obj:getWidth()
-  sky.img.size.h= sky.img.obj:getHeight()
+
+function background.load(self)
+  self.img.size.w= self.img.obj:getWidth()
+  self.img.size.h= self.img.obj:getHeight()
   if _G.screen.w>_G.screen.h then
-    sky.s.x= _G.screen.w/sky.img.size.w
-    sky.s.y= sky.s.x
+    self.s.x= _G.screen.w/self.img.size.w
+    self.s.y= self.s.x
   else
-    sky.s.x= _G.screen.h/sky.img.size.h
-    sky.s.y= sky.s.x
+    self.s.x= _G.screen.h/self.img.size.h
+    self.s.y= self.s.x
   end
 end
 
-function map.load(self, filename)  
-  local file = io.open(filename)    
+function map.load(self, filename)
+  self.tileset= Tileset('assets/graphics/tilesetOpenGame.png', {x=8, y=5})
+  self.tileS= {
+    x=2,
+    y=2
+  }
+  local file = io.open(filename)  
   if file~=nil then
-    for line in file:lines() do       
-      self.matriz[#self.matriz + 1] = {}                    
-      for j = 1, #line, 1 do self.matriz[#self.matriz][j] = line:sub(j,j) end                
+    for line in file:lines() do
+      self.matriz[#self.matriz + 1] = {}
+      for j = 1, #line, 1 do self.matriz[#self.matriz][j] = line:sub(j,j) end
     end
-    file:close()                      
+    file:close()
   end
   self.dimensions= {
-    w= #self.matriz[1]*self.props.objs.size.w,
-    h= #self.matriz*self.props.objs.size.h,
+    w= #self.matriz[1]*self.tileset.tileSize.w,
+    h= #self.matriz*self.tileset.tileSize.h,
   }
-  self.cam.p.i.x= _G.screen.w/2
-  self.cam.p.f.x= self.dimensions.w-_G.screen.w
-  self:loadBackground()
+  self.cam.p.i.x= (_G.screen.w/2)
+  self.cam.p.f.x= (self.dimensions.w-(_G.screen.w/2))
+  background:load()
 end
 
-function map.update(self, dt, player_px, player_vel, player_dir)
-  if 
-    (player_px+self.cam.p.x>=self.cam.p.i.x and self.cam.p.f.x-self.cam.p.x>=-1) and
-    (player_px>=(_G.screen.w/2)-40-player_vel and player_px<=(_G.screen.w/2)+40+player_vel)
-  then 
-    self.cam.acc= (dt * player_vel * 100)
+local t, tt, ttt
+function map:cam_movement(dt, player)
+  t=(player.p.x>self.cam.p.i.x)
+  tt=self.cam.p.x<self.cam.p.f.x
+  ttt=(self.cam.p.x+player.p.x)
+
+  if ((player.p.x>self.cam.p.i.x) and (self.cam.p.x<self.cam.p.f.x)) then
     self.cam.active= true
+    self.cam.acc= (dt * player.vel * 100)
+
     if love.keyboard.isDown("right", "d") then
       self.cam.p.x = self.cam.p.x + self.cam.acc
-      if self.cam.p.x+_G.screen.w-self.dimensions.w>0 then 
-        self.cam.acc= (self.cam.p.x+_G.screen.w-self.dimensions.w) 
-        self.cam.p.x= self.cam.p.x - self.cam.acc
+      if self.cam.p.x<self.cam.p.f.x then
+        self.cam.acc= self.cam.p.x+self.cam.p.f.x
+        self.cam.p.x= self.cam.p.x-self.cam.acc
       end
     end
+
     if love.keyboard.isDown("left", "a") then
-      self.cam.p.x = self.cam.p.x - self.cam.acc
+      self.cam.p.x = self.cam.p.x-self.cam.acc
       if self.cam.p.x<0 then self.cam.p.x = 0 end
     end
   else
     self.cam.active= false
   end
-  self:loadBackground()
+end
+
+function map.update(self, dt, player)
+  self:cam_movement(dt, player)
+  background:load()
 end
 
 function map.positionCharacter(self, position, imaginary_px, character_h, character_sx)
-  local j = math.ceil((imaginary_px)/self.props.objs.size.w)
+  local j = math.ceil((imaginary_px)/self.tileset.tileSize.w)
   local newy
-  for i=1, #map.matriz do
-    if map.matriz[i][j]=='G' then
-      newy= _G.screen.h-((#map.matriz+1-i)*self.props.objs.size.h)-math.abs((character_h*character_sx)/2.2)
+  for i=1, #self.matriz do
+    if self.matriz[i][j]=='G' or self.matriz[i][j]=='g' or self.matriz[i][j]=='h' then
+      newy= _G.screen.h-((#self.matriz+1-i)*self.tileset.tileSize.h)-math.abs((character_h*character_sx)/2.2)
       break
     end 
   end
@@ -105,13 +104,27 @@ function map.positionCharacter(self, position, imaginary_px, character_h, charac
 end
 
 function map.draw(self)
-  love.graphics.draw(sky.img.obj, 0, 0, 0, sky.s.x, sky.s.y)  
+  love.graphics.draw(background.img.obj, 0, 0, 0, background.s.x, background.s.y)  
+
+  love.graphics.print(t and 'v' or 'f', 100, 420)
+  love.graphics.print(tt and 'v' or 'f', 100, 435)
+  love.graphics.print(self.cam.p.f.x, 100, 450)
+  love.graphics.print(ttt, 100, 465)
+
   for i = 1, #self.matriz, 1 do                             
     for j = 1, #self.matriz[i], 1 do                           
       if (self.matriz[i][j] == "T") then                 
-        love.graphics.draw(self.objs.stone, (j-1)*self.props.objs.size.w-self.cam.p.x, _G.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0)  
+        love.graphics.draw(self.tileset.obj, self.tileset.tiles[36], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0)  
       elseif (self.matriz[i][j] == "G") then             
-        love.graphics.draw(self.objs.grass, (j-1)*self.props.objs.size.w-self.cam.p.x, _G.screen.h-map.dimensions.h+((i-1)*self.props.objs.size.h), 0) 
+        love.graphics.draw(self.tileset.obj, self.tileset.tiles[28], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0) 
+      elseif (self.matriz[i][j] == "g") then             
+        love.graphics.draw(self.tileset.obj, self.tileset.tiles[27], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0) 
+      elseif (self.matriz[i][j] == "h") then             
+        love.graphics.draw(self.tileset.obj, self.tileset.tiles[27], (j)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0, -math.abs(1), 1) 
+      elseif (self.matriz[i][j] == "t") then             
+        love.graphics.draw(self.tileset.obj, self.tileset.tiles[35], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0) 
+      elseif (self.matriz[i][j] == "y") then             
+        love.graphics.draw(self.tileset.obj, self.tileset.tiles[35], (j)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0, -math.abs(1), 1) 
       end
     end
   end

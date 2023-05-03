@@ -22,8 +22,8 @@ function npcs.create_option(self, name, imgname, frame_n, frame_positions)
   local i= #self.options+1
   self.options[i]= {
     s= {
-      x= 2.5,
-      y= 2.5
+      x= 5,
+      y= 5
     },
     angle= 0,
     frame= 1,
@@ -114,12 +114,12 @@ function npcs.update(self, dt, player, cam_px)
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i].goto_player==true then
       self.on_the_screen[i].mov= (dt * self.on_the_screen[i].vel * 100)
-      if (self.on_the_screen[i].p.x-cam_px>=player.p.x+34) then
+      if (self.on_the_screen[i].p.x-cam_px>=player.p.x+player.size.w) then
         self:updateFrame(i, dt)
         self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)
         self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
         self.on_the_screen[i].reached_the_player= false
-      elseif (self.on_the_screen[i].p.x-cam_px<=player.p.x-34) then
+      elseif (self.on_the_screen[i].p.x-cam_px<=player.p.x-player.size.w) then
         self:updateFrame(i, dt)
         self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)
         self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x + self.on_the_screen[i].mov)
