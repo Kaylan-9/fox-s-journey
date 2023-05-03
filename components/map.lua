@@ -57,7 +57,7 @@ function map.load(self, filename)
 end
 
 function map:cam_movement(dt, player)
-  self.cam.active= ((player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
+  self.cam.active= ((self.cam.p.x+player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
   if self.cam.active==true then
     self.cam.active= true
     self.cam.acc= (dt * player.vel * 100)

@@ -104,7 +104,7 @@ function player.update(self, dt, cam)
     end
 
     if love.keyboard.isDown("left", "a") then
-      if cam.active==false or (self.p.x>=(self.vel*2) and cam.p.x==0) then self.p.x= self.p.x-mov end
+      if (cam.active==false and self.p.x>=(self.vel*2)) or cam.p.x==0 then self.p.x= self.p.x-mov end
       self.s.x= -math.abs(self.s.x)
     end
     if love.keyboard.isDown("right", "d") then
