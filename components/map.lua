@@ -60,12 +60,12 @@ function map:cam_movement(dt, player)
   self.cam.active= ((self.cam.p.x+player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
   if self.cam.active==true then
     self.cam.active= true
-    self.cam.acc= (dt * player.vel * 100)
+    self.cam.acc= math.ceil(dt * player.vel * 100)
 
     if love.keyboard.isDown("right", "d") then
       self.cam.p.x = self.cam.p.x + self.cam.acc
       if self.cam.p.x+player.p.x>self.cam.p.f.x then
-        self.cam.acc= (self.cam.p.x+player.p.x)-self.cam.p.f.x+1
+        self.cam.acc= math.ceil((self.cam.p.x+player.p.x)-self.cam.p.f.x)
         self.cam.p.x= self.cam.p.x-self.cam.acc
       end
     end
