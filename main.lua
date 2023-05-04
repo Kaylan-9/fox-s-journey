@@ -37,7 +37,7 @@ local function repositioning_characters_on_the_yaxis()
       map:positionCharacter(
         npcs.on_the_screen[i].p, 
         (npcs.on_the_screen[i].p.x),
-        npcs.on_the_screen[i].size.h,
+        npcs.on_the_screen[i].tileset.tileSize.h,
         npcs.on_the_screen[i].s.x
       ).y
     )

@@ -101,8 +101,12 @@ function map.draw(self)
   love.graphics.draw(background.img.obj, 0, 0, 0, background.s.x, background.s.y)  
   love.graphics.print(self.cam.active and 'v' or 'f', 100, 450)
 
+
   for i = 1, #self.matriz, 1 do                             
-    for j = 1, #self.matriz[i], 1 do                           
+    for j = 1, #self.matriz[i], 1 do                     
+      
+      if i<2 then love.graphics.setColor(255/255, 255/255, 255/255, 122/255) end 
+      
       if (self.matriz[i][j] == "T") then                 
         love.graphics.draw(self.tileset.obj, self.tileset.tiles[36], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0)  
       elseif (self.matriz[i][j] == "G") then             
@@ -116,6 +120,9 @@ function map.draw(self)
       elseif (self.matriz[i][j] == "y") then             
         love.graphics.draw(self.tileset.obj, self.tileset.tiles[35], (j)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0, -math.abs(1), 1) 
       end
+
+      if i<2 then love.graphics.setColor(255/255, 255/255, 255/255, 255/255) end 
+
     end
   end
 end

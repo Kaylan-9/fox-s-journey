@@ -1,84 +1,36 @@
+local Character= require('components.character')
 local npcs={
-  options= {},
-  on_the_screen= {},
+  options= { --cada tabela é um novo personagem para o jogo
+    esqueleto= {
+      name= "esqueleto",
+      imgname= "skeletonBase.png",
+      frame_n= {x= 10, y=6},
+      frame_positions= {walking= {i=2, f=7}}
+    }
+  },
+  on_the_screen= {} --cada tabela é um personagem em cena
 }
 
-function npcs.separate_into_frames(self, i, size) 
-  for j=1, self.options[i].frame_n.w do 
-    for k=1, self.options[i].frame_n.h do 
-      self.options[i].frames[j+((k-1)*self.options[i].frame_n.w)]= love.graphics.newQuad(
-        (j-1)*size.w,
-        (k-1)*size.h,
-        size.w,
-        size.h,
-        self.options[i].img.size.w,
-        self.options[i].img.size.h
-      )
-    end
-  end
-end
-
-function npcs.create_option(self, name, imgname, frame_n, frame_positions)
-  local i= #self.options+1
-  self.options[i]= {
-    s= {
-      x= 2.5,
-      y= 2.5
-    },
-    angle= 0,
-    frame= 1,
-    frames= {},
-    name= name,
-    frame_n= frame_n,
-    frame_positions= frame_positions
-  }
-  self.options[i].img= {}
-  self.options[i].img.obj= love.graphics.newImage("assets/graphics/"..imgname)
-  self.options[i].img.size= {}
-  self.options[i].img.size.w= self.options[i].img.obj:getWidth()
-  self.options[i].img.size.h= self.options[i].img.obj:getHeight()
-  self.options[i].size= {
-    w= (self.options[i].img.size.w/self.options[i].frame_n.w),
-    h= (self.options[i].img.size.h/self.options[i].frame_n.h)
-  }
-  self:separate_into_frames(i, self.options[i].size)
-end
-
-function npcs.create_npc(self, n_option, goto_player, vel, positions)
-  if(self.options[n_option]~=nil) then
-    local option= self.options[n_option]
-    self.on_the_screen[#self.on_the_screen+1]= option
-    self.on_the_screen[#self.on_the_screen].goto_player= goto_player
-    self.on_the_screen[#self.on_the_screen].vel= vel
-    self.on_the_screen[#self.on_the_screen].acc= 0
-    self.on_the_screen[#self.on_the_screen].p= positions
-    self.on_the_screen[#self.on_the_screen].p.i= {y=-100}
-    self.on_the_screen[#self.on_the_screen].p.f= {y=-100}
+function npcs.create_npc(self, optioname, goto_player, vel, p)
+  if(self.options[optioname]~=nil) then
+    local new_character= Character(self.options[optioname], vel, p)
+    new_character.goto_player= goto_player
+    table.insert(self.on_the_screen, new_character) --adiciona personagem em cena
   end
 end 
-
-function npcs.load_options(self)
-  self:create_option('esqueleto', "skeletonBase.png", {w= 10, h= 6}, {
-    walking= {i=2, f=7}
-  })
-end
-
-function npcs.load_npcs_on_screen(self)
-  self:create_npc(1, true, 3, {x=30, y=-100})
-end
 
 function npcs.draw_npcs_on_canvas(self, cam_px)
   for i=1, #self.on_the_screen do
     love.graphics.draw(
-      self.on_the_screen[i].img.obj,
-      self.on_the_screen[i].frames[self.on_the_screen[i].frame],
+      self.on_the_screen[i].tileset.obj,
+      self.on_the_screen[i].tileset.tiles[self.on_the_screen[i].frame],
       self.on_the_screen[i].p.x-cam_px,
       self.on_the_screen[i].p.y,
       self.on_the_screen[i].angle,
       self.on_the_screen[i].s.x,
       self.on_the_screen[i].s.y,
-      self.on_the_screen[i].size.w/2,
-      self.on_the_screen[i].size.h/2
+      self.on_the_screen[i].tileset.tileSize.w/2,
+      self.on_the_screen[i].tileset.tileSize.h/2
     )
   end
 end
@@ -89,8 +41,10 @@ function npcs.calc_new_floor_position(self, i, new_y)
 end
 
 function npcs.load(self)
-  self:load_options()
-  self:load_npcs_on_screen()
+  self:create_npc("esqueleto", true, 3, {x=30, y=-100})
+  self:create_npc("esqueleto", true, 2, {x=230, y=-100})
+  self:create_npc("esqueleto", true, 5, {x=430, y=-100})
+  self:create_npc("esqueleto", true, 1, {x=630, y=-100})
 end
 
 function npcs.updateFrame(self, i, dt)
@@ -133,7 +87,6 @@ end
 
 function npcs.draw(self, cam_px)
   self:draw_npcs_on_canvas(cam_px)
-  love.graphics.print(self.on_the_screen[1].p.x, 0, 90)
 end
 
 return npcs
