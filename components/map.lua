@@ -1,6 +1,7 @@
 local Tileset= require('components.tileset')
 local map= {
   matriz= {},
+  s= {x= 2, y= 2},
   cam= {
     active= false,
     acc= 0,
@@ -34,11 +35,8 @@ function background.load(self)
 end
 
 function map.load(self, filename)
-  self.tileset= Tileset('assets/graphics/tilesetOpenGame.png', {x=8, y=5})
-  self.tileS= {
-    x=2,
-    y=2
-  }
+  self.tileset= Tileset('assets/graphics/tilesetOpenGame.png', {x=10, y=6}, nil, self.s)
+  self.s= self.tileset.scale
   local file = io.open(filename)  
   if file~=nil then
     for line in file:lines() do
@@ -48,7 +46,7 @@ function map.load(self, filename)
     file:close()
   end
   self.dimensions= {
-    w= #self.matriz[#self.matriz]*32,
+    w= #self.matriz[#self.matriz]*self.tileset.tileSize.w,
     h= #self.matriz*self.tileset.tileSize.h,
   }
   self.cam.p.i.x= (_G.screen.w/2)
@@ -87,7 +85,7 @@ function map.positionCharacter(self, position, imaginary_px, character_h, charac
   local newy
   for i=1, #self.matriz do
     if self.matriz[i][j]=='G' or self.matriz[i][j]=='g' or self.matriz[i][j]=='h' then
-      newy= _G.screen.h-((#self.matriz+1-i)*self.tileset.tileSize.h)-math.abs((character_h*character_sx)/2.2)
+      newy= _G.screen.h-((#self.matriz+1-i)*(self.tileset.tileSize.h))-math.abs((character_h*character_sx)/2.2)
       break
     end 
   end
@@ -97,32 +95,47 @@ function map.positionCharacter(self, position, imaginary_px, character_h, charac
   }
 end
 
-function map.draw(self)
+
+
+-- Tem o propósito de diminuir o código: serve para indicar que o símbolo na tela será renderizado como o "tile" correspondente ao id_tile (índice da tabela de tiles)
+
+function map:tile_draw(i, j, id_tile, symbol)
+  if self.matriz[i+1][j+1]==symbol then
+    love.graphics.draw(
+      self.tileset.obj,
+      self.tileset.tiles[id_tile],
+      (j*self.tileset.tileSize.w)-self.cam.p.x,
+      _G.screen.h-self.dimensions.h+(i*(self.tileset.tileSize.h)),
+      0,
+      self.tileset.scale.x,
+      self.tileset.scale.y
+    ) 
+  end
+end
+
+function map:draw()
   love.graphics.draw(background.img.obj, 0, 0, 0, background.s.x, background.s.y)  
-  love.graphics.print(self.cam.active and 'v' or 'f', 100, 450)
-
-
-  for i = 1, #self.matriz, 1 do                             
-    for j = 1, #self.matriz[i], 1 do                     
-      
-      if i<2 then love.graphics.setColor(255/255, 255/255, 255/255, 122/255) end 
-      
-      if (self.matriz[i][j] == "T") then                 
-        love.graphics.draw(self.tileset.obj, self.tileset.tiles[36], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0)  
-      elseif (self.matriz[i][j] == "G") then             
-        love.graphics.draw(self.tileset.obj, self.tileset.tiles[28], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0) 
-      elseif (self.matriz[i][j] == "g") then             
-        love.graphics.draw(self.tileset.obj, self.tileset.tiles[27], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0) 
-      elseif (self.matriz[i][j] == "h") then             
-        love.graphics.draw(self.tileset.obj, self.tileset.tiles[27], (j)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0, -math.abs(1), 1) 
-      elseif (self.matriz[i][j] == "t") then             
-        love.graphics.draw(self.tileset.obj, self.tileset.tiles[35], (j-1)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0) 
-      elseif (self.matriz[i][j] == "y") then             
-        love.graphics.draw(self.tileset.obj, self.tileset.tiles[35], (j)*self.tileset.tileSize.w-self.cam.p.x, _G.screen.h-self.dimensions.h+((i-1)*self.tileset.tileSize.h), 0, -math.abs(1), 1) 
-      end
-
-      if i<2 then love.graphics.setColor(255/255, 255/255, 255/255, 255/255) end 
-
+  for i = 0, #self.matriz-1 do                             
+    for j = 0, #self.matriz[i+1]-1 do                     
+      self:tile_draw(i, j, 34, "s")
+      self:tile_draw(i, j, 43, "g")
+      self:tile_draw(i, j, 44, "G")
+      self:tile_draw(i, j, 45, "h")
+      self:tile_draw(i, j, 53, "t")
+      self:tile_draw(i, j, 54, "T")
+      self:tile_draw(i, j, 55, "y")
+      self:tile_draw(i, j, 55, "y")
+      self:tile_draw(i, j, 8, "r")
+      self:tile_draw(i, j, 9, "A")
+      self:tile_draw(i, j, 18, "k")
+      self:tile_draw(i, j, 19, "K")
+      self:tile_draw(i, j, 20, "a")
+      self:tile_draw(i, j, 30, "l")
+      self:tile_draw(i, j, 29, "I")
+      self:tile_draw(i, j, 28, "i")
+      self:tile_draw(i, j, 27, "L")
+      self:tile_draw(i, j, 38, "j")
+      self:tile_draw(i, j, 39, "J")
     end
   end
 end

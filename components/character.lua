@@ -5,7 +5,7 @@ local Character, metatable= {}, {
   __call= function(self, option_props, vel, p) --self permite acessar os atributos de uma instância de uma classe
     local object= {} --objeto para armazenar os futuros atributos de uma classe
     object.s= {x= 2.5, y= 2.5}
-    object.angle= 0
+    object.angle= math.rad(0)
     object.frame= 1
     object.name= option_props.name
     object.frame_positions= option_props.frame_positions

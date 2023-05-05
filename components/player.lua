@@ -1,41 +1,22 @@
 local Tileset= require('components.tileset')
-
-local player= {
-  img= {},
-  pressed= false,
-  angle= math.rad(0),
-  vel= 1,
-  s= {x= 3, y= 3},
-  acc= 0,
-  ctrls= {
-    'a', 's', 'w', 'd',
-    'left', 'down', 'up', 'right',
-    'space'
-  },
-  jump= {
-    reached= false
-  },
-  p= {
-    x= 30, 
-    y= 0,
-    i= {y= -100},
-    f= {y= -100}
-  },
-}
-
-local expression= {
-  img= {},
-  quads= {},
+local Character= require('components.character')
+local player= Character({
+  name= "Faye",
+  imgname= "midi.png",
+  frame_n= {x=16, y=15},
+  frame_positions= {},
+  adjustment= {w=-0.34, h=0.5}
+}, 1, {x= 30, y= 0})
+player.jump= {reached= false}
+player.ctrls= {'a', 's', 'w', 'd', 'left', 'down', 'up', 'right', 'space'}
+player.pressed= false
+player.expression= {
   s= {x= 1.5, y= 1.5},
-  frame= 1
+  frame= 1,
+  tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
 }
 
-function player.load(self) 
-  self.tileset= Tileset('assets/graphics/midi.png', {x=16, y=15}, {w=-0.34, h=0.5})
-  expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
-end
-
-function player.keypressed(self, key) 
+function player:keypressed(key) 
   if self.pressed~=true then
     for i=1, #self.ctrls, 1 do
       if key==self.ctrls[i] then
@@ -46,11 +27,9 @@ function player.keypressed(self, key)
   end
 end
 
-function player.keyreleased(self, key) 
-  self.pressed= false
-end
+function player:keyreleased() self.pressed= false end
 
-function player.updateFrame(self, dt)
+function player:updateFrame(dt)
   local pressed= {}
   pressed.mov= love.keyboard.isDown("right", "d", "left", "a")
   pressed.run= pressed.mov and love.keyboard.isDown("space")
@@ -67,7 +46,7 @@ function player.updateFrame(self, dt)
   end
 end
 
-function player.update(self, dt, cam)
+function player:update(dt, cam)
   local mov= (dt * self.vel * 100)
   self:updateFrame(dt)
 
@@ -93,7 +72,7 @@ function player.update(self, dt, cam)
   end
 
   if love.keyboard.isDown("right", "d", "left", "a") and self.pressed then
-    self.vel= love.keyboard.isDown("space") and 6 or 4
+    self.vel= love.keyboard.isDown("space") and 19 or 4
 
     if love.keyboard.isDown("up", "w") then
       if (self.frame<8 or self.frame>(8+2)) and self.jump.reached==false then self.frame=8 end
@@ -116,15 +95,15 @@ function player.update(self, dt, cam)
 
 end
 
-function player.calc_new_floor_position(self, new_y)
+function player:calc_new_floor_position(new_y)
   if self.p.f.y==-100 then self.p.y= new_y end
   if ((self.p.y<=new_y+15) or self.p.f.y==-100) then self.p.f.y= new_y end
   if self.p.y>=new_y then self.p.i.y= new_y-75 end
 end
 
-function player.draw(self)
+function player:draw()
   love.graphics.draw(self.tileset.obj, self.tileset.tiles[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.tileset.tileSize.w/2, self.tileset.tileSize.h/2)
-  love.graphics.draw(expression.tileset.obj, expression.tileset.tiles[expression.frame], 0, _G.screen.h-(expression.tileset.tileSize.h*1.5), 0, 1.5, 1.5)
+  love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, 1.5, 1.5)
   love.graphics.print(self.jump.reached and 'queda: verdadeiro' or 'queda: falso', 0, 0)
   love.graphics.print('altura atual: '..self.p.y, 0, 15)
   love.graphics.print('altura máxima: '..self.p.i.y, 0, 30)

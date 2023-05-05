@@ -1,6 +1,6 @@
 local Tileset= {}
 local metatable = {
-  __call = function(self, name, n, adjustment)
+  __call = function(self, name, n, adjustment, scale)
     local object= {}
     object.name= name
     object.obj= love.graphics.newImage(object.name)
@@ -16,8 +16,18 @@ local metatable = {
       w= (object.size.w/object.n.x)+object.adjustment.w,
       h= (object.size.h/object.n.y)+object.adjustment.h
     }
+    if scale~=nil then
+      object.scale= scale
+      object.scale.x= (math.floor(object.scale.x*object.tileSize.w)/object.tileSize.w)
+      object.scale.y= (math.floor(object.scale.y*object.tileSize.h)/object.tileSize.h)
+    end
     setmetatable(object, {__index= self})
     object:seTile()
+    if scale~=nil then
+      object.tileSize.w= math.floor(object.tileSize.w*object.scale.x)
+      object.tileSize.h= math.floor(object.tileSize.h*object.scale.y)
+      print(object.scale.x)
+    end
     return object 
   end
 }

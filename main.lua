@@ -12,9 +12,9 @@ local player= require('components.player')
 local npcs= require('components.npcs')
 
 function love.load()  
+  love.graphics.setDefaultFilter("nearest", "nearest")
   _G.screen:change_resolution()
-  map:load('assets/maps/map.txt')   
-  player:load()
+  map:load('assets/maps/map.txt')
   npcs:load()
   balloon:load()
 end
@@ -26,11 +26,11 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-  player:keyreleased(key)
+  player:keyreleased()
 end
 
 local function repositioning_characters_on_the_yaxis()
-  --npcs
+  -- npcs
   for i=1, #npcs.on_the_screen do
     npcs:calc_new_floor_position(
       i,
@@ -43,7 +43,7 @@ local function repositioning_characters_on_the_yaxis()
     )
   end
 
-  --player
+  -- player
   player:calc_new_floor_position(
     map:positionCharacter(
       player.p, 

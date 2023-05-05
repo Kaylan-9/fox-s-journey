@@ -4,15 +4,12 @@ local lines= {}
 local lines_n
 
 local balloon= {
-  p= {
-    x= 0,
-    y= 0
-  },
   angle= 0,
   s= {
     x= 1,
     y= 1
   },
+  active= false,
   messages= {
     "Cheguei até aqui após inúmeros desafios, lutar contra inimigos poderosos e superar minhas próprias limitações. Mas agora, diante deste último obstáculo, sinto que minhas forças começam a falhar. Ainda assim, não posso desistir. Eu preciso encontrar uma maneira de superar esta fase e alcançar meu objetivo final. Lembrei-me das lições que aprendi ao longo do caminho: manter a calma em situações difíceis, não subestimar o poder da estratégia e, acima de tudo, confiar em minhas habilidades. Não posso deixar que o medo me paralise. Eu devo enfrentar este desafio de frente, com toda a coragem e determinação que possuo."
   }
@@ -98,7 +95,7 @@ function balloon.draw(self)
       end
     end
   end
-  love.graphics.setColor(0/255, 12/255, 125/255, 255/255)
+  love.graphics.setColor(0/255, 0/255, 0/255, 255/255)
 
   if #lines==lines_n then
     for i=1, lines_n do
