@@ -20,12 +20,15 @@ function love.load()
 end
 
 function love.keypressed(key)
-  player:keypressed(key)
+  balloon:keypressed(key)
+  player:keypressed(key, balloon.messages)
   if key == 'escape' then love.event.quit()
-  elseif key == 'f11' then _G.screen:change_resolution() end
+  elseif key == 'f11' then _G.screen:change_resolution() 
+  elseif (key == 'f' and #npcs.interaction_queue>0 and balloon.messages==false) then balloon.messages= npcs.on_the_screen[npcs.interaction_queue[1]].messages
+  end
 end
 
-function love.keyreleased(key)
+function love.keyreleased()
   player:keyreleased()
 end
 

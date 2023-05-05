@@ -6,7 +6,9 @@ local player= Character({
   frame_n= {x=16, y=15},
   frame_positions= {},
   adjustment= {w=-0.34, h=0.5}
-}, 1, {x= 30, y= 0})
+}, 
+1, 
+{x= 30, y= 0})
 player.jump= {reached= false}
 player.ctrls= {'a', 's', 'w', 'd', 'left', 'down', 'up', 'right', 'space'}
 player.pressed= false
@@ -16,12 +18,14 @@ player.expression= {
   tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
 }
 
-function player:keypressed(key) 
-  if self.pressed~=true then
-    for i=1, #self.ctrls, 1 do
-      if key==self.ctrls[i] then
-        self.pressed= true
-        break
+function player:keypressed(key, balloon_message) 
+  if balloon_message==false then
+    if self.pressed~=true then
+      for i=1, #self.ctrls, 1 do
+        if key==self.ctrls[i] then
+          self.pressed= true
+          break
+        end
       end
     end
   end

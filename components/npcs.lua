@@ -8,13 +8,15 @@ local npcs={
       frame_positions= {walking= {i=2, f=7}}
     }
   },
-  on_the_screen= {} --cada tabela é um personagem em cena
+  on_the_screen= {}, --cada tabela é um personagem em cena
+  interaction_queue= {} --a fila de NPCs com quem o personagem pode interagir
 }
 
-function npcs.create_npc(self, optioname, goto_player, vel, p)
+function npcs.create_npc(self, optioname, goto_player, vel, p, messages)
   if(self.options[optioname]~=nil) then
-    local new_character= Character(self.options[optioname], vel, p)
+    local new_character= Character(self.options[optioname], vel, p, messages)
     new_character.goto_player= goto_player
+    new_character.pressed= false
     table.insert(self.on_the_screen, new_character) --adiciona personagem em cena
   end
 end 
@@ -36,18 +38,34 @@ function npcs.draw_npcs_on_canvas(self, cam_px)
 end
 
 
-function npcs.calc_new_floor_position(self, i, new_y)
+function npcs:calc_new_floor_position(i, new_y)
   if self.on_the_screen[i].p.f.y==-100 then self.on_the_screen[i].p.y= new_y end
 end
 
 function npcs.load(self)
-  self:create_npc("esqueleto", true, 3, {x=30, y=-100})
-  self:create_npc("esqueleto", true, 2, {x=230, y=-100})
-  self:create_npc("esqueleto", true, 5, {x=430, y=-100})
-  self:create_npc("esqueleto", true, 1, {x=630, y=-100})
+  self:create_npc("esqueleto", true, 3, {x=30, y=-100}, {
+    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
+    "Sim eu sou, e qual é o problema ignorante?",
+    "Bom... tudo bem então! só saí daqui!!'"
+  })
+  self:create_npc("esqueleto", true, 2, {x=230, y=-100}, {
+    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
+    "Sim eu sou, e qual é o problema ignorante?",
+    "Bom... tudo bem então! só saí daqui!!'"
+  })
+  self:create_npc("esqueleto", true, 5, {x=430, y=-100}, {
+    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
+    "Sim eu sou, e qual é o problema ignorante?",
+    "Bom... tudo bem então! só saí daqui!!'"
+  })
+  self:create_npc("esqueleto", true, 1, {x=630, y=-100}, {
+    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
+    "Sim eu sou, e qual é o problema ignorante?",
+    "Bom... tudo bem então! só saí daqui!!'"
+  })
 end
 
-function npcs.updateFrame(self, i, dt)
+function npcs:updateFrame(i, dt)
   if self.on_the_screen[i].reached_the_player==false then
     self.on_the_screen[i].acc= self.on_the_screen[i].acc+(dt * math.random(1, 5))
     if self.on_the_screen[i].acc>=0.5 then
@@ -68,6 +86,7 @@ function npcs.update(self, dt, player, cam_px)
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i].goto_player==true then
       self.on_the_screen[i].mov= (dt * self.on_the_screen[i].vel * 100)
+
       if (self.on_the_screen[i].p.x-cam_px>=player.p.x+player.size.w) then
         self:updateFrame(i, dt)
         self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)
@@ -80,6 +99,22 @@ function npcs.update(self, dt, player, cam_px)
         self.on_the_screen[i].reached_the_player= false
       else
         self.on_the_screen[i].reached_the_player= true
+
+        local count, emptying_count= 0, 0
+        if #self.interaction_queue>0 then
+          for j=1, #self.interaction_queue do
+            if self.interaction_queue[j]~=i then 
+              count= count + 1
+            end
+            if self.on_the_screen[self.interaction_queue[j-emptying_count]].reached_the_player==false then
+              table.remove(self.interaction_queue, j-emptying_count)
+              emptying_count= emptying_count+1
+            end
+          end
+        end
+        if count==#self.interaction_queue then table.insert(self.interaction_queue, i) end
+        count, emptying_count= 0, 0
+
       end
     end
   end
