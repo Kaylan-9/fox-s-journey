@@ -20,11 +20,23 @@ function love.load()
 end
 
 function love.keypressed(key)
-  balloon:keypressed(key)
-  player:keypressed(key, balloon.messages)
+  player:keypressed(key)
   if key == 'escape' then love.event.quit()
   elseif key == 'f11' then _G.screen:change_resolution() 
-  elseif (key == 'f' and #npcs.interaction_queue>0 and balloon.messages==false) then balloon.messages= npcs.on_the_screen[npcs.interaction_queue[1]].messages
+  elseif key == 'f' then 
+    if #balloon.messages==0 then
+      if #npcs.interaction_queue>0 then
+        print(#npcs.interaction_queue)
+        balloon.messages= npcs.on_the_screen[npcs.interaction_queue[1]].messages
+      end
+    else
+      if balloon.i<#balloon.messages then 
+        balloon.i= balloon.i+1
+      else 
+        balloon.messages= {}
+        balloon.i= 1
+      end
+    end
   end
 end
 
@@ -59,8 +71,8 @@ end
 
 
 function love.update(dt)
-  map:update(dt, {p=player.p, vel=player.vel})
-  player:update(dt, map.cam)
+  map:update(dt, {p=player.p, vel=player.vel}, #balloon.messages==0)
+  player:update(dt, map.cam, #balloon.messages==0)
   npcs:update(dt, {p=player.p, size=player.tileset.tileSize}, map.cam.p.x)
   balloon:update()
   repositioning_characters_on_the_yaxis()

@@ -75,9 +75,11 @@ function map:cam_movement(dt, player)
   end
 end
 
-function map.update(self, dt, player)
-  self:cam_movement(dt, player)
-  background:load()
+function map.update(self, dt, player, balloon_message)
+  if balloon_message==true then
+    self:cam_movement(dt, player)
+    background:load()
+  end
 end
 
 function map.positionCharacter(self, position, imaginary_px, character_h, character_sx)

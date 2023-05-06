@@ -43,25 +43,12 @@ function npcs:calc_new_floor_position(i, new_y)
 end
 
 function npcs.load(self)
-  self:create_npc("esqueleto", true, 3, {x=30, y=-100}, {
-    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
-    "Sim eu sou, e qual é o problema ignorante?",
-    "Bom... tudo bem então! só saí daqui!!'"
-  })
   self:create_npc("esqueleto", true, 2, {x=230, y=-100}, {
-    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
-    "Sim eu sou, e qual é o problema ignorante?",
-    "Bom... tudo bem então! só saí daqui!!'"
+    "asddasasasasasasasasasasasasasasasdasdasdsadasd?",
   })
-  self:create_npc("esqueleto", true, 5, {x=430, y=-100}, {
-    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
-    "Sim eu sou, e qual é o problema ignorante?",
-    "Bom... tudo bem então! só saí daqui!!'"
-  })
-  self:create_npc("esqueleto", true, 1, {x=630, y=-100}, {
-    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?",
-    "Sim eu sou, e qual é o problema ignorante?",
-    "Bom... tudo bem então! só saí daqui!!'"
+
+  self:create_npc("esqueleto", true, 2, {x=20, y=-100}, {
+    "Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"
   })
 end
 
@@ -82,7 +69,10 @@ function npcs:updateFrame(i, dt)
   end
 end
 
+
+-- a função abaixo serve para controlar os valores correspondentes aos npcs, como em que momento o player pode iniciar uma conversasão ou não, e também controla por exemplo até quando o esqueleto se movimentara e também a execução de sua animação
 function npcs.update(self, dt, player, cam_px)
+
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i].goto_player==true then
       self.on_the_screen[i].mov= (dt * self.on_the_screen[i].vel * 100)
@@ -99,23 +89,17 @@ function npcs.update(self, dt, player, cam_px)
         self.on_the_screen[i].reached_the_player= false
       else
         self.on_the_screen[i].reached_the_player= true
-
-        local count, emptying_count= 0, 0
-        if #self.interaction_queue>0 then
-          for j=1, #self.interaction_queue do
-            if self.interaction_queue[j]~=i then 
-              count= count + 1
-            end
-            if self.on_the_screen[self.interaction_queue[j-emptying_count]].reached_the_player==false then
-              table.remove(self.interaction_queue, j-emptying_count)
-              emptying_count= emptying_count+1
-            end
-          end
-        end
-        if count==#self.interaction_queue then table.insert(self.interaction_queue, i) end
-        count, emptying_count= 0, 0
-
+        table.insert(self.interaction_queue, i) 
       end
+        
+      local emptying_count= 0
+      for j=1, #self.interaction_queue do
+        if self.on_the_screen[self.interaction_queue[j-emptying_count]].reached_the_player==false then
+          table.remove(self.interaction_queue, j-emptying_count)
+          emptying_count= emptying_count+1
+        end
+      end
+
     end
   end
 end

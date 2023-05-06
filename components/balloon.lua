@@ -9,7 +9,7 @@ local balloon= {
     x= 1,
     y= 1
   },
-  messages= false,
+  messages= {},
   i= 1
 }
 
@@ -44,20 +44,9 @@ function balloon:setTiles_n()
   self.size= (self.tiles_n.x*self.tile.size.w)
 end
 
-function balloon:keypressed(key)
-  if self.messages~=false then
-    if (key=='f' and self.i<#self.messages) then
-      self.i= self.i+1
-    else
-      self.messages= false
-      self.i= 1
-    end
-  end
-end
-
 function balloon:update()
   self:setTiles_n()
-  if self.messages~=false then
+  if #self.messages>0 then
     lines= {}
     local text_w= font:getWidth(self.messages[self.i])
     lines_n= math.ceil(text_w*2/(self.size-(self.text_spacing*2)))
@@ -82,7 +71,7 @@ function balloon:update()
 end
 
 function balloon:draw()
-  if self.messages~=false then
+  if #self.messages>0 then
     for i=1, self.tiles_n.x do
       for j=1, 3 do
         if (i==1 and j==1) then
