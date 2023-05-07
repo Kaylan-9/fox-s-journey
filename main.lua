@@ -10,6 +10,7 @@ local balloon= require('components.balloon')
 local map= require('components.map')
 local player= require('components.player')
 local npcs= require('components.npcs')
+local collision= require('components.collision')
 
 function love.load()  
   love.graphics.setDefaultFilter("nearest", "nearest")
@@ -69,18 +70,30 @@ local function repositioning_characters_on_the_yaxis()
   )
 end
 
+local function npc_deals_damage()
+  for i=1, #npcs.on_the_screen do
+    if npcs.on_the_screen[i].hostile==true then
+      if collision:ellipse(player.p, npcs.on_the_screen[i].p, (npcs.on_the_screen[i].body.w/2), (npcs.on_the_screen[i].body.h/2), (npcs.on_the_screen[i].body.w/2)) then
+        if npcs.on_the_screen[i].damage.attack_frame==npcs.on_the_screen[i].frame then
+          player.life= player.life-npcs.on_the_screen[i].damage.value
+        end
+      end
+    end
+  end
+end
 
 function love.update(dt)
   map:update(dt, {p=player.p, vel=player.vel}, #balloon.messages==0)
   player:update(dt, map.cam, #balloon.messages==0)
   npcs:update(dt, {p=player.p, size=player.tileset.tileSize}, map.cam.p.x)
   balloon:update()
+  npc_deals_damage()
   repositioning_characters_on_the_yaxis()
 end
 
 function love.draw()         
   map:draw() 
-  npcs:draw(map.cam.p.x)
   player:draw()
+  npcs:draw(map.cam.p.x)
   balloon:draw()
 end

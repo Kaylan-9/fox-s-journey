@@ -5,9 +5,10 @@ local player= Character({
   imgname= "midi.png",
   frame_n= {x=16, y=15},
   frame_positions= {},
-  adjustment= {w=-0.34, h=0.5}
-}, 
-1, 
+  adjustment= {w=-0.34, h=0.5},
+  body= {w=30, h=30}
+},
+1,
 {x= 30, y= 0})
 player.jump= {reached= false}
 player.ctrls= {'a', 's', 'w', 'd', 'left', 'down', 'up', 'right', 'space'}
@@ -107,11 +108,7 @@ end
 function player:draw()
   love.graphics.draw(self.tileset.obj, self.tileset.tiles[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.tileset.tileSize.w/2, self.tileset.tileSize.h/2)
   love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, 1.5, 1.5)
-  love.graphics.print(self.jump.reached and 'queda: verdadeiro' or 'queda: falso', 0, 0)
-  love.graphics.print('altura atual: '..self.p.y, 0, 15)
-  love.graphics.print('altura máxima: '..self.p.i.y, 0, 30)
-  love.graphics.print('altura mínima: '..self.p.f.y, 0, 45)
-  love.graphics.print('frame atual: '..self.frame, 0, 60)
+  love.graphics.print('life: '..self.life, 0, 15)
 end
 
 return player
