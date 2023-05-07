@@ -11,6 +11,8 @@ local Character, metatable= {}, {
     object.frame= 1
     object.name= option_props.name
     object.frame_positions= option_props.frame_positions
+    object.hold_animation= false
+    object.previous_animation= {}
     object.animation= ''
     object.vel= vel
     object.acc= 0
@@ -18,16 +20,17 @@ local Character, metatable= {}, {
     object.p= p
     object.p.i= {y=-100}
     object.p.f= {y=-100}
+    object.hostile= hostile
+    if damage~=nil then object.damage= damage end --{attack_frame, value}
+
     if option_props.body~=nil then object.body= option_props.body end -- {w,h}
     object.tileset= Tileset('assets/graphics/'..option_props.imgname, option_props.frame_n, option_props.adjustment)
     if option_props.direction~=nil then object.direction= option_props.direction end
     if messages~=nil then object.messages= messages end
-    if damage~=nil then object.damage= damage end --{attack_frame, value}
-    object.hostile= (hostile==nil and false or true)
     setmetatable(object, {__index= self}) -- relacionar os atributos da classe com a metatable
     return object
   end
-} 
+}
 
 setmetatable(Character, metatable)
 
