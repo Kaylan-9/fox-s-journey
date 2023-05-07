@@ -27,7 +27,6 @@ function love.keypressed(key)
   elseif key == 'f' then 
     if #balloon.messages==0 then
       if #npcs.interaction_queue>0 then
-        print(#npcs.interaction_queue)
         balloon.messages= npcs.on_the_screen[npcs.interaction_queue[1]].messages
       end
     else

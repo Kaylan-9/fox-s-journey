@@ -82,14 +82,22 @@ function map.update(self, dt, player, balloon_message)
   end
 end
 
-function map.positionCharacter(self, position, imaginary_px, character_h, character_sx)
+function map:positionCharacter(position, imaginary_px, character_h, character_sx)
   local j = math.ceil((imaginary_px)/self.tileset.tileSize.w)
   local newy
   for i=1, #self.matriz do
-    if self.matriz[i][j]=='G' or self.matriz[i][j]=='g' or self.matriz[i][j]=='h' then
+    if self.matriz[i][j]=='G' then
       newy= _G.screen.h-((#self.matriz+1-i)*(self.tileset.tileSize.h))-math.abs((character_h*character_sx)/2.2)
       break
-    end 
+    elseif self.matriz[i][j]=='g' or self.matriz[i][j]=='h' then
+      -- distância do começo ao fim do azulejo
+      -- somando o valor decimal restante do tile como a altura em relação a distância do quadrado e inverter se a direção for oposta
+      local d_from_start_tile= self.matriz[i][j]=='h' and (j-((imaginary_px)/self.tileset.tileSize.w)) or (((imaginary_px)/self.tileset.tileSize.w)-math.floor((imaginary_px)/self.tileset.tileSize.w))
+      newy= _G.screen.h-((#self.matriz+(
+        d_from_start_tile
+      )-i)*(self.tileset.tileSize.h))-math.abs((character_h*character_sx)/2.2)
+      break
+    end
   end
   return {
     x= position.x,
