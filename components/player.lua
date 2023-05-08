@@ -72,6 +72,11 @@ function player:update(dt, cam, balloon_message)
         local d_between_iy_fy= (self.p.f.y-self.p.i.y)
         local d_between_iy_y= (self.p.y-self.p.i.y)
         self.p.y= self.p.y - (dt * math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy))) * 0.75 * 100)
+
+        if self.p.y>self.p.f.y then
+          self.p.y= self.p.f.y
+        end
+
       end
     end
 
@@ -101,7 +106,13 @@ end
 
 function player:calc_new_floor_position(new_y)
   if self.p.f.y==-100 then self.p.y= new_y end
-  if ((self.p.y<=new_y+15) or self.p.f.y==-100) then self.p.f.y= new_y end
+
+  if math.ceil(self.p.y)==math.ceil(self.p.f.y) then 
+    self.p.y= new_y
+    self.p.f.y= new_y
+  end
+
+  if self.p.y<=new_y then self.p.f.y= new_y end
   if self.p.y>=new_y then self.p.i.y= new_y-75 end
 end
 

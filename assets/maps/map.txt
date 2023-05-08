@@ -1,9 +1,9 @@
             rA 
-            kKa                                             ssss   
-           LiIl                        rA                  gGGGGh
-           sjJs                        kKa                gtTTTTyh                    ss              sss
+            kKa           g                                 ssss   
+           LiIl               g        rA                  gGGGGh
+           sjJs    g                   kKa                gtTTTTyh                    ss              sss
    sss    gGGGGh        ss        ss  LiIl            sssgtTTTTTTyh         ss       gGGh            gGGGh                                s 
-ssgGGGhssgtTTTTyhssssssgGGhssssssgGGhssjJssssssssssssgGGGGtTTTTTTTyhsssssssgGGhsssssgtTTyhssssssssssgtTTTyhssssssssssssssssssssssssssssssgG 
+ssgGGGhssgtTTTTyhsssgssgGGhssssssgGGhssjJssssssssssssgGGGGtTTTTTTTyhsssssssgGGhsssssgtTTyhssssssssssgtTTTyhssssssssssssssssssssssssssssssgG 
 GGtTTTyGGtTTTTTTyGGGGGGtTTyGGGGGGtTTyGGGGGGGGGGGGGGGGtTTTTTTTTTTTTTyGGGGGGGtTTyGGGGGtTTTTyGGGGGGGGGGtTTTTTyGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGtT
 TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
