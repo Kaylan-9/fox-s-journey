@@ -2,7 +2,7 @@
 
 --função serve para criar um objeto genérico de um personagem: player ou NPCs
 
-local Tileset= require('components.tileset')
+local Tileset= require('models.tileset')
 local Character, metatable= {}, {
   __call= function(self, option_props, vel, p, messages, hostile, damage) --self permite acessar os atributos de uma instância de uma classe
     local object= {} --objeto para armazenar os futuros atributos de uma classe
@@ -16,7 +16,7 @@ local Character, metatable= {}, {
     object.animation= ''
     object.vel= vel
     object.acc= 0
-    object.life= 8
+    object.life= 5
     object.p= p
     object.p.i= {y=-100}
     object.p.f= {y=-100}

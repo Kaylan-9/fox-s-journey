@@ -1,5 +1,5 @@
-local Tileset= require('components.tileset')
-local Character= require('components.character')
+local Tileset= require('models.tileset')
+local Character= require('models.character')
 local player= Character({
   name= "Faye",
   imgname= "midi.png",
@@ -15,6 +15,10 @@ player.expression= {
   s= {x= 1.5, y= 1.5},
   frame= 1,
   tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
+}
+player.display_life= {
+  s= {x= 4.5, y= 4.5},
+  tileset= Tileset('assets/graphics/life.png', {x=player.life, y=1})
 }
 player.pressed= {}  
 
@@ -124,10 +128,14 @@ function player:calc_new_floor_position(new_y)
   if  (self.p.y==self.p.f.y) then self.p.i.y= new_y-90 end
 end
 
+function player:posicao_real_frame_vida()
+  return math.ceil(#self.display_life.tileset.tiles-self.life+1)
+end
+
 function player:draw()
   love.graphics.draw(self.tileset.obj, self.tileset.tiles[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.tileset.tileSize.w/2, self.tileset.tileSize.h/2)
-  love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, 1.5, 1.5)
-  love.graphics.print('life: '..self.life, 0, 15)
+  love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, self.expression.s.x, self.expression.s.y)
+  love.graphics.draw(self.display_life.tileset.obj, self.display_life.tileset.tiles[player:posicao_real_frame_vida()], 0, 0, 0, self.display_life.s.x, self.display_life.s.y)
 end
 
 return player

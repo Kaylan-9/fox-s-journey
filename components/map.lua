@@ -1,4 +1,4 @@
-local Tileset= require('components.tileset')
+local Tileset= require('models.tileset')
 local map= {
   matriz= {},
   s= {x= 2, y= 2},

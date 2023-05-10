@@ -1,4 +1,4 @@
-local Character= require('components.character')
+local Character= require('models.character')
 
 local npcs={
   options= { --cada tabela é um novo personagem para o jogo
