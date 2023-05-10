@@ -21,7 +21,6 @@ function love.load()
 end
 
 function love.keypressed(key)
-  player:keypressed(key)
   if key == 'escape' then love.event.quit()
   elseif key == 'f11' then _G.screen:change_resolution() 
   elseif key == 'f' then 
@@ -38,10 +37,6 @@ function love.keypressed(key)
       end
     end
   end
-end
-
-function love.keyreleased()
-  player:keyreleased()
 end
 
 local function repositioning_characters_on_the_yaxis()

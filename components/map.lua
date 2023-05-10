@@ -1,10 +1,8 @@
-local Json= require("json")
 local Tileset= require('components.tileset')
 local map= {
   matriz= {},
   s= {x= 2, y= 2},
   cam= {
-    active= false,
     acc= 0,
     p= {
       x= 0,
@@ -38,79 +36,14 @@ end
 function map.load(self, filename)
   self.tileset= Tileset('assets/graphics/tilesetOpenGame.png', {x=10, y=6}, nil, self.s)
   self.s= self.tileset.scale
-
-  local file = io.open(filename, "r")
-  if file then
-    local contents= file:read("*a")
-    local myTable= Json.decode(contents)
-
-    for i=1, #myTable do
-      if myTable[i].symbol=="T" then
-        local ver_x=function(xi, xf)
-          if (xi~=nil and xf~=nil) then  
-            for j=xi, xf do
-              if (myTable[i].y.i~=nil and myTable[i].y.f~=nil) then
-                self.matriz[j][myTable[i].y.i-1]= 'G'
-                for k=myTable[i].y.i, myTable[i].y.f do
-                  self.matriz[j][k]= myTable[i].symbol
-                end
-              elseif type(myTable[i].y)=='number' then
-                self.matriz[j][myTable[i].y-1]= 'G'
-                self.matriz[j][myTable[i].y]= myTable[i].symbol
-              end
-            end
-          end  
-        end
-
-        ver_x(myTable[i].x.i, myTable[i].x.f)
-        if myTable[i].x[1]~=nil then
-          for l=1, #myTable[i].x do
-            ver_x(myTable[i].x[l].i, myTable[i].x[l].f)
-            if type(myTable[i].x[l])=='number' then
-              self.matriz[myTable[i].x[l]][myTable[i].y-1]= 'G'
-              self.matriz[myTable[i].x[l]][myTable[i].y]= myTable[i].symbol
-            end 
-          end
-        elseif type(myTable[i].x)=='number' then
-          self.matriz[myTable[i].x][myTable[i].y-1]= 'G'
-          self.matriz[myTable[i].x][myTable[i].y]= myTable[i].symbol
-        end 
-
-      elseif myTable[i].symbol=="g" or myTable[i].symbol=="h" then
-        local ver_x=function(xi, xf)
-          if (xi~=nil and xf~=nil) then  
-            for j=xi, xf do
-              if type(myTable[i].y)=='number' then
-                local current_p= myTable[i].symbol=="g" and (j-xi) or (xf-j)
-                self.matriz[j][myTable[i].y+2+current_p]= 'T'
-                self.matriz[j][myTable[i].y+1+current_p]= myTable[i].symbol=="g" and 't' or 'y'
-                self.matriz[j][myTable[i].y+current_p]= myTable[i].symbol
-              end
-            end
-          end  
-        end
-
-        ver_x(myTable[i].x.i, myTable[i].x.f)
-        if myTable[i].x[1]~=nil then
-          for l=1, #myTable[i].x do
-            ver_x(myTable[i].x[l].i, myTable[i].x[l].f)
-            if type(myTable[i].x[l])=='number' then
-              self.matriz[j][myTable[i].y+2]= 'T'
-              self.matriz[myTable[i].x[l]][myTable[i].y+1]= myTable[i].symbol=="g" and 't' or 'y'
-              self.matriz[myTable[i].x[l]][myTable[i].y]= myTable[i].symbol
-            end 
-          end
-        elseif type(myTable[i].x)=='number' then
-          self.matriz[myTable[i].x][myTable[i].y+2]= 'T'
-          self.matriz[myTable[i].x][myTable[i].y+1]= myTable[i].symbol=="g" and 't' or 'y'
-          self.matriz[myTable[i].x][myTable[i].y]= myTable[i].symbol
-        end 
-      end
+  local file = io.open(filename)  
+  if file~=nil then
+    for line in file:lines() do
+      self.matriz[#self.matriz + 1] = {}
+      for j = 1, #line, 1 do self.matriz[#self.matriz][j] = line:sub(j,j) end
     end
-
     file:close()
   end
-
   self.dimensions= {
     w= #self.matriz[#self.matriz]*self.tileset.tileSize.w,
     h= #self.matriz*self.tileset.tileSize.h,
@@ -121,23 +54,23 @@ function map.load(self, filename)
 end
 
 function map:cam_movement(dt, player)
-  self.cam.active= ((self.cam.p.x+player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
-  if self.cam.active==true then
-    self.cam.active= true
+  -- variável responsável por determinar se a câmera está ativa ou não
+  local cam_active= ((self.cam.p.x+player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
+
+  if cam_active then
     self.cam.acc= math.ceil(dt * player.vel * 100)
 
     if love.keyboard.isDown("right", "d") then
-      self.cam.p.x = self.cam.p.x + self.cam.acc
+      self.cam.p.x= self.cam.p.x+self.cam.acc
       if self.cam.p.x+player.p.x>self.cam.p.f.x then
         self.cam.acc= math.ceil((self.cam.p.x+player.p.x)-self.cam.p.f.x)
         self.cam.p.x= self.cam.p.x-self.cam.acc
       end
-    end
-
-    if love.keyboard.isDown("left", "a") then
-      self.cam.p.x = self.cam.p.x-self.cam.acc
+    elseif love.keyboard.isDown("left", "a") then
+      self.cam.p.x= self.cam.p.x-self.cam.acc
       if self.cam.p.x<0 then self.cam.p.x = 0 end
     end
+
   end
 end
 
