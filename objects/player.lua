@@ -5,7 +5,7 @@ local player= Character({
   imgname= "midi.png",
   frame_n= {x=16, y=15},
   frame_positions= {},
-  adjustment= {w=-0.34, h=0.5},
+  adjustment= {w=0, h=0},
   body= {w=30, h=30}
 },
 1,
@@ -26,8 +26,11 @@ function player:updateFrame(dt, balloon_message)
   self.pressed.mov= love.keyboard.isDown("right", "d", "left", "a")
   self.pressed.run= self.pressed.mov and love.keyboard.isDown("space")
   self.pressed.jump= love.keyboard.isDown("up", "w")
+  self.pressed.soco= love.keyboard.isDown("x")
 
-  if ((self.pressed.mov or self.pressed.run or self.pressed.jump) and balloon_message==true) or (self.canjump==false) or (self.pressed.jump==false and self.p.y<self.p.f.y) then
+  local sendo_controlado= self.pressed.mov or self.pressed.run or self.pressed.jump or self.pressed.soco
+
+  if (sendo_controlado and balloon_message==true) or (self.canjump==false) or (self.pressed.jump==false and self.p.y<self.p.f.y) then
     self.acc= self.acc+(dt * math.random(1, 3))
     if self.acc>=0.35 then
       self.frame= self.frame + 1
@@ -101,14 +104,25 @@ function player:move_x(cam, mov)
   end
 end
 
+function player:soco()
+  if not self.pressed.jump and not self.pressed.mov and not self.pressed.run then
+    if self.pressed.soco then 
+      if self.frame<88 or self.frame>(88+8) then
+        self.frame= 88
+      end 
+    end
+  end
+end
+
 function player:update(dt, cam, balloon_message)
   self:updateFrame(dt, balloon_message)
   self:queda(dt)
   if balloon_message==true then
+    self:soco()
     self:mudanca_direcao()
     self:move_x(cam, (dt * self.vel * 100))
     self:pulo(dt)
-    self.vel= love.keyboard.isDown("space") and 9 or 4
+    self.vel= love.keyboard.isDown("space") and 29 or 4
   end
 end
 
@@ -136,6 +150,27 @@ function player:draw()
   love.graphics.draw(self.tileset.obj, self.tileset.tiles[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.tileset.tileSize.w/2, self.tileset.tileSize.h/2)
   love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, self.expression.s.x, self.expression.s.y)
   love.graphics.draw(self.display_life.tileset.obj, self.display_life.tileset.tiles[player:posicao_real_frame_vida()], 0, 0, 0, self.display_life.s.x, self.display_life.s.y)
+  player:draw_inventory()
+end
+
+function player:draw_inventory()
+  local items= {"teste", "teste"}
+  local vertices= {}
+  local dimensions= {w= 40, h= 40}
+  local spacing= { w= 5, h= 5 }
+  local initial= { w= self.display_life.tileset.obj:getWidth(), h= 0}
+  love.graphics.setColor(0, 0, 0)
+  for i=0, #items-1 do 
+    vertices= {
+      -- x, y
+      initial.w+(i*spacing.w)+(spacing.w)+(i*dimensions.w), initial.h+spacing.h, 
+      initial.w+(i*spacing.w)+(spacing.w)+((i*dimensions.w)+dimensions.w), initial.h+spacing.h,
+      initial.w+(i*spacing.w)+(spacing.w)+((i*dimensions.w)+dimensions.w), initial.h+spacing.h+dimensions.h,
+      initial.w+(i*spacing.w)+(spacing.w)+(i*dimensions.w), initial.h+spacing.h+dimensions.h,
+    }
+    love.graphics.polygon('line', vertices)
+  end
+  love.graphics.setColor(1, 1, 1)
 end
 
 return player

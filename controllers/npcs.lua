@@ -60,7 +60,7 @@ function npcs.load(self)
   -- self:create_npc("esqueleto", true, 2, {x=230, y=-100}, {"asddasasasasasasasasasasasasasasasdasdasdsadasd?"}, {x=2.5, y=2.5}, false)
   -- self:create_npc("lobo", true, 2.5, {x=20, y=-100}, {"Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"}, {x=0.75, y=0.75}, true, {attack_frame=23, value=0.05})
   -- self:create_npc("lobo", true, 1.75, {x=110, y=-100}, {"Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"}, {x=0.75, y=0.75}, true, {attack_frame=23, value=0.05})
-  self:create_npc("lobo", true, 2.25, {x=150, y=-100}, {"Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"}, {x=0.75, y=0.75}, true, {attack_frame=23, value=0.05})
+  -- self:create_npc("lobo", true, 2.25, {x=150, y=-100}, {"Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"}, {x=0.75, y=0.75}, true, {attack_frame=23, value=0.05})
   -- self:create_npc("lobo", true, 2.15, {x=225, y=-100}, {"Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"}, {x=0.75, y=0.75}, true, {attack_frame=23, value=0.05})
 end
 

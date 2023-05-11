@@ -8,8 +8,8 @@ end
 
 local balloon= require('components.balloon')
 local map= require('components.map')
-local player= require('components.player')
-local npcs= require('components.npcs')
+local player= require('objects.player')
+local npcs= require('controllers.npcs')
 local collision= require('components.collision')
 
 function love.load()  
