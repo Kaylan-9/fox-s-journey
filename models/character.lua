@@ -17,6 +17,7 @@ local Character, metatable= {}, {
     object.vel= vel
     object.acc= 0
     object.life= 5
+    object.maximum_life= 5
     object.p= p
     object.p.i= {y=-100}
     object.p.f= {y=-100}

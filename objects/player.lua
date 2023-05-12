@@ -16,10 +16,7 @@ player.expression= {
   frame= 1,
   tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
 }
-player.display_life= {
-  s= {x= 4.5, y= 4.5},
-  tileset= Tileset('assets/graphics/life.png', {x=player.life, y=1})
-}
+
 player.pressed= {}  
 
 function player:updateFrame(dt, balloon_message)
@@ -142,35 +139,11 @@ function player:calc_new_floor_position(new_y)
   if  (self.p.y==self.p.f.y) then self.p.i.y= new_y-90 end
 end
 
-function player:posicao_real_frame_vida()
-  return math.ceil(#self.display_life.tileset.tiles-self.life+1)
-end
 
 function player:draw()
   love.graphics.draw(self.tileset.obj, self.tileset.tiles[self.frame], self.p.x, self.p.y, self.angle, self.s.x, self.s.y, self.tileset.tileSize.w/2, self.tileset.tileSize.h/2)
   love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, self.expression.s.x, self.expression.s.y)
-  love.graphics.draw(self.display_life.tileset.obj, self.display_life.tileset.tiles[player:posicao_real_frame_vida()], 0, 0, 0, self.display_life.s.x, self.display_life.s.y)
-  player:draw_inventory()
-end
-
-function player:draw_inventory()
-  local items= {"teste", "teste"}
-  local vertices= {}
-  local dimensions= {w= 40, h= 40}
-  local spacing= { w= 5, h= 5 }
-  local initial= { w= self.display_life.tileset.obj:getWidth(), h= 0}
-  love.graphics.setColor(0, 0, 0)
-  for i=0, #items-1 do 
-    vertices= {
-      -- x, y
-      initial.w+(i*spacing.w)+(spacing.w)+(i*dimensions.w), initial.h+spacing.h, 
-      initial.w+(i*spacing.w)+(spacing.w)+((i*dimensions.w)+dimensions.w), initial.h+spacing.h,
-      initial.w+(i*spacing.w)+(spacing.w)+((i*dimensions.w)+dimensions.w), initial.h+spacing.h+dimensions.h,
-      initial.w+(i*spacing.w)+(spacing.w)+(i*dimensions.w), initial.h+spacing.h+dimensions.h,
-    }
-    love.graphics.polygon('line', vertices)
-  end
-  love.graphics.setColor(1, 1, 1)
+  
 end
 
 return player
