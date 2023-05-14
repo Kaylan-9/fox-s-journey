@@ -1,42 +1,46 @@
 local Tileset= require('models.tileset')
-local map= {
-  matriz= {},
-  s= {x= 2, y= 2},
-  cam= {
-    acc= 0,
-    p= {
-      x= 0,
-      y= 0,
-      i= {x= 0},
-      f= {x= 0}
-    }
-  }
+local Map, metatable= {}, {
+  __call= function(self, filename_map, filename_background)
+    local obj= {}
+    obj.matriz= {}
+    obj.s= {x= 2, y= 2}
+    obj.cam= {}
+    obj.cam.acc= 0
+    obj.cam.p= {}
+    obj.cam.p.x= 0
+    obj.cam.p.y= 0
+    obj.cam.p.i= {x= 0}
+    obj.cam.p.f= {x= 0}
+    obj.background= {}
+    obj.background.s= {}
+    obj.background.img= {}
+    obj.background.img.obj= love.graphics.newImage("assets/graphics/"..filename_background)
+    obj.background.img.size= {}
+    obj.background.img.size.w= obj.background.img.obj:getWidth()
+    obj.background.img.size.h= obj.background.img.obj:getHeight()
+    setmetatable(obj, {__index= self})
+    obj:backgroundLoad()
+    obj:load(filename_map)
+    return obj
+  end
 }
 
-local background= {
-  s= {},
-  img= {
-    obj= love.graphics.newImage("assets/graphics/tilesetOpenGameBackground.png"),
-    size= {}
-  }
-}
+setmetatable(Map, metatable)
 
-function background.load(self)
-  self.img.size.w= self.img.obj:getWidth()
-  self.img.size.h= self.img.obj:getHeight()
+function Map:backgroundLoad()
   if _G.screen.w>_G.screen.h then
-    self.s.x= _G.screen.w/self.img.size.w
-    self.s.y= self.s.x
+    self.background.s.x= _G.screen.w/self.background.img.size.w
+    self.background.s.y= self.background.s.x
   else
-    self.s.x= _G.screen.h/self.img.size.h
-    self.s.y= self.s.x
+    self.background.s.x= _G.screen.h/self.background.img.size.h
+    self.background.s.y= self.background.s.x
   end
 end
 
-function map.load(self, filename)
+function Map.load(self, filename_map)
   self.tileset= Tileset('assets/graphics/tilesetOpenGame.png', {x=10, y=6}, nil, self.s)
   self.s= self.tileset.scale
-  local file = io.open(filename)  
+  local file = io.open('assets/maps/'..filename_map)  
   if file~=nil then
     for line in file:lines() do
       self.matriz[#self.matriz + 1] = {}
@@ -50,20 +54,19 @@ function map.load(self, filename)
   }
   self.cam.p.i.x= (_G.screen.w/2)
   self.cam.p.f.x= (self.dimensions.w-(_G.screen.w/2))
-  background:load()
 end
 
-function map:cam_movement(dt, player)
+function Map:cam_movement()
   -- variável responsável por determinar se a câmera está ativa ou não
-  local cam_active= ((self.cam.p.x+player.p.x>self.cam.p.i.x) and (self.cam.p.x+player.p.x<(self.cam.p.f.x)))
+  local cam_active= ((self.cam.p.x+_G.player.p.x>self.cam.p.i.x) and (self.cam.p.x+_G.player.p.x<(self.cam.p.f.x)))
 
   if cam_active then
-    self.cam.acc= math.ceil(dt * player.vel * 100)
+    self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
 
     if love.keyboard.isDown("right", "d") then
       self.cam.p.x= self.cam.p.x+self.cam.acc
-      if self.cam.p.x+player.p.x>self.cam.p.f.x then
-        self.cam.acc= math.ceil((self.cam.p.x+player.p.x)-self.cam.p.f.x)
+      if self.cam.p.x+_G.player.p.x>self.cam.p.f.x then
+        self.cam.acc= math.ceil((self.cam.p.x+_G.player.p.x)-self.cam.p.f.x)
         self.cam.p.x= self.cam.p.x-self.cam.acc
       end
     elseif love.keyboard.isDown("left", "a") then
@@ -74,14 +77,16 @@ function map:cam_movement(dt, player)
   end
 end
 
-function map.update(self, dt, player, balloon_message)
-  if balloon_message==true then
-    self:cam_movement(dt, player)
-    background:load()
+function Map:update()
+  local nao_ha_messages= (#_G.balloon.messages==0)
+  -- permite o personagem se mover se não há mensagens
+  if nao_ha_messages then
+    self:cam_movement()
+    self:backgroundLoad()
   end
 end
 
-function map:positionCharacter(position, imaginary_px, character_h, character_sx)
+function Map:positionCharacter(position, imaginary_px, character_h, character_sx)
   local j = math.ceil((imaginary_px)/self.tileset.tileSize.w)
   local newy
   for i=1, #self.matriz do
@@ -104,11 +109,9 @@ function map:positionCharacter(position, imaginary_px, character_h, character_sx
   }
 end
 
-
-
 -- Tem o propósito de diminuir o código: serve para indicar que o símbolo na tela será renderizado como o "tile" correspondente ao id_tile (índice da tabela de tiles)
 
-function map:tile_draw(i, j, id_tile, symbol)
+function Map:tile_draw(i, j, id_tile, symbol)
   if self.matriz[i+1][j+1]==symbol then
     love.graphics.draw(
       self.tileset.obj,
@@ -122,8 +125,8 @@ function map:tile_draw(i, j, id_tile, symbol)
   end
 end
 
-function map:draw()
-  love.graphics.draw(background.img.obj, 0, 0, 0, background.s.x, background.s.y)  
+function Map:draw()
+  love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
   for i = 0, #self.matriz-1 do                             
     for j = 0, #self.matriz[i+1]-1 do                     
       self:tile_draw(i, j, 34, "s")
@@ -149,4 +152,4 @@ function map:draw()
   end
 end
 
-return map
+return Map

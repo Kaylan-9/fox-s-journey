@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Parte calma da floresta de Elísea",
+    "difficulty": 1,
+    "map_file": "1.txt",
+    "background_file": "tilesetOpenGameBackground.png",
+    "npcs": [
+      {
+        "name": "lobo", 
+        "goto_player": true,
+        "vel": 5,
+        "p": {"x": 20, "y": -100}, 
+        "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
+      }
+    ],
+    "boss": {
+      "name": "lobo", 
+      "goto_player": true,
+      "vel": 2.5,
+      "p": {"x": 2900, "y": -100}, 
+      "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
+    },
+    "items": [
+      {
+
+      }
+    ]
+  }, 
+  {
+    "name": "Cavernas Misteriosas",
+    "difficulty": 2,
+    "map_file": "2.txt",
+    "enemies": [
+
+    ],
+    "items": [
+      
+    ]
+  }
+]

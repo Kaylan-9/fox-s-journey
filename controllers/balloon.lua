@@ -1,19 +1,25 @@
 local font= love.graphics.getFont()
 local utf8= require('utf8')
-local lines= {}
-local lines_n
-
-local balloon= {
-  angle= 0,
-  s= {
-    x= 1,
-    y= 1
-  },
-  messages= {},
-  i= 1
+local Balloon, metatable= {}, {
+  __call= function(self)
+    local obj= {}
+    obj.angle= 0
+    obj.s= {}
+    obj.s.x= 1
+    obj.s.y= 1
+    obj.messages= {}
+    obj.i=1
+    obj.lines= {}
+    obj.lines_n= 0
+    setmetatable(obj, {__index= self})
+    obj:load()
+    return obj
+  end
 }
 
-function balloon:load()
+setmetatable(Balloon, metatable)
+
+function Balloon:load()
   self.img= {}
   self.img.obj= love.graphics.newImage("assets/graphics/Comic/comic-10.png")
   self.img.size= {
@@ -38,56 +44,56 @@ function balloon:load()
   }
 end
 
-function balloon:setTiles_n()
+function Balloon:setTiles_n()
   self.tiles_n.x= math.floor((_G.screen.w>self.max_width and self.max_width or _G.screen.w)/(self.tile.size.w*self.s.x))
   self.spacing.w= (_G.screen.w-(self.tiles_n.x*self.tile.size.w))/2
   self.width_msg= (self.tiles_n.x*self.tile.size.w)
 end
 
-function balloon:update()
+function Balloon:update()
   self:setTiles_n()
   self:quebra_linhas_msg()
 end
 
-function balloon:calc_lines_n(text_w)
+function Balloon:calc_lines_n(text_w)
   return math.ceil(text_w*2/(self.width_msg-(self.text_spacing*2)))
 end
 
-function balloon:quebra_linhas_msg()
+function Balloon:quebra_linhas_msg()
   if #self.messages>0 then
-    lines= {}
+    self.lines= {}
     local text_w= font:getWidth(self.messages[self.i])
-    lines_n= self:calc_lines_n(text_w)
+    self.lines_n= self:calc_lines_n(text_w)
     local pi= 1
     local pf= 2
     local subtext= 'test'
 
-    while #lines<lines_n-1 do
-      if #lines>0 then pi= utf8.offset(self.messages[self.i], pf) end
+    while #self.lines<self.lines_n-1 do
+      if #self.lines>0 then pi= utf8.offset(self.messages[self.i], pf) end
       pf= pi + 1
       subtext= self.messages[self.i]:sub(pi, utf8.offset(self.messages[self.i], pf)-1)
       while font:getWidth(subtext)<(self.width_msg/2)-(self.text_spacing*2) do
         pf= pf + 1
         subtext= self.messages[self.i]:sub(pi, utf8.offset(self.messages[self.i], pf)-1)
       end
-      lines[#lines+1]= subtext
+      self.lines[#self.lines+1]= subtext
     end
-    if #lines>1 then pi= utf8.offset(self.messages[self.i], pf)
+    if #self.lines>1 then pi= utf8.offset(self.messages[self.i], pf)
     else pi= utf8.offset(self.messages[self.i], pi)
     end
     subtext= self.messages[self.i]:sub(pi, utf8.offset(self.messages[self.i], utf8.len(self.messages[self.i])))
-    lines[#lines+1]= subtext
+    self.lines[#self.lines+1]= subtext
   end
 end
 
-function balloon:draw()
+function Balloon:draw()
   if #self.messages>0 then
     self:desenha_forma()
     self:escreve_texto()
   end
 end
 
-function balloon:desenha_forma()
+function Balloon:desenha_forma()
   for i=1, self.tiles_n.x do
     for j=1, 3 do
       if (i==1 and j==1) then
@@ -113,14 +119,14 @@ function balloon:desenha_forma()
   end
 end
 
-function balloon:escreve_texto()
+function Balloon:escreve_texto()
   love.graphics.setColor(0/255, 0/255, 0/255, 255/255)
-  if #lines==lines_n then
-    for i=1, lines_n do
-      love.graphics.print(lines[i], self.spacing.w+self.text_spacing, self.spacing.h+self.text_spacing+((i-1)*15*2), self.angle, 2, 2)
+  if #self.lines==self.lines_n then
+    for i=1, self.lines_n do
+      love.graphics.print(self.lines[i], self.spacing.w+self.text_spacing, self.spacing.h+self.text_spacing+((i-1)*15*2), self.angle, 2, 2)
     end
   end
   love.graphics.setColor(255/255, 255/255, 255/255, 255/255)
 end
 
-return balloon
+return Balloon
