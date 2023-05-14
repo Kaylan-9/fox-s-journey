@@ -15,6 +15,7 @@ local Displayers= require('controllers.displayers')
 local Items= require('controllers.items')
 local NPCs= require('controllers.npcs')
 local Balloon= require('controllers.balloon')
+local Player= require('controllers.player')
 
 local fases= json.import('data/fases.json')
 local function iniFase()
@@ -30,7 +31,7 @@ local function iniFase()
   end
   _G.items= Items(inventory, collectibles)
   _G.npcs= NPCs(fase.npcs, fase.boss)
-  _G.player= require('controllers.player')
+  _G.player= Player()
 end 
 
 function love.load()  

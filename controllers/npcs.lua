@@ -41,75 +41,16 @@ function NPCs:calcYPositionReferencesBoss()
   if self.boss.p.f.y==-100 then self.boss.p.y= self.boss.new_y end
 end
 
-function NPCs:updateFrame(i)
-  if self.on_the_screen[i].animation~='' then
-    if self.on_the_screen[i].acc>=(self.on_the_screen[i].freq_frames) then
-      self.on_the_screen[i].frame= self.on_the_screen[i].frame + 1
-      self.on_the_screen[i].acc= 0
-
-      -- A primeira estrutura condicional serve para recomeçar uma animação, após f ele recomeça a animação no frame i
-      -- hold_animation é uma propriedade que serve para travar de um frame a outro até a animação anterior chegar ao seu f
-      if self.on_the_screen[i].hold_animation==false then
-        if
-          (self.on_the_screen[i].frame<self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation].i or
-          self.on_the_screen[i].frame>self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation].f)
-        then
-          self.on_the_screen[i].frame= self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation].i
-        end
-      end
-
-      --- Se a animação não é travada significa que ela está iniciando uma nova animação, essa estrutura basicamente a função de travar animação se ela está no primeiro frame, e quando ele chegar no último ela será destravada
-      if self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation].until_finished==true then
-        self.on_the_screen[i].previous_animation= self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation]
-        self.on_the_screen[i].hold_animation= (self.on_the_screen[i].frame<self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation].f-1 and self.on_the_screen[i].frame>=self.on_the_screen[i].frame_positions[self.on_the_screen[i].animation].i)
-      elseif self.on_the_screen[i].previous_animation.until_finished==true and self.on_the_screen[i].hold_animation==true then
-        self.on_the_screen[i].hold_animation= (self.on_the_screen[i].frame<self.on_the_screen[i].previous_animation.f-1 and self.on_the_screen[i].frame>=self.on_the_screen[i].previous_animation.i)
-      end
-
-    end
-  end
-end
-
-function NPCs:updateFrameBoss()
-  if self.boss.animation~='' then
-    if self.boss.acc>=(self.boss.freq_frames) then
-      self.boss.frame= self.boss.frame + 1
-      self.boss.acc= 0
-
-      -- A primeira estrutura condicional serve para recomeçar uma animação, após f ele recomeça a animação no frame i
-      -- hold_animation é uma propriedade que serve para travar de um frame a outro até a animação anterior chegar ao seu f
-      if self.boss.hold_animation==false then
-        if
-          (self.boss.frame<self.boss.frame_positions[self.boss.animation].i or
-          self.boss.frame>self.boss.frame_positions[self.boss.animation].f)
-        then
-          self.boss.frame= self.boss.frame_positions[self.boss.animation].i
-        end
-      end
-
-      --- Se a animação não é travada significa que ela está iniciando uma nova animação, essa estrutura basicamente a função de travar animação se ela está no primeiro frame, e quando ele chegar no último ela será destravada
-      if self.boss.frame_positions[self.boss.animation].until_finished==true then
-        self.boss.previous_animation= self.boss.frame_positions[self.boss.animation]
-        self.boss.hold_animation= (self.boss.frame<self.boss.frame_positions[self.boss.animation].f-1 and self.boss.frame>=self.boss.frame_positions[self.boss.animation].i)
-      elseif self.boss.previous_animation.until_finished==true and self.boss.hold_animation==true then
-        self.boss.hold_animation= (self.boss.frame<self.boss.previous_animation.f-1 and self.boss.frame>=self.boss.previous_animation.i)
-      end
-
-    end
-  end
-end
-
-
 function NPCs:chasePlayer(i)
   if (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-_G.map.cam.p.x>=_G.player.p.x+_G.player.tileset.tileSize.w) and self.on_the_screen[i].goto_player==true then
     self.on_the_screen[i].animation= 'walking'
-    self:updateFrame(i)
+    self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
     self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
     self.on_the_screen[i].reached_the_player= false
   elseif (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)-_G.map.cam.p.x<=_G.player.p.x-_G.player.tileset.tileSize.w) and self.on_the_screen[i].goto_player==true then
     self.on_the_screen[i].animation= 'walking'
-    self:updateFrame(i)
+    self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
     self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x + self.on_the_screen[i].mov)
     self.on_the_screen[i].reached_the_player= false
@@ -121,13 +62,13 @@ end
 function NPCs:chasePlayerBoss()
   if (math.abs(self.boss.p.x-_G.map.cam.p.x)>=_G.player.p.x) and self.boss.goto_player==true then
     self.boss.animation= 'walking'
-    self:updateFrameBoss()
+    self.boss:defaultUpdateFrame()
     self.boss.s.x= -math.abs(self.boss.s.x)*self.boss.direction
     self.boss.p.x= (self.boss.p.x - self.boss.mov)
     self.boss.reached_the_player= false
   elseif (math.abs(self.boss.p.x-_G.map.cam.p.x)<=_G.player.p.x) and self.boss.goto_player==true then
     self.boss.animation= 'walking'
-    self:updateFrameBoss()
+    self.boss:defaultUpdateFrame()
     self.boss.s.x= math.abs(self.boss.s.x)*self.boss.direction
     self.boss.p.x= (self.boss.p.x + self.boss.mov)
     self.boss.reached_the_player= false
@@ -140,7 +81,7 @@ function NPCs:attackPlayer(i)
   if self.on_the_screen[i].hostile then
     self.on_the_screen[i].animation= 'attacking'
     self:dealsDamage(i)
-    self:updateFrame(i)  
+    self.on_the_screen[i]:defaultUpdateFrame()  
   end
 end 
 

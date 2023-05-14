@@ -36,6 +36,10 @@ local Character, metatable= {}, {
 
 setmetatable(Character, metatable)
 
+function Character:test()
+  print('character -> '..self.name)
+end 
+
 function Character:calcNewFloorPosition(observadoPelaCamera)
   local imaginary_px= observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x
   self.new_y= _G.map:positionCharacter(
@@ -64,6 +68,37 @@ function Character:draw(observadoPelaCamera)
     self.tileset.tileSize.w/2, 
     self.tileset.tileSize.h/2
   )
+end
+
+function Character:defaultUpdateFrame(alternar)
+  if (self.animation~='' and alternar==nil) or (self.animation~='' and alternar) then
+    if self.acc>=(self.freq_frames) then
+      self.frame= self.frame + 1
+      self.acc= 0
+
+      -- A primeira estrutura condicional serve para recomeçar uma animação, após f ele recomeça a animação no frame i
+      -- hold_animation é uma propriedade que serve para travar de um frame a outro até a animação anterior chegar ao seu f
+      if self.hold_animation==false then
+        if
+          (self.frame<self.frame_positions[self.animation].i or
+          self.frame>self.frame_positions[self.animation].f)
+        then
+          self.frame= self.frame_positions[self.animation].i
+        end
+      end
+
+      --- Se a animação não é travada significa que ela está iniciando uma nova animação, essa estrutura basicamente a função de travar animação se ela está no primeiro frame, e quando ele chegar no último ela será destravada
+      if self.frame_positions[self.animation].until_finished==true then
+        self.previous_animation= self.frame_positions[self.animation]
+        self.hold_animation= (self.frame<self.frame_positions[self.animation].f-1 and self.frame>=self.frame_positions[self.animation].i)
+      elseif self.previous_animation.until_finished==true and self.hold_animation==true then
+        self.hold_animation= (self.frame<self.previous_animation.f-1 and self.frame>=self.previous_animation.i)
+      end
+
+    end
+  else 
+    self.frame= 1
+  end
 end
 
 return Character
