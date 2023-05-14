@@ -8,23 +8,16 @@
       {
         "name": "lobo", 
         "goto_player": true,
-        "vel": 5,
-        "p": {"x": 2000, "y": -100}, 
-        "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
-      },
-      {
-        "name": "esqueleto", 
-        "goto_player": true,
         "vel": 7,
-        "p": {"x": 1500, "y": -100}, 
+        "p": {"x": 1200, "y": -100}, 
         "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
       }
     ],
     "boss": {
       "name": "lobo", 
       "goto_player": true,
-      "vel": 2.5,
-      "p": {"x": 2900, "y": -100}, 
+      "vel": 1,
+      "p": {"x": 3000, "y": -100}, 
       "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
     },
     "items": [

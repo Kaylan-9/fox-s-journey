@@ -33,6 +33,10 @@ function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
     local option= deepCopy(self.options[optioname])
     local new_character= Character(option, vel, p, messages)
     new_character.goto_player= goto_player
+    new_character.lock_movement= {
+      left= false, 
+      right= false
+    }
     table.insert(self.on_the_screen, new_character) --adiciona personagem em cena
   end
 end 
@@ -57,20 +61,19 @@ function NPCs:calcYPositionReferencesBoss()
 end
 
 function NPCs:chasePlayer(i)
-  local left= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2))-_G.map.cam.p.x
-  local right= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2))-_G.map.cam.p.x
+  local left= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)+1)-_G.map.cam.p.x
+  local right= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-1)-_G.map.cam.p.x
 
   local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
   local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
 
-  if (right>=playersRightSide) and self.on_the_screen[i].goto_player then
+  if (right>playersRightSide) and self.on_the_screen[i].goto_player then
     self.on_the_screen[i].animation= 'walking'
     self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
     self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
     self.on_the_screen[i].reached_the_player= false
-    print(' Direito '..i)
-  elseif (left<=playersLeftSide) and self.on_the_screen[i].goto_player then
+  elseif (left<playersLeftSide) and self.on_the_screen[i].goto_player then
     self.on_the_screen[i].animation= 'walking'
     self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
@@ -94,7 +97,6 @@ function NPCs:chasePlayerBoss()
     self.boss.s.x= -math.abs(self.boss.s.x)*self.boss.direction
     self.boss.p.x= (self.boss.p.x - self.boss.mov)
     self.boss.reached_the_player= false
-    print(' Direito '..'boss')
   elseif (left<=playersLeftSide) and self.boss.goto_player then
     self.boss.animation= 'walking'
     self.boss:defaultUpdateFrame()
@@ -126,7 +128,9 @@ function NPCs:dealsDamage(i)
   if _G.collision:ellipse(_G.player.p, self.on_the_screen[i].p, (self.on_the_screen[i].body.w/2), (self.on_the_screen[i].body.h/2), (self.on_the_screen[i].body.w/2)) then
     -- quando o frame troca o dano é aplicado
     if self.on_the_screen[i].acc>=(self.on_the_screen[i].freq_frames) and self.on_the_screen[i].hostile.attack_frame==self.on_the_screen[i].frame then
-      _G.player.life= _G.player.life-self.on_the_screen[i].hostile.damage
+      if math.ceil((_G.player.life*#_G.displayers.props_lifeBar.tileset.tiles)/_G.player.maximum_life)>1 then 
+        _G.player.life= _G.player.life-self.on_the_screen[i].hostile.damage
+      end
     end
   end
 end
@@ -134,8 +138,11 @@ end
 function NPCs:dealsDamageBoss()  
   if _G.collision:ellipse(_G.player.p, self.boss.p, (self.boss.body.w/2), (self.boss.body.h/2), (self.boss.body.w/2)) then
     -- quando o frame troca o dano é aplicado
+
     if self.boss.acc>=(self.boss.freq_frames) and self.boss.hostile.attack_frame==self.boss.frame then
-      _G.player.life= _G.player.life-self.boss.hostile.damage
+      if math.ceil((_G.player.life*#_G.displayers.props_lifeBar.tileset.tiles)/_G.player.maximum_life)>1 then 
+        _G.player.life= _G.player.life-self.boss.hostile.damage
+      end 
     end
   end
 end
@@ -158,6 +165,7 @@ function NPCs:update()
     self.on_the_screen[i]:updateParameters(false)
     self:calcYPositionReferences(i)
     self:chasePlayer(i)
+    -- self:impedirMovimentacaoPlayer(i)
     if self.on_the_screen[i].reached_the_player then
       self:attackPlayer(i)
       table.insert(self.interaction_queue, i)  
@@ -177,6 +185,39 @@ function NPCs:update()
 
 end
 
+-- Esse mecânismo serve para a função impedirMovimentaçãoPlayer, invés de subtrair a soma de movimentação do player na horizontal é melhor travar a sua posição com base em uma propriedade para cada NPC
+function NPCs:naoPermiteSeMoverPara(direcao)
+  local pode= false
+  for i=1, #self.on_the_screen do
+    if self.on_the_screen[i].lock_movement[direcao] then
+      pode= true
+      break 
+    end
+  end
+  return pode
+end
+
+function NPCs:impedirMovimentacaoPlayer(i)
+  local npcLeftSide= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-self.on_the_screen[i].max_vel)-_G.map.cam.p.x
+  local npcRightSide= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)+self.on_the_screen[i].max_vel)-_G.map.cam.p.x
+
+  local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)-_G.player.max_vel
+  local playersRightSide= _G.player.p.x+(_G.player.body.w/2)+-_G.player.max_vel
+
+  local collisao= collision:quad(self.on_the_screen[i], _G.player, _G.map.cam)
+  if collisao then
+    if npcLeftSide<=playersRightSide and playersRightSide<=self.on_the_screen[i].p.x-10 then
+      self.on_the_screen[i].lock_movement.right= false
+      self.on_the_screen[i].lock_movement.left= true
+    elseif npcRightSide>=playersLeftSide and playersLeftSide>=self.on_the_screen[i].p.x+10 then
+      self.on_the_screen[i].lock_movement.left= false
+      self.on_the_screen[i].lock_movement.right= true
+    end
+  else 
+    self.on_the_screen[i].lock_movement.right= false
+    self.on_the_screen[i].lock_movement.left= false
+  end
+end 
 
 function NPCs:inciarInteracao()
   if love.keyboard.isDown('f') then 

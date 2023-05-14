@@ -14,11 +14,11 @@ function Collision:ellipse(pi, pf, a, b, r)
   )<=r
 end
 
-function Collision:quad(obj_one, obj_two)
-  local left= obj_one.p.x+(obj_one.body.w/2)>=obj_two.p.x-(obj_two.body.w/2)
-  local right= obj_one.p.x-(obj_one.body.w/2)<=obj_two.p.x+(obj_two.body.w/2)
-  local top= obj_one.p.y-(obj_one.body.h/2)>=obj_two.p.y+(obj_two.body.h/2)
-  local bottom= obj_one.p.y+(obj_one.body.h/2)<=obj_two.p.y-(obj_two.body.h/2)
+function Collision:quad(obj_one, obj_two, cam)
+  local left= obj_one.p.x+(obj_one.body.w/2)>obj_two.p.x-(obj_two.body.w/2)+cam.p.x
+  local right= obj_one.p.x-(obj_one.body.w/2)<obj_two.p.x+(obj_two.body.w/2)+cam.p.x
+  local top= obj_one.p.y-(obj_one.body.h/2)<obj_two.p.y-(obj_two.body.h/2)
+  local bottom= obj_one.p.y+(obj_one.body.h/2)>obj_two.p.y+(obj_two.body.h/2)
   return (left and right) and (top and bottom)
 end
 

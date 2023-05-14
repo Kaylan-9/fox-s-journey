@@ -26,7 +26,6 @@ local metatable = {
     if scale~=nil then
       object.tileSize.w= math.floor(object.tileSize.w*object.scale.x)
       object.tileSize.h= math.floor(object.tileSize.h*object.scale.y)
-      print(object.scale.x)
     end
     return object 
   end

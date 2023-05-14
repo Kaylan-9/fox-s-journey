@@ -19,7 +19,7 @@ local metatable= {
         hostile= {damage= 1, attack_frame= 88}, 
         frame_n= {x=16, y=15}, 
         adjustment= nil, 
-        body= {w=30, h=30}
+        body= {w=30, h=80}
       },
       4,
       {x= 30, y= 0}
@@ -31,7 +31,6 @@ local metatable= {
     obj.expression.frame= 1
     obj.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
     setmetatable(obj, {__index= self})
-    obj:test()
     return obj
   end
 }
@@ -122,8 +121,8 @@ function Player:moveX(mov)
   }
 
   if self.pressed.mov then self:exeCicloAnimMov() end
-  if love.keyboard.isDown("left", "a") and lim.left then self.p.x= self.p.x-mov
-  elseif love.keyboard.isDown("right", "d") and lim.right then self.p.x= self.p.x+mov
+  if love.keyboard.isDown("left", "a") and lim.left and not _G.npcs:naoPermiteSeMoverPara('left') then self.p.x= self.p.x-mov
+  elseif love.keyboard.isDown("right", "d") and lim.right and not _G.npcs:naoPermiteSeMoverPara('right') then self.p.x= self.p.x+mov
   end
 end
 
