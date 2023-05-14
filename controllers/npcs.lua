@@ -14,9 +14,24 @@ local NPCs, metatable= {}, {
 
 setmetatable(NPCs, metatable)
 
+local function deepCopy(original)
+  local copy
+  if type(original) == "table" then
+      copy = {}
+      for key, value in pairs(original) do
+          copy[deepCopy(key)] = deepCopy(value)
+      end
+      setmetatable(copy, deepCopy(getmetatable(original)))
+  else
+      copy = original
+  end
+  return copy
+end
+
 function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
   if(self.options[optioname]~=nil) then
-    local new_character= Character(self.options[optioname], vel, p, messages)
+    local option= deepCopy(self.options[optioname])
+    local new_character= Character(option, vel, p, messages)
     new_character.goto_player= goto_player
     table.insert(self.on_the_screen, new_character) --adiciona personagem em cena
   end
@@ -42,13 +57,20 @@ function NPCs:calcYPositionReferencesBoss()
 end
 
 function NPCs:chasePlayer(i)
-  if (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-_G.map.cam.p.x>=_G.player.p.x+_G.player.tileset.tileSize.w) and self.on_the_screen[i].goto_player==true then
+  local left= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2))-_G.map.cam.p.x
+  local right= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2))-_G.map.cam.p.x
+
+  local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
+  local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
+
+  if (right>=playersRightSide) and self.on_the_screen[i].goto_player then
     self.on_the_screen[i].animation= 'walking'
     self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
     self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
     self.on_the_screen[i].reached_the_player= false
-  elseif (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)-_G.map.cam.p.x<=_G.player.p.x-_G.player.tileset.tileSize.w) and self.on_the_screen[i].goto_player==true then
+    print(' Direito '..i)
+  elseif (left<=playersLeftSide) and self.on_the_screen[i].goto_player then
     self.on_the_screen[i].animation= 'walking'
     self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
@@ -60,13 +82,20 @@ function NPCs:chasePlayer(i)
 end
 
 function NPCs:chasePlayerBoss()
-  if (math.abs(self.boss.p.x-_G.map.cam.p.x)>=_G.player.p.x) and self.boss.goto_player==true then
+  local left= (self.boss.p.x+(self.boss.body.w/2))-_G.map.cam.p.x
+  local right= (self.boss.p.x-(self.boss.body.w/2))-_G.map.cam.p.x
+
+  local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
+  local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
+
+  if (right>=playersRightSide) and self.boss.goto_player then
     self.boss.animation= 'walking'
     self.boss:defaultUpdateFrame()
     self.boss.s.x= -math.abs(self.boss.s.x)*self.boss.direction
     self.boss.p.x= (self.boss.p.x - self.boss.mov)
     self.boss.reached_the_player= false
-  elseif (math.abs(self.boss.p.x-_G.map.cam.p.x)<=_G.player.p.x) and self.boss.goto_player==true then
+    print(' Direito '..'boss')
+  elseif (left<=playersLeftSide) and self.boss.goto_player then
     self.boss.animation= 'walking'
     self.boss:defaultUpdateFrame()
     self.boss.s.x= math.abs(self.boss.s.x)*self.boss.direction
@@ -89,7 +118,7 @@ function NPCs:attackPlayerBoss()
   if self.boss.hostile then
     self.boss.animation= 'attacking'
     self:dealsDamageBoss()
-    self:updateFrameBoss()  
+    self.boss:defaultUpdateFrame()  
   end
 end 
 
@@ -170,11 +199,13 @@ end
 function NPCs:draw() 
   self:drawNPCs()
   self.boss:draw()
+  _G.collision:quadDraw(self.boss, _G.map.cam)
 end
 
 function NPCs:drawNPCs()
   for i=1, #self.on_the_screen do
     self.on_the_screen[i]:draw(false)
+    _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
   end
 end
 
