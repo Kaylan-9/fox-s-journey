@@ -1,6 +1,6 @@
 local Character= require('models.character')
 local NPCs, metatable= {}, {
-  __call= function(self, npcs, boss)
+  __call= function(self, boss, npcs)
     local obj= {}
     obj.options= json.import('data/options_npcs.json')
     obj.on_the_screen= {} --cada tabela é um personagem em cena
@@ -8,7 +8,7 @@ local NPCs, metatable= {}, {
     obj.interaction_queue= {} --a fila de NPCs com quem o personagem pode interagir
     obj.boss= {}
     setmetatable(obj, {__index= self})
-    obj:load(npcs, boss)
+    obj:load(boss, npcs)
     return obj
   end
 }
@@ -29,6 +29,28 @@ local function deepCopy(original)
   return copy
 end
 
+function NPCs:load(boss, npcs)
+  self:loadBoss(boss)
+  self:loadNPCs(npcs)
+end
+
+function NPCs:loadBoss(boss) 
+  local position= {
+    x= _G.map.dimensions.w-600,
+    y= -100
+  } 
+  self.boss= Character(self.options[boss.name], boss.vel, position, false, boss.messages)
+  self.boss.goto_player= true
+  self.boss.active= false
+end
+
+-- incia quando o jogo incia, mas pode ser utilizado para resetar os NPCs, por exemplo ao iir para a próxima fase 
+function NPCs:loadNPCs(npcs)
+  for i=1, #npcs do
+    self:createNPC(npcs[i].name, npcs[i].goto_player, npcs[i].vel, npcs[i].p, npcs[i].messages)
+  end
+end
+
 function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
   if(self.options[optioname]~=nil) then
     local option= deepCopy(self.options[optioname])
@@ -42,16 +64,6 @@ function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
   end
 end 
 
--- incia quando o jogo incia, mas pode ser utilizado para resetar os NPCs, por exemplo ao iir para a próxima fase 
-function NPCs:load(npcs, boss)
-  self.on_the_screen= {}
-  self.boss= Character(self.options[boss.name], boss.vel, boss.p, boss.messages)
-  self.boss.goto_player= true
-  self.boss.active= false
-  for i=1, #npcs do
-    self:createNPC(npcs[i].name, npcs[i].goto_player, npcs[i].vel, npcs[i].p, npcs[i].messages)
-  end
-end
 
 function NPCs:calcYPositionReferences(i)
   if self.on_the_screen[i].p.f.y==-100 then self.on_the_screen[i].p.y= self.on_the_screen[i].new_y end
@@ -86,19 +98,19 @@ function NPCs:chasePlayer(i)
 end
 
 function NPCs:chasePlayerBoss()
-  local left= (self.boss.p.x+(self.boss.body.w/2))-_G.map.cam.p.x
-  local right= (self.boss.p.x-(self.boss.body.w/2))-_G.map.cam.p.x
+  local left= (self.boss.p.x-(self.boss.body.w/2)-1)-_G.map.cam.p.x
+  local right= (self.boss.p.x+(self.boss.body.w/2)+1)-_G.map.cam.p.x
 
   local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
   local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
 
-  if (right>=playersRightSide) and self.boss.goto_player then
+  if (left>playersRightSide) and self.boss.goto_player then
     self.boss.animation= 'walking'
     self.boss:defaultUpdateFrame()
     self.boss.s.x= -math.abs(self.boss.s.x)*self.boss.direction
     self.boss.p.x= (self.boss.p.x - self.boss.mov)
     self.boss.reached_the_player= false
-  elseif (left<=playersLeftSide) and self.boss.goto_player then
+  elseif (right<playersLeftSide) and self.boss.goto_player then
     self.boss.animation= 'walking'
     self.boss:defaultUpdateFrame()
     self.boss.s.x= math.abs(self.boss.s.x)*self.boss.direction
@@ -205,8 +217,7 @@ function NPCs:removeNPC(i)
   self.on_the_screen[i]= nil
 end
 
--- a função abaixo serve para controlar os valores correspondentes aos NPCs, como em que momento o player pode iniciar uma conversasão ou não, e também controla por exemplo até quando o esqueleto se movimentara e também a execução de sua animação
-function NPCs:update()
+function NPCs:updateNPCs()
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i] then
       self.on_the_screen[i].acc= self.on_the_screen[i].acc+(_G.dt * math.random(1, 5))
@@ -227,9 +238,13 @@ function NPCs:update()
     end
     ::continue::
   end
+  -- verifica se sai da filha de interação com os NPCs
   self:verSeRetiraDaFilaDeInteracoesComOPlayer()
+  -- controle de diálogo entre personagem e player
   self:inciarInteracao()
+end
 
+function NPCs:updateBoss()
   self.boss.acc= self.boss.acc+(_G.dt * math.random(1, 5))
   self.boss.mov= (_G.dt * self.boss.vel * 100)
   self.boss:updateParameters(false)
@@ -238,7 +253,12 @@ function NPCs:update()
   if self.boss.reached_the_player then
     self:attackPlayerBoss()
   end
+end
 
+-- a função abaixo serve para controlar os valores correspondentes aos NPCs, como em que momento o player pode iniciar uma conversasão ou não, e também controla por exemplo até quando o esqueleto se movimentara e também a execução de sua animação
+function NPCs:update()
+  self:updateNPCs()
+  self:updateBoss()
 end
 
 -- Esse mecânismo serve para a função impedirMovimentaçãoPlayer, invés de subtrair a soma de movimentação do player na horizontal é melhor travar a sua posição com base em uma propriedade para cada NPC
@@ -276,7 +296,6 @@ function NPCs:impedirMovimentacaoPlayer(i)
   end
 end 
 
--- controle de diálogo entre personagem e player
 function NPCs:inciarInteracao()
   if love.keyboard.isDown('f') then 
     if #balloon.messages==0 then
@@ -298,6 +317,7 @@ end
 function NPCs:draw() 
   self:drawNPCs()
   self.boss:draw()
+  _G.collision:quadDraw(self.boss, _G.map.cam)
   -- _G.collision:quadDraw(self.boss, _G.map.cam)
 end
 

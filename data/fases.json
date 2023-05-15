@@ -17,7 +17,6 @@
       "name": "lobo", 
       "goto_player": true,
       "vel": 1,
-      "p": {"x": 3000, "y": -100}, 
       "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
     },
     "items": [

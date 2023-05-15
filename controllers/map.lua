@@ -61,20 +61,27 @@ function Map:cam_movement()
   -- variável responsável por determinar se a câmera está ativa ou não
   self.cam.active= ((self.cam.p.x+_G.player.p.x>self.cam.p.i.x) and (self.cam.p.x+_G.player.p.x<(self.cam.p.f.x)))
 
-  if self.cam.active then
-    self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
+  -- determinar que o boss é ativo
+  if self.cam.p.x+_G.player.p.x>=(self.cam.p.f.x)-1 then
+    _G.npcs.boss.active= true
+  end
 
-    if love.keyboard.isDown("right", "d") and not _G.npcs:naoPermiteSeMoverPara('right') then
-      self.cam.p.x= self.cam.p.x+self.cam.acc
-      if self.cam.p.x+_G.player.p.x>self.cam.p.f.x then
-        self.cam.acc= math.ceil((self.cam.p.x+_G.player.p.x)-self.cam.p.f.x)
+  if not _G.npcs.boss.active then
+    if self.cam.active then
+      self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
+
+      if love.keyboard.isDown("right", "d") then
+        self.cam.p.x= self.cam.p.x+self.cam.acc
+        if self.cam.p.x+_G.player.p.x>self.cam.p.f.x then
+          self.cam.acc= math.ceil((self.cam.p.x+_G.player.p.x)-self.cam.p.f.x)
+          self.cam.p.x= self.cam.p.x-self.cam.acc
+        end
+      elseif love.keyboard.isDown("left", "a") then
         self.cam.p.x= self.cam.p.x-self.cam.acc
+        if self.cam.p.x<0 then self.cam.p.x = 0 end
       end
-    elseif love.keyboard.isDown("left", "a") and not _G.npcs:naoPermiteSeMoverPara('left') then
-      self.cam.p.x= self.cam.p.x-self.cam.acc
-      if self.cam.p.x<0 then self.cam.p.x = 0 end
-    end
 
+    end
   end
 end
 

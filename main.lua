@@ -30,7 +30,7 @@ local function iniFase()
     collectibles= _G.items.collectibles
   end
   _G.items= Items(inventory, collectibles)
-  _G.npcs= NPCs(fase.npcs, fase.boss)
+  _G.npcs= NPCs(fase.boss, fase.npcs)
   _G.player= Player()
 end 
 
