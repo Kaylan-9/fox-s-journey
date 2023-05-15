@@ -138,8 +138,11 @@ function NPCs:attackPlayerBoss()
 end 
 
 function NPCs:takesDamage(i)
+  print('testando 1')
   if _G.collision:ellipse(_G.player.p, self.on_the_screen[i].p, (self.on_the_screen[i].body.w/2), (self.on_the_screen[i].body.h/2), (self.on_the_screen[i].body.w/2)) then
+    print('testando 2')
     if type(_G.player.hostile.attack_frame)=='table' then
+      print('testando 3')
       for j=1, #_G.player.hostile.attack_frame do
         if _G.player.frame==_G.player.hostile.attack_frame[j] then
           if _G.player.acc>=_G.player.freq_frames then
@@ -245,13 +248,15 @@ function NPCs:updateNPCs()
 end
 
 function NPCs:updateBoss()
-  self.boss.acc= self.boss.acc+(_G.dt * math.random(1, 5))
-  self.boss.mov= (_G.dt * self.boss.vel * 100)
-  self.boss:updateParameters(false)
-  self:calcYPositionReferencesBoss()
-  self:chasePlayerBoss()
-  if self.boss.reached_the_player then
-    self:attackPlayerBoss()
+  if self.boss.active then
+    self.boss.acc= self.boss.acc+(_G.dt * math.random(1, 5))
+    self.boss.mov= (_G.dt * self.boss.vel * 100)
+    self.boss:updateParameters(false)
+    self:calcYPositionReferencesBoss()
+    self:chasePlayerBoss()
+    if self.boss.reached_the_player then
+      self:attackPlayerBoss()
+    end
   end
 end
 
@@ -316,22 +321,20 @@ end
 
 function NPCs:draw() 
   self:drawNPCs()
-  self.boss:draw()
-  _G.collision:quadDraw(self.boss, _G.map.cam)
-  -- _G.collision:quadDraw(self.boss, _G.map.cam)
+  self:drawBoss()
 end
 
-function NPCs:drawLifeBar(i)
+function NPCs:drawLifeBar(obj)
   local larguraDaBarra= 100
-  local tamanhoDeUmPontoVida= (larguraDaBarra/self.on_the_screen[i].maximum_life)
+  local tamanhoDeUmPontoVida= (larguraDaBarra/obj.maximum_life)
   local tamanhoAtual= {
-    w= tamanhoDeUmPontoVida*self.on_the_screen[i].life,
+    w= tamanhoDeUmPontoVida*obj.life,
     h= 10
   }
-  local bottom= self.on_the_screen[i].p.y-(self.on_the_screen[i].body.w/2)-10
+  local bottom= obj.p.y-(obj.body.w/2)-10
   local top= bottom-tamanhoAtual.h
-  local left= self.on_the_screen[i].p.x-(tamanhoAtual.w/2)-_G.map.cam.p.x
-  local right= self.on_the_screen[i].p.x+(tamanhoAtual.w/2)-_G.map.cam.p.x
+  local left= obj.p.x-(tamanhoAtual.w/2)-_G.map.cam.p.x
+  local right= obj.p.x+(tamanhoAtual.w/2)-_G.map.cam.p.x
   local vertices= {
     left, top,
     right, top,
@@ -344,11 +347,17 @@ function NPCs:drawLifeBar(i)
   love.graphics.polygon('line', vertices)
 end
 
+function NPCs:drawBoss()
+  self.boss:draw()
+  self:drawLifeBar(self.boss)
+  _G.collision:quadDraw(self.boss, _G.map.cam)
+end
+
 function NPCs:drawNPCs()
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i]~=nil then
-      self:drawLifeBar(i)
       self.on_the_screen[i]:draw(false)
+      self:drawLifeBar(self.on_the_screen[i])
       _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
     end
   end

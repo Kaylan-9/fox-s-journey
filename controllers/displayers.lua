@@ -30,7 +30,7 @@ function Displayers:drawInventory()
     local vertices= {
       xi, yi,
       xf, yf,
-      xf, yf, 
+      xf, yf,
       xi, yi
     }
     love.graphics.polygon('line', vertices)
