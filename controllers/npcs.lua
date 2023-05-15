@@ -4,6 +4,7 @@ local NPCs, metatable= {}, {
     local obj= {}
     obj.options= json.import('data/options_npcs.json')
     obj.on_the_screen= {} --cada tabela é um personagem em cena
+    obj.number_of_dead= 0 -- para usado depois
     obj.interaction_queue= {} --a fila de NPCs com quem o personagem pode interagir
     obj.boss= {}
     setmetatable(obj, {__index= self})
@@ -31,7 +32,7 @@ end
 function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
   if(self.options[optioname]~=nil) then
     local option= deepCopy(self.options[optioname])
-    local new_character= Character(option, vel, p, messages)
+    local new_character= Character(option, vel, p, false, messages)
     new_character.goto_player= goto_player
     new_character.lock_movement= {
       left= false, 
@@ -61,19 +62,19 @@ function NPCs:calcYPositionReferencesBoss()
 end
 
 function NPCs:chasePlayer(i)
-  local left= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)+1)-_G.map.cam.p.x
-  local right= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-1)-_G.map.cam.p.x
+  local left= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-1)-_G.map.cam.p.x
+  local right= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)+1)-_G.map.cam.p.x
 
   local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
   local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
 
-  if (right>playersRightSide) and self.on_the_screen[i].goto_player then
+  if (left>playersRightSide) and self.on_the_screen[i].goto_player then
     self.on_the_screen[i].animation= 'walking'
     self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= -math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
     self.on_the_screen[i].p.x= (self.on_the_screen[i].p.x - self.on_the_screen[i].mov)
     self.on_the_screen[i].reached_the_player= false
-  elseif (left<playersLeftSide) and self.on_the_screen[i].goto_player then
+  elseif (right<playersLeftSide) and self.on_the_screen[i].goto_player then
     self.on_the_screen[i].animation= 'walking'
     self.on_the_screen[i]:defaultUpdateFrame()
     self.on_the_screen[i].s.x= math.abs(self.on_the_screen[i].s.x)*self.on_the_screen[i].direction
@@ -124,6 +125,22 @@ function NPCs:attackPlayerBoss()
   end
 end 
 
+function NPCs:takesDamage(i)
+  if _G.collision:ellipse(_G.player.p, self.on_the_screen[i].p, (self.on_the_screen[i].body.w/2), (self.on_the_screen[i].body.h/2), (self.on_the_screen[i].body.w/2)) then
+    if type(_G.player.hostile.attack_frame)=='table' then
+      for j=1, #_G.player.hostile.attack_frame do
+        if _G.player.frame==_G.player.hostile.attack_frame[j] then
+          if _G.player.acc>=_G.player.freq_frames then
+            if self.on_the_screen[i].life> 0 then
+              self.on_the_screen[i].life= self.on_the_screen[i].life - _G.player.hostile.damage
+            end
+          end
+        end 
+      end
+    end
+  end
+end
+
 function NPCs:dealsDamage(i)  
   if _G.collision:ellipse(_G.player.p, self.on_the_screen[i].p, (self.on_the_screen[i].body.w/2), (self.on_the_screen[i].body.h/2), (self.on_the_screen[i].body.w/2)) then
     -- quando o frame troca o dano é aplicado
@@ -147,29 +164,68 @@ function NPCs:dealsDamageBoss()
   end
 end
 
+
 function NPCs:verSeRetiraDaFilaDeInteracoesComOPlayer()
   local emptying_count= 0
   for j=1, #self.interaction_queue do
-    if self.on_the_screen[self.interaction_queue[j-emptying_count]].reached_the_player==false then
-      table.remove(self.interaction_queue, j-emptying_count)
-      emptying_count= emptying_count+1
+    if self.on_the_screen[self.interaction_queue[j-emptying_count]] then
+      if self.on_the_screen[self.interaction_queue[j-emptying_count]].reached_the_player==false then
+        table.remove(self.interaction_queue, j-emptying_count)
+        emptying_count= emptying_count+1
+      end
     end
   end
+end
+
+function NPCs:dying(i)
+  if math.floor(self.on_the_screen[i].life)==0 then 
+    self.on_the_screen[i].animation= 'dying'
+    self.on_the_screen[i].goto_player= false
+    if self.on_the_screen[i].frame==self.on_the_screen[i].frame_positions['dying'].f then
+      if self.on_the_screen[i].acc>=(self.on_the_screen[i].freq_frames) then
+
+        -- apagando interação
+        for j=1, #self.interaction_queue do
+          if self.interaction_queue[j]~=nil and self.interaction_queue[j]==i then
+            table.remove(self.interaction_queue, j)
+            break
+          end
+        end
+
+        self.number_of_dead= self.number_of_dead + 1
+        self:removeNPC(i)
+      end
+    else  
+      self.on_the_screen[i]:defaultUpdateFrame() 
+    end
+  end 
+end
+
+function NPCs:removeNPC(i)
+  self.on_the_screen[i]= nil
 end
 
 -- a função abaixo serve para controlar os valores correspondentes aos NPCs, como em que momento o player pode iniciar uma conversasão ou não, e também controla por exemplo até quando o esqueleto se movimentara e também a execução de sua animação
 function NPCs:update()
   for i=1, #self.on_the_screen do
-    self.on_the_screen[i].acc= self.on_the_screen[i].acc+(_G.dt * math.random(1, 5))
-    self.on_the_screen[i].mov= (_G.dt * self.on_the_screen[i].vel * 100) -- o quanto o npc se move
-    self.on_the_screen[i]:updateParameters(false)
-    self:calcYPositionReferences(i)
-    self:chasePlayer(i)
-    -- self:impedirMovimentacaoPlayer(i)
-    if self.on_the_screen[i].reached_the_player then
-      self:attackPlayer(i)
-      table.insert(self.interaction_queue, i)  
+    if self.on_the_screen[i] then
+      self.on_the_screen[i].acc= self.on_the_screen[i].acc+(_G.dt * math.random(1, 5))
+      self.on_the_screen[i].mov= (_G.dt * self.on_the_screen[i].vel * 100) -- o quanto o npc se move
+      self:dying(i)
+      if not self.on_the_screen[i] then 
+        goto continue
+      end
+      self.on_the_screen[i]:updateParameters(false)
+      self:calcYPositionReferences(i)
+      self:chasePlayer(i)
+      -- self:impedirMovimentacaoPlayer(i)
+      if self.on_the_screen[i].reached_the_player then
+        self:attackPlayer(i)
+        self:takesDamage(i)
+        table.insert(self.interaction_queue, i)  
+      end
     end
+    ::continue::
   end
   self:verSeRetiraDaFilaDeInteracoesComOPlayer()
   self:inciarInteracao()
@@ -197,12 +253,13 @@ function NPCs:naoPermiteSeMoverPara(direcao)
   return pode
 end
 
-function NPCs:impedirMovimentacaoPlayer(i)
-  local npcLeftSide= (self.on_the_screen[i].p.x-(self.on_the_screen[i].body.w/2)-self.on_the_screen[i].max_vel)-_G.map.cam.p.x
-  local npcRightSide= (self.on_the_screen[i].p.x+(self.on_the_screen[i].body.w/2)+self.on_the_screen[i].max_vel)-_G.map.cam.p.x
 
-  local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)-_G.player.max_vel
-  local playersRightSide= _G.player.p.x+(_G.player.body.w/2)+-_G.player.max_vel
+function NPCs:impedirMovimentacaoPlayer(i)
+  local npcLeftSide= self.on_the_screen[i]:getSide('left')
+  local npcRightSide= self.on_the_screen[i]:getSide('right')
+
+  local playersLeftSide= _G.player:getSide('left')
+  local playersRightSide= _G.player:getSide('right')
 
   local collisao= collision:quad(self.on_the_screen[i], _G.player, _G.map.cam)
   if collisao then
@@ -219,6 +276,7 @@ function NPCs:impedirMovimentacaoPlayer(i)
   end
 end 
 
+-- controle de diálogo entre personagem e player
 function NPCs:inciarInteracao()
   if love.keyboard.isDown('f') then 
     if #balloon.messages==0 then
@@ -240,13 +298,39 @@ end
 function NPCs:draw() 
   self:drawNPCs()
   self.boss:draw()
-  _G.collision:quadDraw(self.boss, _G.map.cam)
+  -- _G.collision:quadDraw(self.boss, _G.map.cam)
+end
+
+function NPCs:drawLifeBar(i)
+  local larguraDaBarra= 100
+  local tamanhoDeUmPontoVida= (larguraDaBarra/self.on_the_screen[i].maximum_life)
+  local tamanhoAtual= {
+    w= tamanhoDeUmPontoVida*self.on_the_screen[i].life,
+    h= 10
+  }
+  local bottom= self.on_the_screen[i].p.y-(self.on_the_screen[i].body.w/2)-10
+  local top= bottom-tamanhoAtual.h
+  local left= self.on_the_screen[i].p.x-(tamanhoAtual.w/2)-_G.map.cam.p.x
+  local right= self.on_the_screen[i].p.x+(tamanhoAtual.w/2)-_G.map.cam.p.x
+  local vertices= {
+    left, top,
+    right, top,
+    right, bottom,
+    left, bottom
+  }
+  love.graphics.setColor(1, 0, 0)
+  love.graphics.polygon('fill', vertices)
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.polygon('line', vertices)
 end
 
 function NPCs:drawNPCs()
   for i=1, #self.on_the_screen do
-    self.on_the_screen[i]:draw(false)
-    _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
+    if self.on_the_screen[i]~=nil then
+      self:drawLifeBar(i)
+      self.on_the_screen[i]:draw(false)
+      _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
+    end
   end
 end
 

@@ -4,7 +4,7 @@
 
 local Tileset= require('models.tileset')
 local Character, metatable= {}, {
-  __call= function(self, option_props, vel, p, messages) --self permite acessar os atributos de uma instância de uma classe
+  __call= function(self, option_props, vel, p, observadoPelaCamera,  messages) --self permite acessar os atributos de uma instância de uma classe
     local object= {} --objeto para armazenar os futuros atributos de uma classe
     object.name= option_props.name
     object.s= option_props.s
@@ -29,6 +29,7 @@ local Character, metatable= {}, {
     object.p.i= {y=-100}
     object.p.f= {y=-100}
     object.new_y= 0
+    object.observadoPelaCamera= observadoPelaCamera
     setmetatable(object, {__index= self}) -- relacionar os atributos da classe com a metatable
     return object
   end
@@ -40,8 +41,8 @@ function Character:test()
   print('character -> '..self.name)
 end 
 
-function Character:calcNewFloorPosition(observadoPelaCamera)
-  local imaginary_px= observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x
+function Character:calcNewFloorPosition()
+  local imaginary_px= self.observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x
   self.new_y= _G.map:positionCharacter(
     self.p, 
     imaginary_px,
@@ -51,12 +52,12 @@ function Character:calcNewFloorPosition(observadoPelaCamera)
 end
 
 -- terá que ser chamado em todo update para funcionar
-function Character:updateParameters(observadoPelaCamera)
-  self:calcNewFloorPosition(observadoPelaCamera)
+function Character:updateParameters()
+  self:calcNewFloorPosition()
 end
 
-function Character:draw(observadoPelaCamera)
-  local x= observadoPelaCamera and self.p.x or self.p.x-_G.map.cam.p.x
+function Character:draw()
+  local x= self.observadoPelaCamera and self.p.x or self.p.x-_G.map.cam.p.x
   love.graphics.draw(
     self.tileset.obj,
     self.tileset.tiles[self.frame],
@@ -68,6 +69,11 @@ function Character:draw(observadoPelaCamera)
     self.tileset.tileSize.w/2, 
     self.tileset.tileSize.h/2
   )
+end
+
+function Character:getSide(direction)
+  local movimento_de_camera= self.observadoPelaCamera and 0 or _G.map.cam.p.x
+  return self.p.x+(direction=='left' and -(self.body.w/2) or (self.body.w/2))-movimento_de_camera
 end
 
 function Character:defaultUpdateFrame(alternar)

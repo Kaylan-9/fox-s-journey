@@ -16,13 +16,14 @@ local metatable= {
           jumping= {i= 9, f= 10, until_finished= false},
           falling= {i= 12, f= 16, until_finished= false}
         }, 
-        hostile= {damage= 1, attack_frame= 88}, 
+        hostile= {damage= 1, attack_frame= {90, 94}}, 
         frame_n= {x=16, y=15}, 
         adjustment= nil, 
         body= {w=30, h=80}
       },
       4,
-      {x= 30, y= 0}
+      {x= 30, y= 0},
+      true
     ) 
     obj.pressed= {}
     obj.canjump= true
@@ -138,7 +139,6 @@ end
 
 function Player:update()
   local nao_ha_messages= (#_G.balloon.messages==0)
-  self.acc= self.acc+(_G.dt * math.random(1, 3))
   self:updateParameters(true)
   self:calcYPositionReferences()
   self:updateFrame(nao_ha_messages)
@@ -150,6 +150,7 @@ function Player:update()
     self:pulo()
     self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
   end
+  self.acc= self.acc+(_G.dt * math.random(1, 3))
 end
 
 function Player:calcYPositionReferences()
