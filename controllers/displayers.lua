@@ -2,26 +2,26 @@
 local Tileset= require('models.tileset')
 local Displayers, metatable= {}, {
   __call=function(self)
-    local object= {}
-    object.props_invetory= {
+    local obj= {}
+    obj.props_inventory= {
       d_tile= {w= 40, h= 40}, --dimensões do tile
       spacing_tile= { w= 5, h= 5 }, --espaço entre cada tile
     }
-    object.props_lifeBar= {
+    obj.props_lifeBar= {
       frame= 1,
       s= {x= 4.5, y= 4.5},
       tileset= Tileset('assets/graphics/life.png', {x=5, y=1})
     }
-    object.p_incial_para_o_proximo_draw= { w= 0, h= 0 }
-    setmetatable(object, { __index= self })
-    return object
+    obj.p_incial_para_o_proximo_draw= { w= 0, h= 0 }
+    setmetatable(obj, { __index= self })
+    return obj
   end
 }
 
 setmetatable(Displayers, metatable)
 
 function Displayers:drawInventory()
-  love.graphics.setColor(0, 0, 0)
+  -- love.graphics.setColor(0, 0, 0)
   for i=0, #_G.items.inventory-1 do 
     local xi= self.p_incial_para_o_proximo_draw.w+(i*self.props_inventory.spacing_tile.w)+(self.props_inventory.spacing_tile.w)+(i*self.props_inventory.d_tile.w)
     local yi= self.p_incial_para_o_proximo_draw.h+self.props_inventory.spacing_tile.h
@@ -29,16 +29,32 @@ function Displayers:drawInventory()
     local yf= yi+self.props_inventory.d_tile.h 
     local vertices= {
       xi, yi,
+      xf, yi,
       xf, yf,
-      xf, yf,
-      xi, yi
+      xi, yf
     }
+    love.graphics.setColor(0, 0, 0)
     love.graphics.polygon('line', vertices)
+    love.graphics.setColor(1, 1, 1)
+    local positionIcon= {
+      x= xi+(self.props_inventory.d_tile.w/2),
+      y= yi+(self.props_inventory.d_tile.h/2)
+    }
+    love.graphics.draw(
+      _G.items.inventory[i+1].tileset.obj,
+      _G.items.inventory[i+1].tileset.tiles[_G.items.inventory[i+1].frame], 
+      positionIcon.x, positionIcon.y, 
+      0,
+      1,
+      1,
+      (_G.items.inventory[i+1].tileset.tileSize.w/2), 
+      (_G.items.inventory[i+1].tileset.tileSize.h/2)
+    )
     if i==#_G.items.inventory-1 then
-      self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+xf+self.props_inventory.spacing_tile.w
+      self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+xf+(self.props_inventory.spacing_tile.w)
     end
   end
-  love.graphics.setColor(1, 1, 1)
+  -- love.graphics.setColor(1, 1, 1)
 end
 
 function Displayers:drawLifeBar()
@@ -51,7 +67,7 @@ function Displayers:drawLifeBar()
     self.props_lifeBar.s.x, 
     self.props_lifeBar.s.y
   )
-  self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+self.props_lifeBar.tileset.tileSize.w
+  self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+(self.props_lifeBar.tileset.tileSize.w*self.props_lifeBar.s.x)
 end
 
 function Displayers:draw()
@@ -68,7 +84,7 @@ end
 function Displayers:update()
   --frame correto da barra de vida
   self:atualizaFrameLifeBar()
-  
+  self.p_incial_para_o_proximo_draw.w= 0
 end
 
 return Displayers

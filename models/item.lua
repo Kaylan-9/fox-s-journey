@@ -1,47 +1,39 @@
-local Collision= require("useful.collision")
 local Tileset= require('models.tileset')
-
-local collision= Collision()
 
 -- colecionável -> não é possível dropar o item: gema
 -- power-up -> fica no inventário e é possível dropar
 -- restaurador -> pode restaurar a vida do player quando ele quiser ele também fica no inventário
 local Item, metatable= {}, {
-  __call= function(self, name, frame, p, size, type, val_mod_em_interacao)
-    local object= {}
-    object.name= name
-    object.type= type
-    if object.type=='power-up' or object.type=='restaurador' then object.active= false end
-    object.frame= frame
-    object.s= {x= 1, y= 1}
-    object.tileset= Tileset('assets/graphics/Fruits.png', {x= 4, y= 6})
-    object.angle= 0
-    object.p= p
-    object.size= size
-    object.val_mod_em_interacao= val_mod_em_interacao
-    setmetatable(object, {__index= self})
-    return object
+  __call= function(self, name, frame, p, s, type, val_mod_em_interacao)
+    local obj= {}
+    obj.name= name
+    obj.type= type
+    if obj.type=='power-up' or obj.type=='restaurador' then obj.activateInInventory= false end
+    obj.frame= frame
+    obj.s= {x= 1, y= 1}
+    obj.tileset= Tileset('assets/graphics/Fruits.png', {x= 4, y= 7})
+    obj.angle= 0
+    obj.p= p
+    obj.s= s
+    obj.val_mod_em_interacao= val_mod_em_interacao
+    setmetatable(obj, {__index= self})
+    return obj
   end
 }
 
 setmetatable(Item, metatable)
 
-function Item:disableInInventory() self.active= false end
-function Item:activateInInventory() self.active= true end
+--! não utilizado ainda :construction: {
+function Item:disableInInventory() self.activateInInventory= false end
+function Item:activateInInventory() self.activateInInventory= true end
 
--- Aplicar valor ao personagem desejado
-function Item:addToPropertyValue(character)
-  for key, value in pairs(self.val_somados_em_interacao) do
-    character[key]= character[key] + value
-  end
-end
 
 -- Substituir valor ao personagem desejado
 function Item:replacePropertyValue(character)
   for key, value in pairs(self.val_mod_em_interacao) do
 
     -- restaurador aproveitar a propriedade active para ser excluido pela classe items
-    if self.type=='power-up' or self.type=='restaurador' then self.active= true end
+    if self.type=='power-up' or self.type=='restaurador' then self.activateInInventory= true end
 
     if self.type=='power-up' then character[key]= value
     elseif self.type=='restaurador' then character[key]= character[key] + value
@@ -49,15 +41,12 @@ function Item:replacePropertyValue(character)
 
   end
 end
+--! }
 
-function Item:playerPodeOuNaoColetar(player_position, player_raio)
+function Item:playerPodeOuNaoColetar()
   local can= false
-  if collision:circle(player_position, self.p, player_raio) then
-    if self.type=='colecionável' then
-      can= true
-    else
-      if love.keyboard.isDown('l') then can= true end
-    end
+  if collision:circle(_G.player.p, self.p, (_G.player.body.w/2)) then
+    can= (self.type=='colecionável' or love.keyboard.isDown('l'))
   end
   return can
 end

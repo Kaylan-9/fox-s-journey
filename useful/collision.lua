@@ -2,7 +2,7 @@ local Collision= { teste= true }
 
 function Collision:circle(pi, pf, r)
   return math.sqrt(
-    ((pf.x-pi.x)^2)+
+    ((pf.x-pi.x-_G.map.cam.p.x)^2)+
     ((pf.y-pi.y)^2)
   )<=r
 end

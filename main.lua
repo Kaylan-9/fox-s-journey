@@ -1,4 +1,5 @@
 _G.json= require('useful.json')
+_G.tbl= require('useful.tbl')
 _G.collision= require('useful.collision')
 _G.current_stage_game= 1
 _G.screen= {}
@@ -29,7 +30,8 @@ local function iniFase()
     inventory= _G.items.inventory
     collectibles= _G.items.collectibles
   end
-  _G.items= Items(inventory, collectibles)
+  -- teste
+  _G.items= Items(inventory, fase.items, collectibles)
   _G.npcs= NPCs(fase.boss, fase.npcs)
   _G.player= Player()
 end 
@@ -41,6 +43,7 @@ function love.load()
 end
 
 function love.keypressed(key)
+  items:keypressed(key)
   if key == 'escape' then love.event.quit()
   elseif key == 'f11' then _G.screen:change_resolution() 
   end
@@ -61,14 +64,16 @@ function love.update(dt)
   map:update()
   player:update()
   npcs:update()
+  items:update()
   balloon:update()
 end
 
 function love.draw()         
   map:draw() 
-  displayers:draw()
   player:draw(true)
   player:drawExpression()
   npcs:draw()
+  -- items:draw()
   balloon:draw()
+  displayers:draw()
 end

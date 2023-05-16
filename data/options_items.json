@@ -1,0 +1,38 @@
+{
+  "maca": {
+    "name": "maça",
+    "frame": 1, 
+    "type": "restaurador",
+    "val_mod_em_interacao": {
+      "life": 2
+    },
+    "s": {
+      "x": 2,
+      "y": 2
+    }
+  },
+  "morango": {
+    "name": "morango",
+    "frame": 8, 
+    "type": "restaurador",
+    "val_mod_em_interacao": {
+      "life": 1
+    },
+    "s": {
+      "x": 2,
+      "y": 2
+    }
+  },
+  "uvas": {
+    "name": "uvas",
+    "frame": 9, 
+    "type": "restaurador",
+    "val_mod_em_interacao": {
+      "life": 4
+    },
+    "s": {
+      "x": 2,
+      "y": 2
+    }
+  }
+}

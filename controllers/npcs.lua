@@ -1,4 +1,5 @@
 local Character= require('models.character')
+
 local NPCs, metatable= {}, {
   __call= function(self, boss, npcs)
     local obj= {}
@@ -14,20 +15,6 @@ local NPCs, metatable= {}, {
 }
 
 setmetatable(NPCs, metatable)
-
-local function deepCopy(original)
-  local copy
-  if type(original) == "table" then
-      copy = {}
-      for key, value in pairs(original) do
-          copy[deepCopy(key)] = deepCopy(value)
-      end
-      setmetatable(copy, deepCopy(getmetatable(original)))
-  else
-      copy = original
-  end
-  return copy
-end
 
 function NPCs:load(boss, npcs)
   self:loadBoss(boss)
@@ -53,7 +40,7 @@ end
 
 function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
   if(self.options[optioname]~=nil) then
-    local option= deepCopy(self.options[optioname])
+    local option= _G.tbl:deepCopy(self.options[optioname])
     local new_character= Character(option, vel, p, false, messages)
     new_character.goto_player= goto_player
     new_character.lock_movement= {
@@ -137,12 +124,25 @@ function NPCs:attackPlayerBoss()
   end
 end 
 
-function NPCs:takesDamage(i)
-  print('testando 1')
-  if _G.collision:ellipse(_G.player.p, self.on_the_screen[i].p, (self.on_the_screen[i].body.w/2), (self.on_the_screen[i].body.h/2), (self.on_the_screen[i].body.w/2)) then
-    print('testando 2')
+function NPCs:takesDamageBoss()
+  if _G.collision:ellipse(_G.player.p, self.boss.p, (self.boss.body.w/2), (self.boss.body.h/2), (self.boss.body.w/2)) then
     if type(_G.player.hostile.attack_frame)=='table' then
-      print('testando 3')
+      for j=1, #_G.player.hostile.attack_frame do
+        if _G.player.frame==_G.player.hostile.attack_frame[j] then
+          if _G.player.acc>=_G.player.freq_frames then
+            if self.boss.life> 0 then
+              self.boss.life= self.boss.life - _G.player.hostile.damage
+            end
+          end
+        end 
+      end
+    end
+  end
+end
+
+function NPCs:takesDamage(i)
+  if _G.collision:ellipse(_G.player.p, self.on_the_screen[i].p, (self.on_the_screen[i].body.w/2), (self.on_the_screen[i].body.h/2), (self.on_the_screen[i].body.w/2)) then
+    if type(_G.player.hostile.attack_frame)=='table' then
       for j=1, #_G.player.hostile.attack_frame do
         if _G.player.frame==_G.player.hostile.attack_frame[j] then
           if _G.player.acc>=_G.player.freq_frames then
