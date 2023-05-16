@@ -5,24 +5,31 @@ local Items, metatable= {}, {
     local obj= {}
     obj.options= json.import('data/options_items.json')
     obj.in_the_game_stage= {}
-    obj.inventory= {}
+    obj.inventory= inventory and inventory or {}
     obj.emptying_count_inventory= 0
+    obj.emptying_count_in_the_game_stage= 0
     obj.collectibles= collectibles and collectibles or {}
     setmetatable(obj, {__index= self})
     --testando
-    obj:load(inventory)
+    obj:load(items)
     return obj
   end
 }
 
 setmetatable(Items, metatable)
 
+function Items:calcYPositionReferences(i)
+  if self.in_the_game_stage[i].p.f.y==-100 then
+    self.in_the_game_stage[i].p.y= self.in_the_game_stage[i].new_y end
+end
+
 function Items:load(items)
   for i=1, #items do 
     local option= _G.tbl:deepCopy(self.options[items[i].name])
-    local new_item= Item(option.name, option.frame, {x=1, y=1}, option.s, option.type, option.val_mod_em_interacao)
+    local new_item= Item(option.name, option.frame, {x=items[i].p.x, y=-100}, option.s, option.type, option.val_mod_em_interacao)
+    new_item.new_y= 0
     -- testando
-    table.insert(self.inventory, new_item)
+    table.insert(self.in_the_game_stage, new_item)
   end
 end
 
@@ -31,9 +38,10 @@ function Items:removeItem(indice)
 end
 
 function Items:addToInventory(indice)
-  local item= self.in_the_game_stage[indice]
+  self.emptying_count_in_the_game_stage= self.emptying_count_in_the_game_stage + 1
+  local item= table.remove(self.in_the_game_stage, indice)
+  print(item.name)
   table.insert(self.inventory, item)
-  table.remove(self.in_the_game_stage, indice)
 end
 
 function Items:addToCollectibles(indice)
@@ -54,19 +62,18 @@ function Items:drop(indice, nova_posicao)
 end
 
 function Items:verIndiviCadaItemSeColetar(i)
-  local player_pode_coletar= self.in_the_game_stage[i]:playerPodeOuNaoColetar()
-  if player_pode_coletar then
-    if not self.in_the_game_stage[i].type=='colecionável' then self:addToInventory(i)
+  if self.in_the_game_stage[i]:playerPodeOuNaoColetar() then
+    if self.in_the_game_stage[i].type~='colecionável' then self:addToInventory(i)
     else self:addToCollectibles(i)
     end
   end
 end 
 
 function Items:verSeItemRestauradorFoiUsado(i)
-  if self.inventory[i-self.emptying_count_inventory].type=='restaurador' then
-    if self.inventory[i-self.emptying_count_inventory].activateInInventory then
-      self.inventory[i-self.emptying_count_inventory]:replacePropertyValue(_G.player)
-      table.remove(self.inventory, i-self.emptying_count_inventory)
+  if self.inventory[i].type=='restaurador' then
+    if self.inventory[i].activateInInventory then
+      self.inventory[i]:replacePropertyValue(_G.player)
+      table.remove(self.inventory, i)
       self.emptying_count_inventory= self.emptying_count_inventory + 1
     end
   end
@@ -92,8 +99,15 @@ end
 
 function Items:update()
   self.emptying_count_inventory= 0
-  for i=1, #self.in_the_game_stage do self:verIndiviCadaItemSeColetar(i) end
-  for i=1, #self.inventory do self:verSeItemRestauradorFoiUsado(i) end
+  self.emptying_count_in_the_game_stage= 0
+  for i=1, #self.in_the_game_stage do 
+    self:verIndiviCadaItemSeColetar(i-self.emptying_count_in_the_game_stage) 
+    if not self.in_the_game_stage[i-self.emptying_count_in_the_game_stage] then goto continue end
+    self.in_the_game_stage[i-self.emptying_count_in_the_game_stage]:updateParameters()
+    self:calcYPositionReferences(i-self.emptying_count_in_the_game_stage)
+    ::continue::
+  end
+  for i=1, #self.inventory do self:verSeItemRestauradorFoiUsado(i-self.emptying_count_inventory) end
 end
 
 function Items:draw()

@@ -21,13 +21,22 @@
     },
     "items": [
       {
-        "name": "morango"
+        "name": "morango",
+        "p": {
+          "x": 70
+        }
       },
       {
-        "name": "maca"
+        "name": "maca",
+        "p": {
+          "x": 770
+        }
       },
       {
-        "name": "uvas"
+        "name": "uvas",
+        "p": {
+          "x": 1570
+        }
       }
     ]
   }, 

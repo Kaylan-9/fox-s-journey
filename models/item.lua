@@ -13,7 +13,13 @@ local Item, metatable= {}, {
     obj.s= {x= 1, y= 1}
     obj.tileset= Tileset('assets/graphics/Fruits.png', {x= 4, y= 7})
     obj.angle= 0
-    obj.p= p
+    obj.p= {
+      x= p.x,
+      y= 0,
+      f= {
+        y= -100
+      }
+    }
     obj.s= s
     obj.val_mod_em_interacao= val_mod_em_interacao
     setmetatable(obj, {__index= self})
@@ -27,6 +33,19 @@ setmetatable(Item, metatable)
 function Item:disableInInventory() self.activateInInventory= false end
 function Item:activateInInventory() self.activateInInventory= true end
 
+function Item:calcNewFloorPosition()
+  local imaginary_px= self.observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x
+  self.new_y= _G.map:positionCharacter(
+    self.p, 
+    imaginary_px,
+    self.tileset.tileSize.h, 
+    self.s.x
+  ).y
+end
+
+function Item:updateParameters()
+  self:calcNewFloorPosition()
+end
 
 -- Substituir valor ao personagem desejado
 function Item:replacePropertyValue(character)
@@ -53,7 +72,7 @@ end
 
 function Item:draw()
   love.graphics.draw(
-    self.tileset.tileset.obj,
+    self.tileset.obj,
     self.tileset.tiles[self.frame],
     self.p.x-_G.map.cam.p.x, 
     self.p.y,

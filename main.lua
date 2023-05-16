@@ -31,7 +31,7 @@ local function iniFase()
     collectibles= _G.items.collectibles
   end
   -- teste
-  _G.items= Items(inventory, fase.items, collectibles)
+  _G.items= Items(fase.items, inventory, collectibles)
   _G.npcs= NPCs(fase.boss, fase.npcs)
   _G.player= Player()
 end 
@@ -73,7 +73,7 @@ function love.draw()
   player:draw(true)
   player:drawExpression()
   npcs:draw()
-  -- items:draw()
+  items:draw()
   balloon:draw()
   displayers:draw()
 end
