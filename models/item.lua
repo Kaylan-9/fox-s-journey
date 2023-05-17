@@ -4,14 +4,14 @@ local Tileset= require('models.tileset')
 -- power-up -> fica no inventário e é possível dropar
 -- restaurador -> pode restaurar a vida do player quando ele quiser ele também fica no inventário
 local Item, metatable= {}, {
-  __call= function(self, name, frame, p, s, type, val_mod_em_interacao)
+  __call= function(self, name, frame, p, s, type, val_mod_em_interacao, tileset)
     local obj= {}
     obj.name= name
     obj.type= type
     if obj.type=='power-up' or obj.type=='restaurador' then obj.activateInInventory= false end
     obj.frame= frame
     obj.s= {x= 1, y= 1}
-    obj.tileset= Tileset('assets/graphics/Fruits.png', {x= 4, y= 7})
+    obj.tileset= tileset
     obj.angle= 0
     obj.p= {
       x= p.x,

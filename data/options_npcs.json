@@ -1,23 +1,19 @@
 { 
   "esqueleto": {
     "name": "esqueleto",
-    "imgname": "skeletonBase.png",
     "hostile": false,
     "s": {"x": 3, "y": 3},
-    "frame_n": {"x": 10, "y": 6},
     "frame_positions": {"walking": {"i":2, "f":7, "until_finished":false}},
     "direction": 1,
     "body": {"w":20, "h":20}
   },
   "lobo": {
     "name": "lobo",
-    "imgname": "wolf.png",
     "hostile": {
       "damage": 1,
       "attack_frame": 23
     },
     "s": {"x": 0.75, "y": 0.75},
-    "frame_n": {"x": 5, "y":8},
     "frame_positions": {
       "walking": {"i":4, "f":7, "until_finished":false},
       "attacking": {"i":19, "f":26, "until_finished":true},

@@ -4,11 +4,11 @@
 
 local Tileset= require('models.tileset')
 local Character, metatable= {}, {
-  __call= function(self, option_props, vel, p, observadoPelaCamera,  messages) --self permite acessar os atributos de uma instância de uma classe
+  __call= function(self, option_props, vel, p, observadoPelaCamera, tileset, messages) --self permite acessar os atributos de uma instância de uma classe
     local object= {} --objeto para armazenar os futuros atributos de uma classe
     object.name= option_props.name
     object.s= option_props.s
-    object.tileset= Tileset('assets/graphics/'..option_props.imgname, option_props.frame_n, option_props.adjustment)
+    object.tileset= Tileset('assets/graphics/'..options_tileset[tileset].imgname, options_tileset[tileset].n, options_tileset[tileset].adjustment)
     object.frame_positions= option_props.frame_positions
     object.hostile= option_props.hostile --{attack_frame, damage}
     if option_props.body~=nil then object.body= option_props.body end -- {w,h}

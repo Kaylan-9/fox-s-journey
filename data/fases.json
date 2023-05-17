@@ -5,13 +5,7 @@
     "map_file": "1.txt",
     "background_file": "tilesetOpenGameBackground.png",
     "npcs": [
-      {
-        "name": "lobo", 
-        "goto_player": true,
-        "vel": 7,
-        "p": {"x": 1200, "y": -100}, 
-        "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
-      }
+      
     ],
     "boss": {
       "name": "lobo", 
@@ -37,7 +31,26 @@
         "p": {
           "x": 1570
         }
+      }, 
+      {
+        "name": "uvas",
+        "p": {
+          "x": 1570
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "x": 900
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "x": 1100
+        }
       }
+
     ]
   }, 
   {

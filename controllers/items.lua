@@ -1,3 +1,4 @@
+local Tileset= require('models.tileset')
 local Item= require('models.item')
 
 local Items, metatable= {}, {
@@ -10,7 +11,6 @@ local Items, metatable= {}, {
     obj.emptying_count_in_the_game_stage= 0
     obj.collectibles= collectibles and collectibles or {}
     setmetatable(obj, {__index= self})
-    --testando
     obj:load(items)
     return obj
   end
@@ -26,9 +26,9 @@ end
 function Items:load(items)
   for i=1, #items do 
     local option= _G.tbl:deepCopy(self.options[items[i].name])
-    local new_item= Item(option.name, option.frame, {x=items[i].p.x, y=-100}, option.s, option.type, option.val_mod_em_interacao)
+    local tileset= Tileset('assets/graphics/'.._G.options_tileset[option.tileset].imgname, _G.options_tileset[option.tileset].n)
+    local new_item= Item(option.name, option.frame, {x=items[i].p.x, y=-100}, option.s, option.type, option.val_mod_em_interacao, tileset)
     new_item.new_y= 0
-    -- testando
     table.insert(self.in_the_game_stage, new_item)
   end
 end
@@ -40,17 +40,13 @@ end
 function Items:addToInventory(indice)
   self.emptying_count_in_the_game_stage= self.emptying_count_in_the_game_stage + 1
   local item= table.remove(self.in_the_game_stage, indice)
-  print(item.name)
   table.insert(self.inventory, item)
 end
 
 function Items:addToCollectibles(indice)
   local name= self.in_the_game_stage[indice].name
-  if self.collectibles[name]~=nil then
-    self.collectibles[name]= 1
-  else
-    self.collectibles[name]= self.collectibles[name] + 1
-  end
+  self.collectibles[name]= not self.collectibles[name] and 1 or self.collectibles[name] + 1
+  self.emptying_count_in_the_game_stage= self.emptying_count_in_the_game_stage + 1
   table.remove(self.in_the_game_stage, indice)
 end
 

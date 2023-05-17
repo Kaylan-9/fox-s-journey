@@ -1,0 +1,22 @@
+{
+  "gems": {
+    "imgname": "gems.png",
+    "n": {"x": 2, "y": 2}
+  },
+  "fruits": {
+    "imgname": "fruits.png",
+    "n": {"x": 4, "y": 7}
+  },
+  "player": {
+    "imgname": "player.png",
+    "n": {"x": 16, "y": 15}
+  },
+  "lobo": {
+    "imgname": "wolf.png",
+    "n": {"x": 5, "y":8}
+  },
+  "esqueleto": {
+    "imgname": "skeleton.png",
+    "n": {"x": 10, "y": 6}
+  }
+}

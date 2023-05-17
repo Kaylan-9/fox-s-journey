@@ -1,6 +1,7 @@
 {
   "maca": {
     "name": "maça",
+    "tileset": "fruits",
     "frame": 1, 
     "type": "restaurador",
     "val_mod_em_interacao": {
@@ -13,6 +14,7 @@
   },
   "morango": {
     "name": "morango",
+    "tileset": "fruits",
     "frame": 8, 
     "type": "restaurador",
     "val_mod_em_interacao": {
@@ -25,11 +27,32 @@
   },
   "uvas": {
     "name": "uvas",
+    "tileset": "fruits",
     "frame": 9, 
     "type": "restaurador",
     "val_mod_em_interacao": {
       "life": 4
     },
+    "s": {
+      "x": 2,
+      "y": 2
+    }
+  },
+  "gema_red": {
+    "name": "gema_red",
+    "tileset": "gems",
+    "frame": 3, 
+    "type": "colecionável",
+    "s": {
+      "x": 2,
+      "y": 2
+    }
+  },
+  "gema_green": {
+    "name": "gema_green",
+    "tileset": "gems",
+    "frame": 2, 
+    "type": "colecionável",
     "s": {
       "x": 2,
       "y": 2

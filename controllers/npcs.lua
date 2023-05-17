@@ -26,7 +26,7 @@ function NPCs:loadBoss(boss)
     x= _G.map.dimensions.w-600,
     y= -100
   } 
-  self.boss= Character(self.options[boss.name], boss.vel, position, false, boss.messages)
+  self.boss= Character(self.options[boss.name], boss.vel, position, false, boss.name, boss.messages)
   self.boss.goto_player= true
   self.boss.active= false
 end
@@ -41,7 +41,7 @@ end
 function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
   if(self.options[optioname]~=nil) then
     local option= _G.tbl:deepCopy(self.options[optioname])
-    local new_character= Character(option, vel, p, false, messages)
+    local new_character= Character(option, vel, p, false, optioname, messages)
     new_character.goto_player= goto_player
     new_character.lock_movement= {
       left= false, 

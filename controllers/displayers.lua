@@ -1,5 +1,7 @@
 -- todo método Displayers possui a soma do propriedade "p_incial_para_o_proximo_draw" com outro valor para indicar a posição disponível para o próximo displayer 
+local font= love.graphics.getFont()
 local Tileset= require('models.tileset')
+
 local Displayers, metatable= {}, {
   __call=function(self)
     local obj= {}
@@ -7,6 +9,11 @@ local Displayers, metatable= {}, {
       d_tile= {w= 40, h= 40}, --dimensões do tile
       spacing_tile= { w= 5, h= 5 }, --espaço entre cada tile
     }
+    obj.props_collectibles= {
+      spacing_tile= { w= 5, h= 5 }, --espaço entre cada tile
+    }
+    obj.options_items= json.import('data/options_items.json')
+    obj.props_items= {}
     obj.props_lifeBar= {
       frame= 1,
       s= {x= 4.5, y= 4.5},
@@ -19,6 +26,25 @@ local Displayers, metatable= {}, {
 }
 
 setmetatable(Displayers, metatable)
+
+function Displayers:drawCollectibles()
+  for k, v in pairs(self.props_items) do
+    local text= 'x'..tostring(_G.items.collectibles[k])
+    local text_w= font:getWidth(text)
+    self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+(self.props_items[k].tileSize.w+self.props_collectibles.spacing_tile.w)
+    love.graphics.draw(
+      self.props_items[k].obj,
+      self.props_items[k].tiles[self.options_items[k].frame],
+      self.p_incial_para_o_proximo_draw.w,
+      0,
+      0, 
+      1,
+      1
+    )
+    love.graphics.print(text, self.p_incial_para_o_proximo_draw.w, 0)
+    self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+(text_w)
+  end
+end
 
 function Displayers:drawInventory()
   -- love.graphics.setColor(0, 0, 0)
@@ -73,6 +99,13 @@ end
 function Displayers:draw()
   self:drawLifeBar()
   self:drawInventory()
+  self:drawCollectibles()
+end
+
+function Displayers:atualizaTileSetListItems()
+  for k, v in pairs(_G.items.collectibles) do
+    self.props_items[k]= Tileset('assets/graphics/'.._G.options_tileset[self.options_items[k].tileset].imgname, _G.options_tileset[self.options_items[k].tileset].n)
+  end
 end
 
 function Displayers:atualizaFrameLifeBar()
@@ -83,6 +116,7 @@ end
 
 function Displayers:update()
   --frame correto da barra de vida
+  self:atualizaTileSetListItems()
   self:atualizaFrameLifeBar()
   self.p_incial_para_o_proximo_draw.w= 0
 end

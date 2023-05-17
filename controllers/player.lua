@@ -8,7 +8,6 @@ local metatable= {
       {
         name= "Faye", 
         s= {x= 2.5, y= 2.5}, 
-        imgname= "midi.png", 
         frame_positions= {
           walking= {i= 17, f= 24, until_finished= false},
           attacking= {i= 89, f= 96, until_finished= true},
@@ -17,13 +16,12 @@ local metatable= {
           falling= {i= 12, f= 16, until_finished= false}
         }, 
         hostile= {damage= 1, attack_frame= {90, 94}}, 
-        frame_n= {x=16, y=15}, 
-        adjustment= nil, 
         body= {w=30, h=80}
       },
       4,
       {x= 30, y= 0},
-      true
+      true,
+      "player"
     ) 
     obj.pressed= {}
     obj.canjump= true
@@ -178,7 +176,15 @@ end
 
 
 function Player:drawExpression()
-  love.graphics.draw(self.expression.tileset.obj, self.expression.tileset.tiles[self.expression.frame], 0, _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 0, self.expression.s.x, self.expression.s.y)
+  love.graphics.draw(
+    self.expression.tileset.obj, 
+    self.expression.tileset.tiles[self.expression.frame], 
+    0, 
+    _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 
+    0, 
+    self.expression.s.x, 
+    self.expression.s.y
+  )
   _G.collision:quadDraw(self)
 end
 

@@ -1,5 +1,6 @@
 _G.json= require('useful.json')
 _G.tbl= require('useful.tbl')
+_G.options_tileset= json.import('data/options_tileset.json')
 _G.collision= require('useful.collision')
 _G.current_stage_game= 1
 _G.screen= {}
