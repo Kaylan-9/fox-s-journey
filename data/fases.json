@@ -5,7 +5,13 @@
     "map_file": "1.txt",
     "background_file": "tilesetOpenGameBackground.png",
     "npcs": [
-      
+      {
+        "name": "lobo", 
+        "goto_player": true,
+        "p": {"x": 500, "y": 500},
+        "vel": 1,
+        "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
+      }
     ],
     "boss": {
       "name": "lobo", 

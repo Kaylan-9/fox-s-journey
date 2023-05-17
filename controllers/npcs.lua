@@ -195,6 +195,7 @@ end
 function NPCs:dying(i)
   if math.floor(self.on_the_screen[i].life)==0 then 
     self.on_the_screen[i].animation= 'dying'
+    if not self.on_the_screen[i].audios.dying:isPlaying() then self.on_the_screen[i].audios.dying:play() end
     self.on_the_screen[i].goto_player= false
     if self.on_the_screen[i].frame==self.on_the_screen[i].frame_positions['dying'].f then
       if self.on_the_screen[i].acc>=(self.on_the_screen[i].freq_frames) then

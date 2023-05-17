@@ -17,7 +17,7 @@
     "frame_positions": {
       "walking": {"i":4, "f":7, "until_finished":false},
       "attacking": {"i":19, "f":26, "until_finished":true},
-      "dying": {"i": 27, "f": 33, "until_finished": true}
+      "dying": {"i": 27, "f": 33, "until_finished": true, "audio": "lobo_dying.mp3"}
     },
     "direction": -1,
     "body": {"w":150, "h":120}

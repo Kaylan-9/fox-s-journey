@@ -5,33 +5,37 @@
 local Tileset= require('models.tileset')
 local Character, metatable= {}, {
   __call= function(self, option_props, vel, p, observadoPelaCamera, tileset, messages) --self permite acessar os atributos de uma instância de uma classe
-    local object= {} --objeto para armazenar os futuros atributos de uma classe
-    object.name= option_props.name
-    object.s= option_props.s
-    object.tileset= Tileset('assets/graphics/'..options_tileset[tileset].imgname, options_tileset[tileset].n, options_tileset[tileset].adjustment)
-    object.frame_positions= option_props.frame_positions
-    object.hostile= option_props.hostile --{attack_frame, damage}
-    if option_props.body~=nil then object.body= option_props.body end -- {w,h}
-    if option_props.direction~=nil then object.direction= option_props.direction end
-    if messages~=nil then object.messages= messages end
-    object.vel= vel
-    object.max_vel= vel*2
-    object.angle= math.rad(0)
-    object.frame= 1
-    object.hold_animation= false
-    object.previous_animation= {}
-    object.animation= ''
-    object.acc= 0
-    object.maximum_life= 5
-    object.life= object.maximum_life
-    object.freq_frames= 0.45
-    object.p= p
-    object.p.i= {y=-100}
-    object.p.f= {y=-100}
-    object.new_y= 0
-    object.observadoPelaCamera= observadoPelaCamera
-    setmetatable(object, {__index= self}) -- relacionar os atributos da classe com a metatable
-    return object
+    local obj= {} --objeto para armazenar os futuros atributos de uma classe
+    obj.name= option_props.name
+    obj.s= option_props.s
+    obj.tileset= Tileset('assets/graphics/'..options_tileset[tileset].imgname, options_tileset[tileset].n, options_tileset[tileset].adjustment)
+    obj.frame_positions= option_props.frame_positions
+    obj.hostile= option_props.hostile --{attack_frame, damage}
+    if option_props.body~=nil then obj.body= option_props.body end -- {w,h}
+    if option_props.direction~=nil then obj.direction= option_props.direction end
+    if messages~=nil then obj.messages= messages end
+    obj.vel= vel
+    obj.max_vel= vel*2
+    obj.angle= math.rad(0)
+    obj.frame= 1
+    obj.hold_animation= false
+    obj.previous_animation= {}
+    obj.animation= ''
+    obj.acc= 0
+    obj.maximum_life= 5
+    obj.life= obj.maximum_life
+    obj.freq_frames= 0.45
+    obj.p= p
+    obj.p.i= {y=-100}
+    obj.p.f= {y=-100}
+    obj.audios= {}
+    obj.new_y= 0
+    obj.observadoPelaCamera= observadoPelaCamera 
+    obj.audio_em_tantos_s= 2
+    setmetatable(obj, {__index= self}) -- relacionar os atributos da classe com a metatable
+    obj:loadAudio()
+    obj:resetTempoAudio()
+    return obj
   end
 }
 
@@ -40,6 +44,20 @@ setmetatable(Character, metatable)
 function Character:test()
   print('character -> '..self.name)
 end 
+
+function Character:resetTempoAudio()
+  self.audio_sem_tocar_ha= 0
+  self.fim_sem_audio_tempo= 0
+  self.ini_sem_audio_tempo= 0
+end
+
+function Character:loadAudio()
+  for k, v in pairs(self.frame_positions) do
+    if self.frame_positions[k].audio~=nil then
+      self.audios[k]= love.audio.newSource('assets/audios/'..self.frame_positions[k].audio, 'static')
+    end
+  end
+end
 
 function Character:calcNewFloorPosition()
   local imaginary_px= self.observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x

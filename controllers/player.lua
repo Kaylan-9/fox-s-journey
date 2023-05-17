@@ -12,7 +12,7 @@ local metatable= {
           walking= {i= 17, f= 24, until_finished= false},
           attacking= {i= 89, f= 96, until_finished= true},
           running= {i= 33, f= 40, until_finished= false},
-          jumping= {i= 9, f= 10, until_finished= false},
+          jumping= {i= 9, f= 10, until_finished= false, audio='player_jump.wav'},
           falling= {i= 12, f= 16, until_finished= false}
         }, 
         hostile= {damage= 1, attack_frame= {90, 94}}, 
@@ -82,9 +82,37 @@ function Player:exeCicloAnimPulo()
   end
 end
 
+function Player:keypressed(key, scancode, isrepeat)
+  self:exeAudioPuloKeypressed(key, isrepeat)
+end
+
+function Player:exeAudioPulo()
+  -- reseta o tempo se o canjump é true
+  if self.p.y>=self.new_y then self:resetTempoAudio() end 
+  -- não executa há
+  self.audio_sem_tocar_ha= self.fim_sem_audio_tempo - self.ini_sem_audio_tempo
+  -- nennhum audio do player foi tocado e o audio não está tocando
+  if not self.audios.jumping:isPlaying() then
+    if self.audio_sem_tocar_ha>=self.audio_em_tantos_s then
+      self.audios.jumping:play()  
+      self.fim_sem_audio_tempo, self.ini_sem_audio_tempo= 0, 0
+    else 
+      self.fim_sem_audio_tempo= love.timer.getTime()
+    end 
+  else self.ini_sem_audio_tempo= love.timer.getTime()
+  end
+end
+
+function Player:exeAudioPuloKeypressed(key, isrepeat)
+  if (key=='up' or key=='w') and self.canjump and not isrepeat then
+    self.audios.jumping:play()
+  end
+end
+
 function Player:pulo()
   if love.keyboard.isDown("up", "w") and self.canjump==true then
     self:exeCicloAnimPulo()    
+    self:exeAudioPulo()
     local d_between_iy_fy= (self.p.f.y-self.p.i.y)
     local d_between_iy_y= (self.p.y-self.p.i.y)
     self.p.y= self.p.y - (_G.dt * math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy))) * 0.75 * 100)

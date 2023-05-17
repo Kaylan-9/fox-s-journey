@@ -43,8 +43,9 @@ function love.load()
   iniFase()
 end
 
-function love.keypressed(key)
+function love.keypressed(key, scancode, isrepeat)
   items:keypressed(key)
+  player:keypressed(key, scancode, isrepeat)
   if key == 'escape' then love.event.quit()
   elseif key == 'f11' then _G.screen:change_resolution() 
   end
