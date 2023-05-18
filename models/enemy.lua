@@ -20,6 +20,23 @@ local metatable, Enemy= {
 
 setmetatable(Enemy, metatable)
 
+-- como possui a função de executar a morte de um NPC, a função tem que remover diretamente da lista de NPCs, por isso que o método pertence a classe NPCs
+function Enemy:dying()
+  if math.floor(self.life)==0 then 
+    self.animation= 'dying'
+    if not self.audios.dying:isPlaying() then self.audios.dying:play() end
+    self.goto_player= false
+    if self.frame==self.frame_positions['dying'].f then
+      if self.acc>=(self.freq_frames) then
+        self:destroy()
+      end
+    else  
+      self:defaultUpdateFrame() 
+    end
+  end 
+end
+
+
 function Enemy:drawLifeBar()
   local larguraDaBarra= 100
   local tamanhoDeUmPontoVida= (larguraDaBarra/self.maximum_life)

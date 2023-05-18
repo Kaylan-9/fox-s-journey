@@ -73,6 +73,14 @@ end
 
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+function Character:destroy()
+  for k, v in pairs(self) do
+    self[k] = nil
+  end
+  setmetatable(self, nil)
+  self.was_destroyed= true
+end
+
 
 function Character:calcNewFloorPosition()
   local imaginary_px= self.observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x

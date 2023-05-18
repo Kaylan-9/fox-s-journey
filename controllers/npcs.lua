@@ -28,10 +28,6 @@ function NPCs:create(optioname, running_speed, starting_position, messages, spee
   end
 end 
 
-function NPCs:remove(i)
-  self.on_the_screen[i]= nil
-end
-
 function NPCs:verSeRetiraDaFilaDeInteracoesComOPlayer()
   local emptying_count= 0
   for j=1, #self.interaction_queue do
@@ -40,59 +36,52 @@ function NPCs:verSeRetiraDaFilaDeInteracoesComOPlayer()
         table.remove(self.interaction_queue, j-emptying_count)
         emptying_count= emptying_count+1
       end
+    else
+      --NPC morreu
+      table.remove(self.interaction_queue, j-emptying_count)
     end
   end
 end
-
--- como possui a função de executar a morte de um NPC, a função tem que remover diretamente da lista de NPCs, por isso que o método pertence a classe NPCs
-function NPCs:dying(i)
-  if math.floor(self.on_the_screen[i].life)==0 then 
-    self.on_the_screen[i].animation= 'dying'
-    if not self.on_the_screen[i].audios.dying:isPlaying() then self.on_the_screen[i].audios.dying:play() end
-    self.on_the_screen[i].goto_player= false
-    if self.on_the_screen[i].frame==self.on_the_screen[i].frame_positions['dying'].f then
-      if self.on_the_screen[i].acc>=(self.on_the_screen[i].freq_frames) then
-        -- apagando interação
-        for j=1, #self.interaction_queue do
-          if self.interaction_queue[j]~=nil and self.interaction_queue[j]==i then
-            table.remove(self.interaction_queue, j)
-            break
-          end
-        end
-        self.number_of_dead= self.number_of_dead + 1
-        self:remove(i)
-      end
-    else  
-      self.on_the_screen[i]:defaultUpdateFrame() 
-    end
-  end 
-end
-
 
 -- a função abaixo serve para controlar os valores correspondentes aos NPCs, como em que momento o player pode iniciar uma conversasão ou não, e também controla por exemplo até quando o esqueleto se movimentara e também a execução de sua animação
 function NPCs:update()
   for i=1, #self.on_the_screen do
-    self.on_the_screen[i].acc= self.on_the_screen[i].acc + (_G.dt * math.random(1, 5))
-    self.on_the_screen[i].mov= (_G.dt * self.on_the_screen[i].vel * 100) -- o quanto se move
-    self.on_the_screen[i]:updateParameters()
-    self.on_the_screen[i]:calcYPositionReferences()
-    self.on_the_screen[i]:chasePlayer()
-    
-    self:dying(i)
-    if not self.on_the_screen[i] then goto continue end
-    if self.on_the_screen[i].reached_the_player and not self.on_the_screen[i]:verSeExisteDialogoQueIterrompe(i) and #_G.balloon.messages==0 then
-      self.on_the_screen[i]:attackPlayer()
-      self.on_the_screen[i]:takesDamage()
-      table.insert(self.interaction_queue, i)  
+    if self.on_the_screen[i] then
+      self.on_the_screen[i].acc= self.on_the_screen[i].acc + (_G.dt * math.random(1, 5))
+      self.on_the_screen[i].mov= (_G.dt * self.on_the_screen[i].vel * 100) -- o quanto se move
+      self.on_the_screen[i]:updateParameters()
+      self.on_the_screen[i]:calcYPositionReferences()
+      self.on_the_screen[i]:chasePlayer()
+      
+      self.on_the_screen[i]:dying()
+      if self.on_the_screen[i].was_destroyed then goto continue end
+      if self.on_the_screen[i].reached_the_player and not self.on_the_screen[i]:verSeExisteDialogoQueIterrompe() and #_G.balloon.messages==0 then
+        self.on_the_screen[i]:attackPlayer()
+        self.on_the_screen[i]:takesDamage()
+        table.insert(self.interaction_queue, i)  
+      end
     end
     ::continue::
   end
   -- verifica se sai da filha de interação com os NPCs
+  self:removeMortos()
   self:verSeRetiraDaFilaDeInteracoesComOPlayer()
 end
 
 function NPCs:keypressed(key)
   self:iniciarDialogo(key)
+end
+
+function NPCs:removeMortos()
+  local count_empty_death_rate= 0 
+  
+  for i=1, #self.on_the_screen do
+    if self.on_the_screen[i-count_empty_death_rate].was_destroyed then 
+      self.number_of_dead= self.number_of_dead + 1
+      table.remove(self.on_the_screen, i-count_empty_death_rate)
+      count_empty_death_rate= count_empty_death_rate + 1
+    end
+  end 
 end
 
 function NPCs:iniciarDialogo(key)
@@ -119,7 +108,7 @@ Esse mecânismo serve para a função impedirMovimentaçãoPlayer, invés de sub
 function NPCs:naoPermiteSeMoverPara(direcao)
   local pode= false
   for i=1, #self.on_the_screen do
-    if self.on_the_screen[i].lock_movement[direcao] then
+    if self.on_the_screen-count_empty_death_rate].lock_movement[direcao] then
       pode= true
       break 
     end
@@ -152,18 +141,11 @@ end
 ]]
 
 function NPCs:draw() 
-  self:drawNPCs()
-end
-
-function NPCs:drawNPCs()
   for i=1, #self.on_the_screen do
-    if self.on_the_screen[i]~=nil then
-      self.on_the_screen[i]:draw(false)
-      self.on_the_screen[i]:drawLifeBar()
-      _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
-    end
+    self.on_the_screen[i]:draw()
+    self.on_the_screen[i]:drawLifeBar()
+    _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
   end
 end
-
 
 return NPCs
