@@ -10,14 +10,22 @@
         "goto_player": true,
         "p": {"x": 500, "y": 500},
         "vel": 1,
-        "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
+        "messages": [
+          "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
+          "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
+        ],
+        "speech_interruption": false
       }
     ],
     "boss": {
       "name": "lobo", 
       "goto_player": true,
       "vel": 1,
-      "messages": ["Ei humano o que faz aqui?!!!! Pera você é uma raposa de pé?"]
+      "messages": [
+        "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
+        "Você acha que pode desafiar o poder do lobisomem? Eu vou te mostrar o que significa enfrentar o verdadeiro predador!"
+      ],
+      "speech_interruption": false
     },
     "items": [
       {

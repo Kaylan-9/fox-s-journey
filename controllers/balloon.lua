@@ -44,26 +44,26 @@ function Balloon:load()
   }
 end
 
-function Balloon:setTiles_n()
+function Balloon:setTilesN()
   self.tiles_n.x= math.floor((_G.screen.w>self.max_width and self.max_width or _G.screen.w)/(self.tile.size.w*self.s.x))
   self.spacing.w= (_G.screen.w-(self.tiles_n.x*self.tile.size.w))/2
   self.width_msg= (self.tiles_n.x*self.tile.size.w)
 end
 
 function Balloon:update()
-  self:setTiles_n()
-  self:quebra_linhas_msg()
+  self:setTilesN()
+  self:quebraLinhasMsg()
 end
 
-function Balloon:calc_lines_n(text_w)
+function Balloon:calcLinesN(text_w)
   return math.ceil(text_w*2/(self.width_msg-(self.text_spacing*2)))
 end
 
-function Balloon:quebra_linhas_msg()
+function Balloon:quebraLinhasMsg()
   if #self.messages>0 then
     self.lines= {}
     local text_w= font:getWidth(self.messages[self.i])
-    self.lines_n= self:calc_lines_n(text_w)
+    self.lines_n= self:calcLinesN(text_w)
     local pi= 1
     local pf= 2
     local subtext= 'test'
@@ -88,12 +88,12 @@ end
 
 function Balloon:draw()
   if #self.messages>0 then
-    self:desenha_forma()
-    self:escreve_texto()
+    self:desenhaForma()
+    self:escreveTexto()
   end
 end
 
-function Balloon:desenha_forma()
+function Balloon:desenhaForma()
   for i=1, self.tiles_n.x do
     for j=1, 3 do
       if (i==1 and j==1) then
@@ -119,7 +119,7 @@ function Balloon:desenha_forma()
   end
 end
 
-function Balloon:escreve_texto()
+function Balloon:escreveTexto()
   love.graphics.setColor(0/255, 0/255, 0/255, 255/255)
   if #self.lines==self.lines_n then
     for i=1, self.lines_n do

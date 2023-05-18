@@ -34,14 +34,15 @@ end
 -- incia quando o jogo incia, mas pode ser utilizado para resetar os NPCs, por exemplo ao iir para a próxima fase 
 function NPCs:loadNPCs(npcs)
   for i=1, #npcs do
-    self:createNPC(npcs[i].name, npcs[i].goto_player, npcs[i].vel, npcs[i].p, npcs[i].messages)
+    self:createNPC(npcs[i].name, npcs[i].goto_player, npcs[i].vel, npcs[i].p, npcs[i].messages, npcs[i].speech_interruption)
   end
 end
 
-function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
+function NPCs.createNPC(self, optioname, goto_player, vel, p, messages, speech_interruption)
   if(self.options[optioname]~=nil) then
     local option= _G.tbl:deepCopy(self.options[optioname])
-    local new_character= Character(option, vel, p, false, optioname, messages)
+    print(speech_interruption and 'y' or 'n')
+    local new_character= Character(option, vel, p, false, optioname, messages, speech_interruption)
     new_character.goto_player= goto_player
     new_character.lock_movement= {
       left= false, 
@@ -50,7 +51,6 @@ function NPCs.createNPC(self, optioname, goto_player, vel, p, messages)
     table.insert(self.on_the_screen, new_character) --adiciona personagem em cena
   end
 end 
-
 
 function NPCs:calcYPositionReferences(i)
   if self.on_the_screen[i].p.f.y==-100 then self.on_the_screen[i].p.y= self.on_the_screen[i].new_y end
@@ -221,6 +221,16 @@ function NPCs:removeNPC(i)
   self.on_the_screen[i]= nil
 end
 
+function NPCs:verSeExisteDialogoQueIterrompe(indice)
+  print(self.on_the_screen[indice].speech_interruption)
+  if self.on_the_screen[indice].speech_interruption then
+    _G.balloon.messages= self.on_the_screen[indice].messages
+    self.on_the_screen[indice].speech_interruption= false
+    return true 
+  end
+  return false
+end
+
 function NPCs:updateNPCs()
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i] then
@@ -234,7 +244,7 @@ function NPCs:updateNPCs()
       self:calcYPositionReferences(i)
       self:chasePlayer(i)
       -- self:impedirMovimentacaoPlayer(i)
-      if self.on_the_screen[i].reached_the_player then
+      if self.on_the_screen[i].reached_the_player and not self:verSeExisteDialogoQueIterrompe(i) and #_G.balloon.messages==0 then
         self:attackPlayer(i)
         self:takesDamage(i)
         table.insert(self.interaction_queue, i)  
@@ -244,8 +254,6 @@ function NPCs:updateNPCs()
   end
   -- verifica se sai da filha de interação com os NPCs
   self:verSeRetiraDaFilaDeInteracoesComOPlayer()
-  -- controle de diálogo entre personagem e player
-  self:inciarInteracao()
 end
 
 function NPCs:updateBoss()
@@ -265,6 +273,27 @@ end
 function NPCs:update()
   self:updateNPCs()
   self:updateBoss()
+end
+
+function NPCs:keypressed(key)
+  self:iniciarDialogo(key)
+end
+
+function NPCs:iniciarDialogo(key)
+  if key=='f' then 
+    if #balloon.messages==0 then
+      if #self.interaction_queue>0 then
+        _G.balloon.messages= self.on_the_screen[self.interaction_queue[1]].messages
+      end
+    else
+      if _G.balloon.i<#balloon.messages then 
+        _G.balloon.i= _G.balloon.i+1
+      else 
+        _G.balloon.messages= {}
+        _G.balloon.i= 1
+      end
+    end
+  end
 end
 
 -- Esse mecânismo serve para a função impedirMovimentaçãoPlayer, invés de subtrair a soma de movimentação do player na horizontal é melhor travar a sua posição com base em uma propriedade para cada NPC
@@ -301,23 +330,6 @@ function NPCs:impedirMovimentacaoPlayer(i)
     self.on_the_screen[i].lock_movement.left= false
   end
 end 
-
-function NPCs:inciarInteracao()
-  if love.keyboard.isDown('f') then 
-    if #balloon.messages==0 then
-      if #self.interaction_queue>0 then
-        _G.balloon.messages= self.on_the_screen[self.interaction_queue[1]].messages
-      end
-    else
-      if _G.balloon.i<#balloon.messages then 
-        _G.balloon.i= _G.balloon.i+1
-      else 
-        _G.balloon.messages= {}
-        _G.balloon.i= 1
-      end
-    end
-  end
-end
 
 
 function NPCs:draw() 

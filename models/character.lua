@@ -4,7 +4,7 @@
 
 local Tileset= require('models.tileset')
 local Character, metatable= {}, {
-  __call= function(self, option_props, vel, p, observadoPelaCamera, tileset, messages) --self permite acessar os atributos de uma instância de uma classe
+  __call= function(self, option_props, vel, p, observadoPelaCamera, tileset, messages, speech_interruption) --self permite acessar os atributos de uma instância de uma classe
     local obj= {} --objeto para armazenar os futuros atributos de uma classe
     obj.name= option_props.name
     obj.s= option_props.s
@@ -28,10 +28,10 @@ local Character, metatable= {}, {
     obj.p= p
     obj.p.i= {y=-100}
     obj.p.f= {y=-100}
-    obj.audios= {}
     obj.new_y= 0
     obj.observadoPelaCamera= observadoPelaCamera 
     obj.audio_em_tantos_s= 2
+    obj.speech_interruption= speech_interruption
     setmetatable(obj, {__index= self}) -- relacionar os atributos da classe com a metatable
     obj:loadAudio()
     obj:resetTempoAudio()
@@ -52,6 +52,7 @@ function Character:resetTempoAudio()
 end
 
 function Character:loadAudio()
+  self.audios= {}
   for k, v in pairs(self.frame_positions) do
     if self.frame_positions[k].audio~=nil then
       self.audios[k]= love.audio.newSource('assets/audios/'..self.frame_positions[k].audio, 'static')

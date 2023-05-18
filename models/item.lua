@@ -65,7 +65,7 @@ end
 function Item:playerPodeOuNaoColetar()
   local can= false
   if collision:circle(_G.player.p, self.p, (_G.player.body.w/2)) then
-    can= (self.type=='colecionável' or love.keyboard.isDown('l'))
+    can= (self.type=='colecionável' or love.keyboard.isDown('f'))
   end
   return can
 end
