@@ -1,5 +1,6 @@
 _G.json= require('useful.json')
 _G.tbl= require('useful.tbl')
+_G.options_npcs= json.import('data/options_npcs.json')
 _G.options_tileset= json.import('data/options_tileset.json')
 _G.collision= require('useful.collision')
 _G.current_stage_game= 1
@@ -33,7 +34,7 @@ local function iniFase()
   end
   -- teste
   _G.items= Items(fase.items, inventory, collectibles)
-  _G.npcs= NPCs(fase.boss, fase.npcs)
+  _G.npcs= NPCs(fase.npcs)
   _G.player= Player()
 end 
 
@@ -54,10 +55,10 @@ end
 
 
 local function passouDeFase()
-  if npcs.boss.life<=0 then
-    _G.current_stage_game= _G.current_stage_game + 1
-    iniFase()
-  end
+  -- if npcs.boss.life<=0 then
+  --   _G.current_stage_game= _G.current_stage_game + 1
+  --   iniFase()
+  -- end
 end
 
 function love.update(dt)
@@ -65,8 +66,8 @@ function love.update(dt)
   displayers:update()
   _G.dt= dt
   map:update()
-  player:update()
   npcs:update()
+  player:update()
   items:update()
   balloon:update()
 end

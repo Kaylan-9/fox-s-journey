@@ -148,14 +148,18 @@ function Player:moveX(mov)
   }
 
   local ver_padrao= {
-    left= (love.keyboard.isDown("left", "a") and not _G.npcs:naoPermiteSeMoverPara('left') and self.p.x>(self.vel*2)),
-    right= (love.keyboard.isDown("right", "d") and not _G.npcs:naoPermiteSeMoverPara('right') and (self.p.x<(_G.screen.w-(self.vel*2))))
+    left= (love.keyboard.isDown("left", "a") and self.p.x>(self.vel*2)),
+    right= (love.keyboard.isDown("right", "d") and (self.p.x<(_G.screen.w-(self.vel*2))))
   }
 
   if self.pressed.mov then self:exeCicloAnimMov() end
-  if (ver_padrao.left and lim.left) or (ver_padrao.left and _G.npcs.boss.active) then 
+  if (ver_padrao.left and lim.left) 
+  -- or (ver_padrao.left and _G.npcs.boss.active)
+   then 
     self.p.x= self.p.x-mov
-  elseif (ver_padrao.right and lim.right) or (ver_padrao.right and _G.npcs.boss.active) then 
+  elseif (ver_padrao.right and lim.right) 
+  -- or (ver_padrao.right and _G.npcs.boss.active) 
+then 
     self.p.x= self.p.x+mov
   end
 end

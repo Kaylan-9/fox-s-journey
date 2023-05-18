@@ -66,7 +66,7 @@ function Map:cam_movement()
     _G.npcs.boss.active= true
   end
 
-  if not _G.npcs.boss.active then
+  -- if not _G.npcs.boss.active then
     if self.cam.active then
       self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
 
@@ -82,7 +82,7 @@ function Map:cam_movement()
       end
 
     end
-  end
+  -- end
 end
 
 function Map:update()
