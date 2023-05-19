@@ -4,7 +4,7 @@ local Item= require('models.item')
 local Items, metatable= {}, {
   __call= function(self, items, inventory, collectibles) -- -> pelo player, com exceção do list
     local obj= {}
-    obj.options= json.import('data/options_items.json')
+    obj.options= json.import('data/options/items.json')
     obj.in_the_game_stage= {}
     obj.inventory= inventory and inventory or {}
     obj.emptying_count_inventory= 0
@@ -27,10 +27,25 @@ function Items:load(items)
   for i=1, #items do 
     local option= _G.tbl:deepCopy(self.options[items[i].name])
     local tileset= Tileset('assets/graphics/'.._G.options_tileset[option.tileset].imgname, _G.options_tileset[option.tileset].n)
-    local new_item= Item(option.name, option.frame, {x=items[i].p.x, y=-100}, option.s, option.type, option.val_mod_em_interacao, tileset)
-    new_item.new_y= 0
-    table.insert(self.in_the_game_stage, new_item)
+    if type(items[i].p.x)=='number' then self:create(option, tileset, items[i].p.x)
+    else 
+      self:createVariosDeUmaVez(option, tileset, items[i].p.xi, items[i].p.xf)
+    end
   end
+end
+
+function Items:create(option, tileset, x)
+  local new_item= Item(option.name, option.frame, {x=x, y=-100}, option.s, option.type, option.val_mod_em_interacao, tileset)
+  new_item.new_y= 0
+  table.insert(self.in_the_game_stage, new_item)
+end
+
+function Items:createVariosDeUmaVez(option, tileset, xi, xf)
+  local spacing_entre_cada = tileset.tileSize.w+(tileset.tileSize.w/2)
+  local num_items= (xf-xi)/spacing_entre_cada
+  for i=0, num_items-1 do 
+    self:create(option, tileset, xi+(i*spacing_entre_cada))
+  end 
 end
 
 function Items:removeItem(indice)

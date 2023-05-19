@@ -25,16 +25,20 @@ local metatable= {
     ) 
     obj.pressed= {}
     obj.canjump= true
-    obj.expression= {}
-    obj.expression.s= {x= 1.5, y= 1.5}
-    obj.expression.frame= 1
-    obj.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
     setmetatable(obj, {__index= self})
+    obj:setExpressionProps()
     return obj
   end
 }
 
 setmetatable(Player, metatable)
+
+function Player:setExpressionProps()
+  self.expression= {}
+  self.expression.s= {x= 1.5, y= 1.5}
+  self.expression.frame= 1
+  self.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
+end
 
 function Player:updateFrame(nao_ha_messages)
   self.pressed.mov= love.keyboard.isDown("right", "d", "left", "a")

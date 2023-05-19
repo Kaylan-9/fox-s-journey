@@ -14,7 +14,7 @@
           "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
           "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
         ],
-        "speech_interruption": false
+        "speech_interruption": true
       }
     ],
     "boss": {
@@ -61,7 +61,8 @@
       {
         "name": "gema_green",
         "p": {
-          "x": 1100
+          "xi": 1100,
+          "xf": 4000
         }
       }
 

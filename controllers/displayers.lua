@@ -13,7 +13,7 @@ local Displayers, metatable= {}, {
       spacing_tile= { w= 5, h= 5 }, --espaço entre cada tile
       s= {x= 2, y=2}
     }
-    obj.options_items= json.import('data/options_items.json')
+    obj.options_items= json.import('data/options/items.json')
     obj.props_items= {}
     obj.props_lifeBar= {
       frame= 1,
