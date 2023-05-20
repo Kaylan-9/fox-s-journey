@@ -1,9 +1,8 @@
 local Tileset= require('models.tileset')
 local Map, metatable= {}, {
-  __call= function(self, filename_tileset_map, filename_map, filename_background)
-    local obj= {}
+  __call= function(self, config)
+    local obj= config
     obj.options_maps= json.import('data/options/maps.json')
-    obj.option_map= obj.options_maps[filename_tileset_map]
     obj.matriz= {}
     obj.s= {x= 2, y= 2}
     obj.cam= {}
@@ -17,13 +16,13 @@ local Map, metatable= {}, {
     obj.background= {}
     obj.background.s= {}
     obj.background.img= {}
-    obj.background.img.obj= love.graphics.newImage("assets/graphics/"..filename_background)
+    obj.background.img.obj= love.graphics.newImage("assets/graphics/"..obj.filename_background)
     obj.background.img.size= {}
     obj.background.img.size.w= obj.background.img.obj:getWidth()
     obj.background.img.size.h= obj.background.img.obj:getHeight()
     setmetatable(obj, {__index= self})
     obj:backgroundLoad()
-    obj:load(filename_tileset_map, filename_map)
+    obj:load()
     return obj
   end
 }
@@ -40,10 +39,10 @@ function Map:backgroundLoad()
   end
 end
 
-function Map.load(self, filename_tileset_map, filename_map)
-  self.tileset= Tileset('assets/graphics/'..filename_tileset_map, {x=10, y=6}, nil, self.s)
+function Map:load()
+  self.tileset= Tileset('assets/graphics/'..self.filename_tileset, self.n, nil, self.s)
   self.s= self.tileset.scale
-  local file = io.open('assets/maps/'..filename_map)  
+  local file = io.open('assets/maps/'..self.filename)  
   if file~=nil then
     for line in file:lines() do
       self.matriz[#self.matriz + 1] = {}
@@ -59,6 +58,7 @@ function Map.load(self, filename_tileset_map, filename_map)
   }
   self.cam.p.i.x= (_G.screen.w/2)
   self.cam.p.f.x= (self.dimensions.w-(_G.screen.w/2))
+  self.option_map= _G.tbl:deepCopy(self.options_maps[self.filename_tileset])
 end
 
 function Map:camBloqueaNoBoss()

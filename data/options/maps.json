@@ -1,5 +1,5 @@
 {
-  "tilesetOpenGame.png":{
+  "tilesetOpenGame.png": {
     "s": {"tile": 34, "behavior": "none"},
     "g": {"tile": 43, "behavior": "down_and_up"},
     "G": {"tile": 44, "behavior": "floor"},
@@ -18,5 +18,13 @@
     "L": {"tile": 27, "behavior": "none"},
     "j": {"tile": 38, "behavior": "none"},
     "J": {"tile": 39, "behavior": "none"}
+  },
+  "cave_tileset.png": {
+    "g": {"tile": 51, "behavior": "down_and_up"},
+    "G": {"tile": 52, "behavior": "floor"},
+    "h": {"tile": 53, "behavior": "up_and_down"},
+    "t": {"tile": 61, "behavior": "none"},
+    "T": {"tile": 62, "behavior": "none"},
+    "y": {"tile": 63, "behavior": "none"}
   }
 }

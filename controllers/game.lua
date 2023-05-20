@@ -54,7 +54,7 @@ local function newTimer(duracao)
 end
 
 function Game:setTimers()
-  self.timerFimFase= newTimer(5)
+  self.timerFimFase= newTimer(1)
 end
 
 function Game:nextLevel()
@@ -86,11 +86,7 @@ end
 
 function Game:loadLevel()
   self:loadMusic()
-  _G.map= Map(
-    self.fase.filename_tileset_map,
-    self.fase.filename_map, 
-    self.fase.filename_background
-  )
+  _G.map= Map(self.fase.map)
   self:loadItems()
   self:determinarBoss()
   _G.npcs= NPCs(self.fase.npcs)
@@ -131,7 +127,7 @@ function Game:update()
 end
 
 function Game:draw()
-  map:draw() 
+  if map then map:draw() end
   player:draw()
   player:drawExpression()
   npcs:draw()

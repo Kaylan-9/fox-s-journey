@@ -4,9 +4,12 @@
     "music": "music_florest.mp3",
     "bossmusic": "boss_florest_music.mp3",
     "difficulty": 1,
-    "filename_map": "1.txt",
-    "filename_background": "tilesetOpenGameBackground.png",
-    "filename_tileset_map": "tilesetOpenGame.png",
+    "map": {
+      "filename": "1.txt",
+      "filename_background": "tilesetOpenGameBackground.png",
+      "filename_tileset": "tilesetOpenGame.png",
+      "n": {"x": 10, "y": 6}
+    },
     "npcs": [
       {
         "name": "lobo", 
@@ -85,11 +88,14 @@
   {
     "name": "Cavernas Misteriosas",
     "music": "music_cave.mp3",
+    "map": {
+      "filename_background": "cave_background.png",
+      "filename_tileset": "cave_tileset.png",
+      "filename": "1.txt",
+      "n": {"x": 10, "y": 7}
+    },
     "bossmusic": "boss_cave_music.mp3",
-    "filename_background": "cave_background.png",
-    "filename_tileset_map": "cave_tileset.png",
     "difficulty": 2,
-    "filename_map": "1.txt",
     "npcs": [],
     "items": [],
     "boss": {
