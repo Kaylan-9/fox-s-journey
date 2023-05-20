@@ -8,7 +8,6 @@ local metatable, Enemy= {
     --tileset recebe o nome de option_props pois eles são iguais, ou seja menos um argumento
     local obj= Character(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption)
     obj.goto_player= goto_player
-    obj.active= false
     obj.lock_movement= {
       left= false, 
       right= false

@@ -4,6 +4,7 @@
     "difficulty": 1,
     "map_file": "1.txt",
     "background_file": "tilesetOpenGameBackground.png",
+    "filename_tileset_map": "tilesetOpenGame.png",
     "npcs": [
       {
         "name": "lobo", 
@@ -14,7 +15,18 @@
           "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
           "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
         ],
-        "speech_interruption": true
+        "speech_interruption": false
+      },
+      {
+        "name": "lobo", 
+        "goto_player": true,
+        "p": {"x": 3500, "y": 500},
+        "vel": 1,
+        "messages": [
+          "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
+          "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
+        ],
+        "speech_interruption": false
       }
     ],
     "boss": {
@@ -70,13 +82,21 @@
   }, 
   {
     "name": "Cavernas Misteriosas",
+    "background_file": "tilesetOpenGameBackground.png",
+    "filename_tileset_map": "cave_tileset.png",
     "difficulty": 2,
-    "map_file": "2.txt",
-    "enemies": [
-
-    ],
-    "items": [
-      
-    ]
+    "map_file": "1.txt",
+    "npcs": [],
+    "items": [],
+    "boss": {
+      "name": "lobo", 
+      "goto_player": true,
+      "vel": 10,
+      "messages": [
+        "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
+        "Você acha que pode desafiar o poder do lobisomem? Eu vou te mostrar o que significa enfrentar o verdadeiro predador!"
+      ],
+      "speech_interruption": false
+    }
   }
 ]

@@ -3,7 +3,7 @@
     "name": "esqueleto",
     "hostile": false,
     "s": {"x": 3, "y": 3},
-    "frame_positions": {"walking": {"i":2, "f":7, "until_finished":false}},
+    "frame_positions": {"walking": {"i":2, "f":7, "type": "default"}},
     "direction": 1,
     "body": {"w":20, "h":20}
   },
@@ -15,9 +15,9 @@
     },
     "s": {"x": 0.75, "y": 0.75},
     "frame_positions": {
-      "walking": {"i":4, "f":7, "until_finished":false},
-      "attacking": {"i":19, "f":26, "until_finished":true},
-      "dying": {"i": 27, "f": 33, "until_finished": true, "audio": "lobo_dying.mp3"}
+      "walking": {"i":4, "f":7, "type": "default"},
+      "attacking": {"i":19, "f":26, "type": "until_finished"},
+      "dying": {"i": 27, "f": 33, "type": "until_finished", "audio": "lobo_dying.mp3"}
     },
     "direction": -1,
     "body": {"w":150, "h":120}

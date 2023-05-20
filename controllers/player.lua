@@ -9,11 +9,12 @@ local metatable= {
         name= "Faye", 
         s= {x= 2.5, y= 2.5}, 
         frame_positions= {
-          walking= {i= 17, f= 24, until_finished= false},
-          attacking= {i= 89, f= 96, until_finished= true},
-          running= {i= 33, f= 40, until_finished= false},
-          jumping= {i= 9, f= 10, until_finished= false, audio='player_jump.wav'},
-          falling= {i= 12, f= 16, until_finished= false}
+          walking= {i= 17, f= 24, type= "default"},
+          attacking= {i= 89, f= 96, type= "until_finished"},
+          running= {i= 33, f= 40, type= "default"},
+          jumping= {i= 9, f= 10, type= "default", audio='player_jump.wav'},
+          falling= {i= 12, f= 16, type= "default"},
+          finishing= {i= 237, f= 238, type= "default"}
         }, 
         hostile= {damage= 1, attack_frame= {90, 94}}, 
         body= {w=30, h=80}
@@ -48,6 +49,7 @@ function Player:updateFrame(nao_ha_messages)
 
   local sendo_controlado= self.pressed.mov or self.pressed.run or self.pressed.jump or self.pressed.soco
   local mudanca_frame= 
+    self.animation=='finishing' or
     self.pressed.soco or 
     (sendo_controlado and nao_ha_messages==true) or 
     (self.canjump==false) or 
@@ -143,7 +145,8 @@ function Player:mudancaDirecao()
   end
 end 
 
-function Player:moveX(mov)
+function Player:moveX()
+  local mov= (_G.dt * self.vel * 100)
   local posicao_cam_inativa_e_igual= (_G.map.cam.p.x+self.p.x<=_G.map.cam.p.i.x+(self.vel*2)) or (_G.map.cam.p.x+self.p.x>=_G.map.cam.p.f.x-self.vel)
   --limite na tela com base no controle do Player
   local lim= {
@@ -157,12 +160,10 @@ function Player:moveX(mov)
   }
 
   if self.pressed.mov then self:exeCicloAnimMov() end
-  if (ver_padrao.left and lim.left) 
-  -- or (ver_padrao.left and _G.npcs.boss.active)
+  if (ver_padrao.left and lim.left) or (ver_padrao.left and _G.boss.active)
    then 
     self.p.x= self.p.x-mov
-  elseif (ver_padrao.right and lim.right) 
-  -- or (ver_padrao.right and _G.npcs.boss.active) 
+  elseif (ver_padrao.right and lim.right) or (ver_padrao.right and _G.boss.active) 
 then 
     self.p.x= self.p.x+mov
   end
@@ -187,10 +188,11 @@ function Player:update()
   if nao_ha_messages then
     self:soco()
     self:mudancaDirecao()
-    self:moveX((_G.dt * self.vel * 100))
+    self:moveX()
     self:pulo()
     self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
   end
+  self:finalizando()
   self.acc= self.acc+(_G.dt * math.random(1, 3))
 end
 
@@ -210,6 +212,11 @@ function Player:calcYPositionReferences()
   if  (self.p.y==self.p.f.y) then self.p.i.y= self.new_y-90 end
 end
 
+function Player:finalizando()
+  if _G.boss.was_destroyed then
+    self.animation= 'finishing'
+  end
+end
 
 function Player:drawExpression()
   love.graphics.draw(

@@ -1,6 +1,6 @@
 local Tileset= require('models.tileset')
 local Map, metatable= {}, {
-  __call= function(self, filename_map, filename_background)
+  __call= function(self, filename_tileset_map, filename_map, filename_background)
     local obj= {}
     obj.matriz= {}
     obj.s= {x= 2, y= 2}
@@ -21,7 +21,7 @@ local Map, metatable= {}, {
     obj.background.img.size.h= obj.background.img.obj:getHeight()
     setmetatable(obj, {__index= self})
     obj:backgroundLoad()
-    obj:load(filename_map)
+    obj:load(filename_tileset_map, filename_map)
     return obj
   end
 }
@@ -38,8 +38,8 @@ function Map:backgroundLoad()
   end
 end
 
-function Map.load(self, filename_map)
-  self.tileset= Tileset('assets/graphics/tilesetOpenGame.png', {x=10, y=6}, nil, self.s)
+function Map.load(self, filename_tileset_map, filename_map)
+  self.tileset= Tileset('assets/graphics/'..filename_tileset_map, {x=10, y=6}, nil, self.s)
   self.s= self.tileset.scale
   local file = io.open('assets/maps/'..filename_map)  
   if file~=nil then
@@ -57,17 +57,24 @@ function Map.load(self, filename_map)
   self.cam.p.f.x= (self.dimensions.w-(_G.screen.w/2))
 end
 
-function Map:cam_movement()
-  -- variável responsável por determinar se a câmera está ativa ou não
-  self.cam.active= ((self.cam.p.x+_G.player.p.x>self.cam.p.i.x) and (self.cam.p.x+_G.player.p.x<(self.cam.p.f.x)))
-
-  -- determinar que o boss é ativo
-  if self.cam.p.x+_G.player.p.x>=(self.cam.p.f.x)-1 then
-    _G.npcs.boss.active= true
+function Map:camBloqueaNoBoss()
+  if self:positcaoRealPlayer()>=(self.cam.p.f.x)-1 then
+    _G.boss.active= true
   end
+end
+
+function Map:positcaoRealPlayer()
+  return self.cam.p.x+_G.player.p.x
+end
+
+function Map:camMovement()
+  -- variável responsável por determinar se a câmera está ativa ou não
+  local p_inicial_min= (self:positcaoRealPlayer()>self.cam.p.i.x)
+  local p_final_max= (self:positcaoRealPlayer()<(self.cam.p.f.x))
+  self.cam.active= (p_inicial_min and p_final_max)
 
   -- if not _G.npcs.boss.active then
-    if self.cam.active then
+    if self.cam.active and not _G.boss.active then
       self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
 
       if love.keyboard.isDown("right", "d") then
@@ -89,7 +96,8 @@ function Map:update()
   local nao_ha_messages= (#_G.balloon.messages==0)
   -- permite o personagem se mover se não há mensagens
   if nao_ha_messages then
-    self:cam_movement()
+    self:camBloqueaNoBoss()
+    self:camMovement()
     self:backgroundLoad()
   end
 end
@@ -119,7 +127,7 @@ end
 
 -- Tem o propósito de diminuir o código: serve para indicar que o símbolo na tela será renderizado como o "tile" correspondente ao id_tile (índice da tabela de tiles)
 
-function Map:tile_draw(i, j, id_tile, symbol)
+function Map:tileDraw(i, j, id_tile, symbol)
   if self.matriz[i+1][j+1]==symbol then
     love.graphics.draw(
       self.tileset.obj,
@@ -137,25 +145,25 @@ function Map:draw()
   love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
   for i = 0, #self.matriz-1 do                             
     for j = 0, #self.matriz[i+1]-1 do                     
-      self:tile_draw(i, j, 34, "s")
-      self:tile_draw(i, j, 43, "g")
-      self:tile_draw(i, j, 44, "G")
-      self:tile_draw(i, j, 45, "h")
-      self:tile_draw(i, j, 53, "t")
-      self:tile_draw(i, j, 54, "T")
-      self:tile_draw(i, j, 55, "y")
-      self:tile_draw(i, j, 55, "y")
-      self:tile_draw(i, j, 8, "r")
-      self:tile_draw(i, j, 9, "A")
-      self:tile_draw(i, j, 18, "k")
-      self:tile_draw(i, j, 19, "K")
-      self:tile_draw(i, j, 20, "a")
-      self:tile_draw(i, j, 30, "l")
-      self:tile_draw(i, j, 29, "I")
-      self:tile_draw(i, j, 28, "i")
-      self:tile_draw(i, j, 27, "L")
-      self:tile_draw(i, j, 38, "j")
-      self:tile_draw(i, j, 39, "J")
+      self:tileDraw(i, j, 34, "s")
+      self:tileDraw(i, j, 43, "g")
+      self:tileDraw(i, j, 44, "G")
+      self:tileDraw(i, j, 45, "h")
+      self:tileDraw(i, j, 53, "t")
+      self:tileDraw(i, j, 54, "T")
+      self:tileDraw(i, j, 55, "y")
+      self:tileDraw(i, j, 55, "y")
+      self:tileDraw(i, j, 8, "r")
+      self:tileDraw(i, j, 9, "A")
+      self:tileDraw(i, j, 18, "k")
+      self:tileDraw(i, j, 19, "K")
+      self:tileDraw(i, j, 20, "a")
+      self:tileDraw(i, j, 30, "l")
+      self:tileDraw(i, j, 29, "I")
+      self:tileDraw(i, j, 28, "i")
+      self:tileDraw(i, j, 27, "L")
+      self:tileDraw(i, j, 38, "j")
+      self:tileDraw(i, j, 39, "J")
     end
   end
 end

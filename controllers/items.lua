@@ -10,6 +10,7 @@ local Items, metatable= {}, {
     obj.emptying_count_inventory= 0
     obj.emptying_count_in_the_game_stage= 0
     obj.collectibles= collectibles and collectibles or {}
+    obj.audio_collecting_item= love.audio.newSource('assets/audios/collecting_items.wav', 'static')
     setmetatable(obj, {__index= self})
     obj:load(items)
     return obj
@@ -74,6 +75,7 @@ end
 
 function Items:verIndiviCadaItemSeColetar(i)
   if self.in_the_game_stage[i]:playerPodeOuNaoColetar() then
+    self.audio_collecting_item:play()
     if self.in_the_game_stage[i].type~='colecionável' then self:addToInventory(i)
     else self:addToCollectibles(i)
     end

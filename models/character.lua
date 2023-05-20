@@ -118,7 +118,7 @@ function Character:getSide(direction)
 end
 
 function Character:defaultUpdateFrame(alternar)
-  if (self.animation~='' and alternar==nil) or (self.animation~='' and alternar) then
+  if self.animation~='' and (alternar==nil or alternar or self.frame_positions[self.animation].type=='infinite') then
     if self.acc>=(self.freq_frames) then
       self.frame= self.frame + 1
       self.acc= 0
@@ -135,11 +135,11 @@ function Character:defaultUpdateFrame(alternar)
       end
 
       --- Se a animação não é travada significa que ela está iniciando uma nova animação, essa estrutura basicamente a função de travar animação se ela está no primeiro frame, e quando ele chegar no último ela será destravada
-      if self.frame_positions[self.animation].until_finished==true then
+      if self.frame_positions[self.animation].type=="until_finished" then
         self.previous_animation= self.frame_positions[self.animation]
         self.hold_animation= (self.frame<self.frame_positions[self.animation].f-1 and self.frame>=self.frame_positions[self.animation].i)
       -- Espera animação
-      elseif self.previous_animation.until_finished==true and self.hold_animation==true then
+      elseif self.previous_animation.type=="until_finished" and self.hold_animation==true then
         self.hold_animation= (self.frame<self.previous_animation.f-1 and self.frame>=self.previous_animation.i)
       end
 
