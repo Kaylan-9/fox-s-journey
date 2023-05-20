@@ -1,0 +1,22 @@
+{
+  "tilesetOpenGame.png":{
+    "s": {"tile": 34, "behavior": "none"},
+    "g": {"tile": 43, "behavior": "down_and_up"},
+    "G": {"tile": 44, "behavior": "floor"},
+    "h": {"tile": 45, "behavior": "up_and_down"},
+    "t": {"tile": 53, "behavior": "none"},
+    "T": {"tile": 54, "behavior": "none"},
+    "y": {"tile": 55, "behavior": "none"},
+    "r": {"tile": 8, "behavior": "none"},
+    "A": {"tile": 9, "behavior": "none"},
+    "k": {"tile": 18, "behavior": "none"},
+    "K": {"tile": 19, "behavior": "none"},
+    "a": {"tile": 20, "behavior": "none"},
+    "l": {"tile": 30, "behavior": "none"},
+    "I": {"tile": 29, "behavior": "none"},
+    "i": {"tile": 28, "behavior": "none"},
+    "L": {"tile": 27, "behavior": "none"},
+    "j": {"tile": 38, "behavior": "none"},
+    "J": {"tile": 39, "behavior": "none"}
+  }
+}

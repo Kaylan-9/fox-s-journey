@@ -2,6 +2,8 @@ local Tileset= require('models.tileset')
 local Map, metatable= {}, {
   __call= function(self, filename_tileset_map, filename_map, filename_background)
     local obj= {}
+    obj.options_maps= json.import('data/options/maps.json')
+    obj.option_map= obj.options_maps[filename_tileset_map]
     obj.matriz= {}
     obj.s= {x= 2, y= 2}
     obj.cam= {}
@@ -45,7 +47,9 @@ function Map.load(self, filename_tileset_map, filename_map)
   if file~=nil then
     for line in file:lines() do
       self.matriz[#self.matriz + 1] = {}
-      for j = 1, #line, 1 do self.matriz[#self.matriz][j] = line:sub(j,j) end
+      for j = 1, #line do 
+        self.matriz[#self.matriz][j] = line:sub(j,j) 
+      end
     end
     file:close()
   end
@@ -102,26 +106,47 @@ function Map:update()
   end
 end
 
+function Map:tileAtualX(imaginary_px)
+  return math.ceil((imaginary_px)/self.tileset.tileSize.w)
+end
+
+function Map:behaviorTileAtual(i, j, behavior)
+  if self.option_map[self.matriz[i][j]]~=nil then
+    return self.option_map[self.matriz[i][j]].behavior==behavior
+  end
+end
+
+function Map:indicePY(i, tile_percentage)
+  return #self.matriz+tile_percentage-i
+end 
+
+function Map:calcFloorTileAtual(i, j, indice_inicial, imaginary_px, character_h, character_sx)
+  local reajuste_meio_personagem= math.abs((character_h*character_sx)/2.2)
+  local tile_percentage= 0
+  if self:behaviorTileAtual(i, j, 'floor') then tile_percentage= indice_inicial
+                                                                           --1 inverte o sentido aumentando o y 
+  elseif self:behaviorTileAtual(i, j, 'down_and_up') then tile_percentage= 1-(j-(imaginary_px/self.tileset.tileSize.w))
+  elseif self:behaviorTileAtual(i, j, 'up_and_down') then tile_percentage= (j-(imaginary_px/self.tileset.tileSize.w))
+  end
+
+  if tile_percentage~=0 then 
+    return _G.screen.h-(self:indicePY(i, tile_percentage)*(self.tileset.tileSize.h))-reajuste_meio_personagem
+  end
+end
+
 function Map:positionCharacter(position, imaginary_px, character_h, character_sx)
-  local j = math.ceil((imaginary_px)/self.tileset.tileSize.w)
-  local newy
-  for i=1, #self.matriz do
-    if self.matriz[i][j]=='G' then
-      newy= _G.screen.h-((#self.matriz+1-i)*(self.tileset.tileSize.h))-math.abs((character_h*character_sx)/2.2)
-      break
-    elseif self.matriz[i][j]=='g' or self.matriz[i][j]=='h' then
-      -- distância do começo ao fim do azulejo
-      -- somando o valor decimal restante do tile como a altura em relação a distância do quadrado e inverter se a direção for oposta
-      local d_from_start_tile= self.matriz[i][j]=='h' and (j-((imaginary_px)/self.tileset.tileSize.w)) or (((imaginary_px)/self.tileset.tileSize.w)-math.floor((imaginary_px)/self.tileset.tileSize.w))
-      newy= _G.screen.h-((#self.matriz+(
-        d_from_start_tile
-      )-i)*(self.tileset.tileSize.h))-math.abs((character_h*character_sx)/2.2)
-      break
-    end
+  local indice_inicial= 1
+  local new_positiony
+  local j = self:tileAtualX(imaginary_px)
+  for i=indice_inicial, #self.matriz do
+    new_positiony= self:calcFloorTileAtual(i, j, indice_inicial, imaginary_px, character_h, character_sx)
+    if new_positiony then 
+      break 
+    end 
   end
   return {
     x= position.x,
-    y= newy
+    y= new_positiony
   }
 end
 
@@ -145,25 +170,10 @@ function Map:draw()
   love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
   for i = 0, #self.matriz-1 do                             
     for j = 0, #self.matriz[i+1]-1 do                     
-      self:tileDraw(i, j, 34, "s")
-      self:tileDraw(i, j, 43, "g")
-      self:tileDraw(i, j, 44, "G")
-      self:tileDraw(i, j, 45, "h")
-      self:tileDraw(i, j, 53, "t")
-      self:tileDraw(i, j, 54, "T")
-      self:tileDraw(i, j, 55, "y")
-      self:tileDraw(i, j, 55, "y")
-      self:tileDraw(i, j, 8, "r")
-      self:tileDraw(i, j, 9, "A")
-      self:tileDraw(i, j, 18, "k")
-      self:tileDraw(i, j, 19, "K")
-      self:tileDraw(i, j, 20, "a")
-      self:tileDraw(i, j, 30, "l")
-      self:tileDraw(i, j, 29, "I")
-      self:tileDraw(i, j, 28, "i")
-      self:tileDraw(i, j, 27, "L")
-      self:tileDraw(i, j, 38, "j")
-      self:tileDraw(i, j, 39, "J")
+      -- acessando configuração do tileset do mapa atual para desenhar o tile correto
+      for k, v in pairs(self.option_map) do
+        self:tileDraw(i, j, v.tile, k)
+      end
     end
   end
 end

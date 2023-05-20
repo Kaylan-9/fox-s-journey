@@ -21,7 +21,6 @@ setmetatable(Game, metatable)
 
 function Game:somaTempo()
   self.timer= self.timer + (_G.dt)
-  print(self.timer)
 end
 
 function Game:setProps()
@@ -89,8 +88,8 @@ function Game:loadLevel()
   self:loadMusic()
   _G.map= Map(
     self.fase.filename_tileset_map,
-    self.fase.map_file, 
-    self.fase.background_file
+    self.fase.filename_map, 
+    self.fase.filename_background
   )
   self:loadItems()
   self:determinarBoss()
