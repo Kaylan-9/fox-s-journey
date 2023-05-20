@@ -1,8 +1,9 @@
 _G.json= require('useful.json')
 _G.tbl= require('useful.tbl')
+_G.collision= require('useful.collision')
+
 _G.options_npcs= json.import('data/options/npcs.json')
 _G.options_tileset= json.import('data/options/tileset.json')
-_G.collision= require('useful.collision')
 
 local Game= require('controllers.game')
 local game= Game()

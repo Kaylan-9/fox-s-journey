@@ -22,6 +22,7 @@ local Item, metatable= {}, {
     }
     obj.s= s
     obj.val_mod_em_interacao= val_mod_em_interacao
+    obj.audio_collecting_item= love.audio.newSource('assets/audios/collecting_items.wav', 'static')
     setmetatable(obj, {__index= self})
     return obj
   end
@@ -67,6 +68,7 @@ function Item:playerPodeOuNaoColetar()
   if collision:circle(_G.player.p, self.p, (_G.player.body.w/2)) then
     can= (self.type=='colecionável' or love.keyboard.isDown('f'))
   end
+  if can then self.audio_collecting_item:play() end
   return can
 end
 

@@ -71,13 +71,28 @@ function Game:determinarBoss()
   end
 end 
 
+function Game:loadMusic()
+  if self.music then self.music:pause() end
+  self.name_music= (_G.boss~=nil and _G.boss.active) and self.fase.bossmusic or self.fase.music
+  self.music= love.audio.newSource('assets/audios/'..self.name_music, 'static')
+  self.music:play()
+  self.music:setLooping(true)
+end
+
+function Game:iniciarMusicBoss()
+  if _G.boss.active and self.name_music~=self.fase.bossmusic then
+    self:loadMusic()
+  end
+end
+
 function Game:loadLevel()
-  self:loadItems()
+  self:loadMusic()
   _G.map= Map(
     self.fase.filename_tileset_map,
     self.fase.map_file, 
     self.fase.background_file
   )
+  self:loadItems()
   self:determinarBoss()
   _G.npcs= NPCs(self.fase.npcs)
   _G.displayers= Displayers()
@@ -107,6 +122,7 @@ end
 function Game:update()
   displayers:update()
   map:update()
+  self:iniciarMusicBoss()
   npcs:update()
   player:update()
   items:update()

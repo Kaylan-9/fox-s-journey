@@ -67,29 +67,29 @@ function Map:positcaoRealPlayer()
   return self.cam.p.x+_G.player.p.x
 end
 
-function Map:camMovement()
-  -- variável responsável por determinar se a câmera está ativa ou não
+function Map:camDeveSerAtiva()
   local p_inicial_min= (self:positcaoRealPlayer()>self.cam.p.i.x)
   local p_final_max= (self:positcaoRealPlayer()<(self.cam.p.f.x))
-  self.cam.active= (p_inicial_min and p_final_max)
+  self.cam.active= (p_inicial_min and p_final_max) and (not _G.boss.active or _G.boss.was_destroyed)
+end
 
-  -- if not _G.npcs.boss.active then
-    if self.cam.active and not _G.boss.active then
-      self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
+function Map:camMovement()
+  self:camDeveSerAtiva()
+  if self.cam.active then
+    self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
 
-      if love.keyboard.isDown("right", "d") then
-        self.cam.p.x= self.cam.p.x+self.cam.acc
-        if self.cam.p.x+_G.player.p.x>self.cam.p.f.x then
-          self.cam.acc= math.ceil((self.cam.p.x+_G.player.p.x)-self.cam.p.f.x)
-          self.cam.p.x= self.cam.p.x-self.cam.acc
-        end
-      elseif love.keyboard.isDown("left", "a") then
+    if love.keyboard.isDown("right", "d") then
+      self.cam.p.x= self.cam.p.x+self.cam.acc
+      if self.cam.p.x+_G.player.p.x>self.cam.p.f.x then
+        self.cam.acc= math.ceil((self.cam.p.x+_G.player.p.x)-self.cam.p.f.x)
         self.cam.p.x= self.cam.p.x-self.cam.acc
-        if self.cam.p.x<0 then self.cam.p.x = 0 end
       end
-
+    elseif love.keyboard.isDown("left", "a") then
+      self.cam.p.x= self.cam.p.x-self.cam.acc
+      if self.cam.p.x<0 then self.cam.p.x = 0 end
     end
-  -- end
+
+  end
 end
 
 function Map:update()

@@ -1,6 +1,8 @@
 [
   {
     "name": "Parte calma da floresta de Elísea",
+    "music": "music_florest.mp3",
+    "bossmusic": "boss_florest_music.mp3",
     "difficulty": 1,
     "map_file": "1.txt",
     "background_file": "tilesetOpenGameBackground.png",
@@ -82,7 +84,9 @@
   }, 
   {
     "name": "Cavernas Misteriosas",
-    "background_file": "tilesetOpenGameBackground.png",
+    "music": "music_cave.mp3",
+    "bossmusic": "boss_cave_music.mp3",
+    "background_file": "cave_background.png",
     "filename_tileset_map": "cave_tileset.png",
     "difficulty": 2,
     "map_file": "1.txt",

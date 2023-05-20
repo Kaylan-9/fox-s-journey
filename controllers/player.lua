@@ -41,7 +41,7 @@ function Player:setExpressionProps()
   self.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
 end
 
-function Player:updateFrame(nao_ha_messages)
+function Player:updateFrame()
   self.pressed.mov= love.keyboard.isDown("right", "d", "left", "a")
   self.pressed.run= self.pressed.mov and love.keyboard.isDown("space")
   self.pressed.jump= love.keyboard.isDown("up", "w")
@@ -49,9 +49,9 @@ function Player:updateFrame(nao_ha_messages)
 
   local sendo_controlado= self.pressed.mov or self.pressed.run or self.pressed.jump or self.pressed.soco
   local mudanca_frame= 
-    self.animation=='finishing' or
+    self.animation=='finishing' or 
     self.pressed.soco or 
-    (sendo_controlado and nao_ha_messages==true) or 
+    (sendo_controlado and #_G.balloon.messages==0) or 
     (self.canjump==false) or 
     (self.pressed.jump==false and self.p.y<self.p.f.y)
 
@@ -71,11 +71,6 @@ function Player:exeCicloAnimQueda()
   if self:animaContinuaEmExec() then
     if self.canjump==false then
       self.animation= 'falling'
-      -- if (self.frame==(11+5+1)) then --troca para outra sequência de frames
-      --   self.frame= 13
-      -- elseif (self.frame<11 or self.frame>(11+5)) then 
-      --   self.frame= 11
-      -- end
     end
   end
 end
@@ -145,7 +140,7 @@ function Player:mudancaDirecao()
   end
 end 
 
-function Player:moveX()
+function Player:andar()
   local mov= (_G.dt * self.vel * 100)
   local posicao_cam_inativa_e_igual= (_G.map.cam.p.x+self.p.x<=_G.map.cam.p.i.x+(self.vel*2)) or (_G.map.cam.p.x+self.p.x>=_G.map.cam.p.f.x-self.vel)
   --limite na tela com base no controle do Player
@@ -160,8 +155,7 @@ function Player:moveX()
   }
 
   if self.pressed.mov then self:exeCicloAnimMov() end
-  if (ver_padrao.left and lim.left) or (ver_padrao.left and _G.boss.active)
-   then 
+  if (ver_padrao.left and lim.left) or (ver_padrao.left and _G.boss.active) then 
     self.p.x= self.p.x-mov
   elseif (ver_padrao.right and lim.right) or (ver_padrao.right and _G.boss.active) 
 then 
@@ -170,28 +164,37 @@ then
 end
 
 function Player:soco()
-  -- if not self.pressed.jump and not self.pressed.mov and not self.pressed.run then
   if self:animaContinuaEmExec() then
     if self.pressed.soco then 
       self.animation= 'attacking'
     end
   end
-  -- end
+end
+
+function Player:corrida()
+  self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
+end 
+
+function Player:permitirMove()
+  return #_G.balloon.messages==0 and self.animation~='finishing'
+end
+
+function Player:controlando()
+  if self:permitirMove() then
+    self:soco()
+    self:mudancaDirecao()
+    self:andar()
+    self:pulo()
+    self:corrida()
+  end
 end
 
 function Player:update()
-  local nao_ha_messages= (#_G.balloon.messages==0)
-  self:updateParameters(true)
+  self:updateParameters()
   self:calcYPositionReferences()
-  self:updateFrame(nao_ha_messages)
+  self:updateFrame()
   self:queda()
-  if nao_ha_messages then
-    self:soco()
-    self:mudancaDirecao()
-    self:moveX()
-    self:pulo()
-    self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
-  end
+  self:controlando()
   self:finalizando()
   self.acc= self.acc+(_G.dt * math.random(1, 3))
 end
