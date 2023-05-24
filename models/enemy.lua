@@ -23,7 +23,7 @@ setmetatable(Enemy, metatable)
 function Enemy:dying()
   if math.floor(self.life)==0 then 
     self.animation= 'dying'
-    -- if not self.audios.dying:isPlaying() then self.audios.dying:play() end
+    if not self.audios.dying:isPlaying() then self.audios.dying:play() end
     self.goto_player= false
     if self.frame==self.frame_positions['dying'].f then
       if self.acc>=(self.freq_frames) then
@@ -99,6 +99,7 @@ function Enemy:takesDamage()
       for j=1, #_G.player.hostile.attack_frame do
         if _G.player.frame==_G.player.hostile.attack_frame[j] then
           if _G.player.acc>=_G.player.freq_frames then
+            _G.player.audios['attacking']:play()
             if self.life > 0 then
               self.life= self.life - _G.player.hostile.damage
             end

@@ -74,7 +74,7 @@ function Game:loadMusic()
   if self.music then self.music:pause() end
   self.name_music= (_G.boss~=nil and _G.boss.active) and self.fase.bossmusic or self.fase.music
   self.music= love.audio.newSource('assets/audios/'..self.name_music, 'static')
-  -- self.music:play()
+  self.music:play()
   self.music:setLooping(true)
 end
 
@@ -139,7 +139,8 @@ end
 
 function Game:keypressed(key, scancode, isrepeat)
   items:keypressed(key)
-  boss:keypressed(key, scancode, isrepeat)
+
+  if not boss.was_destroyed then boss:keypressed(key, scancode, isrepeat) end
   npcs:keypressed(key, scancode, isrepeat)
   player:keypressed(key, scancode, isrepeat)
   self:controlesTela(key)
@@ -151,13 +152,15 @@ function Game:controlesTela(key)
   end
 end
 
-function Game:levelEnded()
+function Game:parametersToGoToNextStage()
   local boss_morto= _G.boss.was_destroyed
   local zero_npcs= #_G.npcs.on_the_screen==0 and boss_morto
   local ultimo_frame_finishing= _G.player.frame==_G.player.frame_positions.finishing.f
-  local pode_prosseguir= zero_npcs and ultimo_frame_finishing
-  
-  if pode_prosseguir then
+  return zero_npcs and ultimo_frame_finishing
+end 
+
+function Game:levelEnded()
+  if self:parametersToGoToNextStage() then
     self.timerFimFase:start()
     if self.timerFimFase:finish() then  
       self.timerFimFase:reset()

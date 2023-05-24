@@ -26,6 +26,7 @@
     "boss": {
       "name": "lobo", 
       "goto_player": true,
+      "s": {"x": 2, "y": 2},
       "vel": 1,
       "messages": [
         "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
@@ -90,6 +91,7 @@
     "boss": {
       "name": "lobo", 
       "goto_player": true,
+      "s": {"x": 2, "y": 2},
       "vel": 10,
       "messages": [
         "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",

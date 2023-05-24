@@ -4,6 +4,7 @@ local metatable, Boss= {
   __call=function(self, boss)
     local option= _G.tbl:deepCopy(_G.options_npcs[boss.name])
     local obj= Enemy(option, boss.vel, {x= _G.map.dimensions.w-600, y= -100}, boss.messages, boss.speech_interruption, true)
+    obj.s= boss.s
     obj.goto_player= true
     obj.active= false
     setmetatable(obj, {__index= self})

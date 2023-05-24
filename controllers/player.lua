@@ -10,7 +10,7 @@ local metatable= {
         s= {x= 2.5, y= 2.5}, 
         frame_positions= {
           walking= {i= 17, f= 24, type= "default"},
-          attacking= {i= 89, f= 96, type= "until_finished"},
+          attacking= {i= 89, f= 96, type= "until_finished", audio='player_hit.mp3'},
           running= {i= 33, f= 40, type= "default"},
           jumping= {i= 9, f= 10, type= "default", audio='player_jump.wav'},
           falling= {i= 12, f= 16, type= "default"},
@@ -68,7 +68,7 @@ function Player:queda()
 end
 
 function Player:exeCicloAnimQueda()
-  if self:animaContinuaEmExec() then
+  if self:animComecaExec() then
     if self.canjump==false then
       self.animation= 'falling'
     end
@@ -76,7 +76,7 @@ function Player:exeCicloAnimQueda()
 end
 
 function Player:exeCicloAnimPulo()
-  if self:animaContinuaEmExec() then
+  if self:animComecaExec() then
     if self.pressed.jump and self.canjump then
       self.animation= 'jumping'
     end
@@ -95,7 +95,7 @@ function Player:exeAudioPulo()
   -- nennhum audio do player foi tocado e o audio não está tocando
   if not self.audios.jumping:isPlaying() then
     if self.audio_sem_tocar_ha>=self.audio_em_tantos_s then
-      -- self.audios.jumping:play()  
+      self.audios.jumping:play()  
       self.fim_sem_audio_tempo, self.ini_sem_audio_tempo= 0, 0
     else 
       self.fim_sem_audio_tempo= love.timer.getTime()
@@ -120,14 +120,15 @@ function Player:pulo()
   end
 end
 
-function Player:animaContinuaEmExec()         
+-- serve para verificar se a animação começa 
+function Player:animComecaExec()         
                                -- animação não é continua                                        -- É o frame final para terminar a animação     
-  return self.animation=='' or not self.frame_positions[self.animation].until_finished or self.frame_positions[self.animation].f==self.frame
+  return self.animation=='' or not self.frame_positions[self.animation].type=='until_finished' or self.frame_positions[self.animation].f==self.frame
 end
 
 function Player:exeCicloAnimMov()
   -- se não está pressionado o botão de pulo & o Player pode pular
-  if self:animaContinuaEmExec() then
+  if self:animComecaExec() then
     if self.pressed.jump==false and self.canjump and self.pressed.mov then
       self.animation= not love.keyboard.isDown("space") and 'walking' or 'running'
     end
@@ -140,8 +141,7 @@ function Player:mudancaDirecao()
   end
 end 
 
-function Player:andar()
-  local mov= (_G.dt * self.vel * 100)
+function Player:parametersToAllowMoveWhenTyingToWalk(param)
   local posicao_cam_inativa_e_igual= (_G.map.cam.p.x+self.p.x<=_G.map.cam.p.i.x+(self.vel*2)) or (_G.map.cam.p.x+self.p.x>=_G.map.cam.p.f.x-self.vel)
   --limite na tela com base no controle do Player
   local lim= {
@@ -154,17 +154,18 @@ function Player:andar()
     right= (love.keyboard.isDown("right", "d") and (self.p.x<(_G.screen.w-(self.vel*2))))
   }
 
+  return (ver_padrao[param] and lim[param])
+end
+
+function Player:andar()
+  local mov= (_G.dt * self.vel * 100)
   if self.pressed.mov then self:exeCicloAnimMov() end
-  if (ver_padrao.left and lim.left) or (ver_padrao.left and _G.boss.active) then 
-    self.p.x= self.p.x-mov
-  elseif (ver_padrao.right and lim.right) or (ver_padrao.right and _G.boss.active) 
-then 
-    self.p.x= self.p.x+mov
-  end
+  if self:parametersToAllowMoveWhenTyingToWalk('left') then self.p.x= self.p.x-mov end
+  if self:parametersToAllowMoveWhenTyingToWalk('right') then self.p.x= self.p.x+mov end
 end
 
 function Player:soco()
-  if self:animaContinuaEmExec() then
+  if self:animComecaExec() then
     if self.pressed.soco then 
       self.animation= 'attacking'
     end
@@ -216,7 +217,7 @@ function Player:calcYPositionReferences()
 end
 
 function Player:finalizando()
-  if _G.boss.was_destroyed then
+  if (_G.boss.was_destroyed==true and #_G.npcs.on_the_screen==0) then
     self.animation= 'finishing'
   end
 end

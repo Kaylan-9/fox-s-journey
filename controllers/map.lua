@@ -62,7 +62,7 @@ function Map:load()
 end
 
 function Map:camBloqueaNoBoss()
-  if self:positcaoRealPlayer()>=(self.cam.p.f.x)-1 then
+  if self:positcaoRealPlayer()>=(self.cam.p.f.x)-(_G.screen.w/2) then
     _G.boss.active= true
   end
 end
@@ -74,7 +74,7 @@ end
 function Map:camDeveSerAtiva()
   local p_inicial_min= (self:positcaoRealPlayer()>self.cam.p.i.x)
   local p_final_max= (self:positcaoRealPlayer()<(self.cam.p.f.x))
-  self.cam.active= (p_inicial_min and p_final_max) and (not _G.boss.active or _G.boss.was_destroyed)
+  self.cam.active= (p_inicial_min and p_final_max)
 end
 
 function Map:camMovement()
