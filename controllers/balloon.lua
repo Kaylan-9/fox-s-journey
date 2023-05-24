@@ -8,9 +8,14 @@ local Balloon, metatable= {}, {
     obj.s.x= 1
     obj.s.y= 1
     obj.messages= {}
-    obj.i=1
+    obj.indice=1
+    obj.p_character= {
+      i= 1, 
+      f= 2
+    }
     obj.lines= {}
     obj.lines_n= 0
+    obj.subtext= ''
     setmetatable(obj, {__index= self})
     obj:load()
     return obj
@@ -60,31 +65,44 @@ function Balloon:calcLinesN(text_w)
 end
 
 function Balloon:quebraLinhasMsg()
-  if #self.messages>0 then
-    self.lines= {}
-    local text_w= font:getWidth(self.messages[self.i])
-    self.lines_n= self:calcLinesN(text_w)
-    local pi= 1
-    local pf= 2
-    local subtext= 'test'
+  -- mensagem atual -> math.ceil(self.indice) 
 
-    while #self.lines<self.lines_n-1 do
-      if #self.lines>0 then pi= utf8.offset(self.messages[self.i], pf) end
-      pf= pi + 1
-      subtext= self.messages[self.i]:sub(pi, utf8.offset(self.messages[self.i], pf)-1)
-      while font:getWidth(subtext)<(self.width_msg/2)-(self.text_spacing*2) do
-        pf= pf + 1
-        subtext= self.messages[self.i]:sub(pi, utf8.offset(self.messages[self.i], pf)-1)
+  if #self.messages>0 then
+    local text_w= font:getWidth(self.messages[math.ceil(self.indice)])
+    self.lines_n= self:calcLinesN(text_w)
+    self.lines= {}
+    self.p_character.i, self.p_character.f= 1, 1
+    
+
+    while #self.lines<self.lines_n do
+      -- pega a última posição do character e coloca como posição inicial da próxima linha
+      if #self.lines>0 then 
+        self.p_character.i= utf8.offset(self.messages[math.ceil(self.indice)], self.p_character.f)
       end
-      self.lines[#self.lines+1]= subtext
+      -- aumenta o indice final da posição do texto até a posição do character final do trecho de texto 
+      self.p_character.f= self.p_character.i
+      self.subtext= self.messages[math.ceil(self.indice)]:sub(self.p_character.i, utf8.offset(self.messages[math.ceil(self.indice)], self.p_character.f))
+      self:letraPorLetra()
+      self.lines[#self.lines+1]= self.subtext
     end
-    if #self.lines>1 then pi= utf8.offset(self.messages[self.i], pf)
-    else pi= utf8.offset(self.messages[self.i], pi)
-    end
-    subtext= self.messages[self.i]:sub(pi, utf8.offset(self.messages[self.i], utf8.len(self.messages[self.i])))
-    self.lines[#self.lines+1]= subtext
   end
 end
+
+function Balloon:letraPorLetra()
+  -- Se é a última linha
+  if #self.lines==self.lines_n-1 then
+    if #self.lines>1 then self.p_character.i= self.p_character.f end
+    self.subtext= self.messages[math.ceil(self.indice)]:sub(self.p_character.i, self.messages[math.ceil(self.indice)]:len())    
+    return
+  end
+
+  local comprimento_subtext= font:getWidth(self.subtext)
+  while comprimento_subtext<(self.width_msg/2)-(self.text_spacing*2) do
+    self.p_character.f= self.p_character.f + 1
+    self.subtext= self.messages[math.ceil(self.indice)]:sub(self.p_character.i, utf8.offset(self.messages[math.ceil(self.indice)], self.p_character.f)-1)
+    comprimento_subtext= font:getWidth(self.subtext)
+  end
+end 
 
 function Balloon:draw()
   if #self.messages>0 then

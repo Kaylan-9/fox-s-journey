@@ -50,9 +50,11 @@ function NPCs:update()
   self:removeMortos()
 end
 
-function NPCs:keypressed(key)
+
+
+function NPCs:keypressed(key, scancode, isrepeat)
   for i=1, #self.on_the_screen do
-    self.on_the_screen[i]:iniciarDialogo(key)
+    self.on_the_screen[i]:iniciarDialogo(key, scancode, isrepeat)
   end
 end
 

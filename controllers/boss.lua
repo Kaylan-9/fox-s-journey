@@ -32,4 +32,8 @@ function Boss:update()
   ::continue::
 end
 
+function Boss:keypressed(key, scancode, isrepeat)
+  self:iniciarDialogo(key, scancode, isrepeat)
+end
+
 return Boss

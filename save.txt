@@ -1,0 +1,11 @@
+      // {
+      //   "name": "lobo", 
+      //   "goto_player": true,
+      //   "p": {"x": 3500, "y": 500},
+      //   "vel": 1,
+      //   "messages": [
+      //     "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
+      //     "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
+      //   ],
+      //   "speech_interruption": false
+      // }

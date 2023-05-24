@@ -23,7 +23,7 @@ setmetatable(Enemy, metatable)
 function Enemy:dying()
   if math.floor(self.life)==0 then 
     self.animation= 'dying'
-    if not self.audios.dying:isPlaying() then self.audios.dying:play() end
+    -- if not self.audios.dying:isPlaying() then self.audios.dying:play() end
     self.goto_player= false
     if self.frame==self.frame_positions['dying'].f then
       if self.acc>=(self.freq_frames) then
@@ -134,18 +134,23 @@ function Enemy:calcYPositionReferences()
   if self.p.f.y==-100 then self.p.y= self.new_y end
 end
 
-function Enemy:iniciarDialogo(key)
+function Enemy:iniciarDialogo(key, scancode, isrepeat)
   if key=='f' then 
-    local pode_iniciar_dialogo= (#balloon.messages==0 and self.reached_the_player)
-    if pode_iniciar_dialogo then 
-      _G.balloon.messages= self.messages
-    else
-      if _G.balloon.i<#balloon.messages then _G.balloon.i= _G.balloon.i+1
-      else 
-        _G.balloon.messages= {}
-        _G.balloon.i= 1
+    local pode_iniciar_dialogo= (#_G.balloon.messages==0)
+
+    if self.reached_the_player then
+      if pode_iniciar_dialogo then 
+        _G.balloon.messages= self.messages
+      else
+        if _G.balloon.indice>=#_G.balloon.messages then 
+          _G.balloon.indice= 1
+          _G.balloon.messages= {}
+        else
+          _G.balloon.indice= _G.balloon.indice + 1
+        end
       end
-    end
+    end 
+    
   end
 end
 
