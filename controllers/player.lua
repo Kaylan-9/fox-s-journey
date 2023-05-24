@@ -62,7 +62,7 @@ function Player:queda()
   if (self.canjump==false) or (love.keyboard.isDown("up", "w")==false and self.p.y<self.p.f.y) then 
     local d_between_iy_fy= (self.p.f.y-self.p.i.y)
     local d_between_iy_y= (self.p.y-self.p.i.y)
-    self.p.y= self.p.y + (_G.dt * (math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy)))+0.1) * 100)
+    self.p.y= self.p.y + (_G.dt * (math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy)))+0.1) * 500)
     self:exeCicloAnimQueda()
   end
 end
@@ -116,7 +116,7 @@ function Player:pulo()
     self:exeAudioPulo()
     local d_between_iy_fy= (self.p.f.y-self.p.i.y)
     local d_between_iy_y= (self.p.y-self.p.i.y)
-    self.p.y= self.p.y - (_G.dt * math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy))) * 0.75 * 100)
+    self.p.y= self.p.y - (_G.dt * math.ceil(1-(((d_between_iy_fy)-(d_between_iy_y))/(d_between_iy_fy))) * 0.95 * 500)
   end
 end
 

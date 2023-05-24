@@ -20,7 +20,7 @@
           "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
           "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
         ],
-        "speech_interruption": false
+        "speech_interruption": true
       },
       {
         "name": "lobo", 
@@ -39,10 +39,9 @@
       "goto_player": true,
       "vel": 1,
       "messages": [
-        "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
-        "Você acha que pode desafiar o poder do lobisomem? Eu vou te mostrar o que significa enfrentar o verdadeiro predador!"
+        "Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!"        
       ],
-      "speech_interruption": false
+      "speech_interruption": true
     },
     "items": [
       {
@@ -103,10 +102,9 @@
       "goto_player": true,
       "vel": 10,
       "messages": [
-        "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
-        "Você acha que pode desafiar o poder do lobisomem? Eu vou te mostrar o que significa enfrentar o verdadeiro predador!"
+        "Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!" 
       ],
-      "speech_interruption": false
+      "speech_interruption": true
     }
   }
 ]
