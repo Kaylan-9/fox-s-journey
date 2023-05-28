@@ -34,7 +34,7 @@ function NPCs:update()
       self.on_the_screen[i].mov= (_G.dt * self.on_the_screen[i].vel * 100) -- o quanto se move
       self.on_the_screen[i]:updateParameters()
       self.on_the_screen[i]:calcYPositionReferences()
-      self.on_the_screen[i]:chasePlayer()
+      if self.on_the_screen[i]:playerVisible() then self.on_the_screen[i]:chasePlayer() end
       self.on_the_screen[i]:dying()
       if self.on_the_screen[i].was_destroyed then goto continue end
       local pode_ser_hostil_e_atacado= (self.on_the_screen[i].reached_the_player and not self.on_the_screen[i]:verSeExisteDialogoQueIterrompe() and #_G.balloon.messages==0)

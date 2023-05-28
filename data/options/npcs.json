@@ -4,6 +4,7 @@
     "hostile": false,
     "s": {"x": 3, "y": 3},
     "frame_positions": {"walking": {"i":2, "f":7, "type": "default"}},
+    "type":"walking",
     "direction": 1,
     "body": {"w":20, "h":20}
   },
@@ -19,7 +20,22 @@
       "attacking": {"i":19, "f":26, "type": "until_finished"},
       "dying": {"i": 27, "f": 33, "type": "until_finished", "audio": "lobo_dying.mp3"}
     },
+    "type":"walking",
     "direction": -1,
     "body": {"w":150, "h":120}
+  },
+  "bat": {
+    "name": "bat",
+    "hostile": {
+      "damage": 1,
+      "attack_frame": [1, 2, 3, 4, 5, 6]
+    },
+    "s": {"x": 3, "y": 3},
+    "frame_positions": {
+      "flying": {"i": 1, "f": 5, "type": "default"}
+    },
+    "type":"flying",
+    "direction": -1,
+    "body": {"w":40, "h":20}
   }
 }

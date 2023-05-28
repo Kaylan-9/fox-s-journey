@@ -9,3 +9,31 @@
       //   ],
       //   "speech_interruption": false
       // }
+
+
+
+{
+    "name": "Cavernas Misteriosas",
+    "music": "music_cave.mp3",
+    "map": {
+      "filename_background": "cave_background.png",
+      "filename_tileset": "cave_tileset.png",
+      "filename": "1.txt",
+      "n": {"x": 10, "y": 7}
+    },
+    "bossmusic": "boss_cave_music.mp3",
+    "difficulty": 2,
+    "npcs": [],
+    "items": [],
+    "boss": {
+      "name": "lobo", 
+      "goto_player": true,
+      "s": {"x": 2, "y": 2},
+      "vel": 10,
+      "messages": [
+        "Ah, finalmente você chegou, intruso! Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!",
+        "Você acha que pode desafiar o poder do lobisomem? Eu vou te mostrar o que significa enfrentar o verdadeiro predador!"
+      ],
+      "speech_interruption": false
+    }
+  }

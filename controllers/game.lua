@@ -11,51 +11,22 @@ local metatable, Game= {
     local obj= {}
     obj.timer= 0
     setmetatable(obj, {__index=self})
-    obj:setProps()
-    obj:setTimers()
+
+    _G.screen= {
+      w= love.graphics.getWidth(),
+      h= love.graphics.getHeight()
+    }
+    _G.fullscreen, _G.fstype= love.window.getFullscreen()
+    _G.dt= 0
+
+    obj.fases= json.import('data/fases.json')
+    obj.game_stage= 0
+    obj.timer_fim_fase= timer:new(1)
     return obj 
   end 
 }, {}
 
 setmetatable(Game, metatable)
-
-function Game:somaTempo()
-  self.timer= self.timer + (_G.dt)
-end
-
-function Game:setProps()
-  _G.screen= {}
-  _G.screen.fullscreen, _G.screen.fstype= love.window.getFullscreen()
-  _G.dt= 0
-  self.fases= json.import('data/fases.json')
-  self.game_stage= 0
-end 
-
-local function newTimer(duracao)
-  return {
-    duracao= duracao,
-    t_i= 0,
-    t_f= 0,
-    start=function(self)
-      if self.t_i==0 then
-        self.t_i= love.timer.getTime()
-      end 
-    end,
-    reset=function(self)
-      self.t_i= 0
-      self.t_f= 0
-    end,
-    finish=function(self)
-      self.t_f= love.timer.getTime()
-      local perocrrido=  self.t_f - self.t_i
-      return perocrrido>=self.duracao
-    end
-  }
-end
-
-function Game:setTimers()
-  self.timerFimFase= newTimer(1)
-end
 
 function Game:nextLevel()
   if self.game_stage<#self.fases then
@@ -64,31 +35,19 @@ function Game:nextLevel()
   end
 end 
 
-function Game:determinarBoss()
-  if type(self.fase.boss.name)=='string' then
-    _G.boss= Boss(self.fase.boss)
-  end
-end 
-
 function Game:loadMusic()
-  if self.music then self.music:pause() end
-  self.name_music= (_G.boss~=nil and _G.boss.active) and self.fase.bossmusic or self.fase.music
-  self.music= love.audio.newSource('assets/audios/'..self.name_music, 'static')
-  self.music:play()
-  self.music:setLooping(true)
-end
-
-function Game:iniciarMusicBoss()
-  if _G.boss.active and self.name_music~=self.fase.bossmusic then
-    self:loadMusic()
-  end
+  self.name_music= self.fases[self.game_stage].music
+  if _G.music then _G.music:pause() end
+  _G.music= love.audio.newSource('assets/audios/'..self.name_music, 'static')
+  music:play()
+  music:setLooping(true)
 end
 
 function Game:loadLevel()
   self:loadMusic()
-  _G.map= Map(self.fase.map)
   self:loadItems()
-  self:determinarBoss()
+  _G.map= Map(self.fase.map)
+  if type(self.fase.boss.name)=='string' then _G.boss= Boss(self.fase.boss) end
   _G.npcs= NPCs(self.fase.npcs)
   _G.displayers= Displayers()
   _G.balloon= Balloon()
@@ -98,10 +57,7 @@ end
 -- Separado da função loadLevel, pois o o inventário do player pode estar com algum item específico
 function Game:loadItems()
   local inventory, collectibles= {}, {}
-  if _G.items then
-    inventory= _G.items.inventory
-    collectibles= _G.items.collectibles
-  end
+  if _G.items then inventory, collectibles= _G.items.inventory, _G.items.collectibles end
   _G.items= Items(self.fase.items, inventory, collectibles)
 end
 
@@ -109,15 +65,14 @@ end
 
 function Game:load()
   love.graphics.setDefaultFilter("nearest", "nearest")
+  love.audio.setVolume(0.1)
   self:nextLevel()
-  self:alternarResolucao()
   self:loadLevel()
 end
 
 function Game:update()
   displayers:update()
   map:update()
-  self:iniciarMusicBoss()
   npcs:update()
   player:update()
   items:update()
@@ -161,9 +116,9 @@ end
 
 function Game:levelEnded()
   if self:parametersToGoToNextStage() then
-    self.timerFimFase:start()
-    if self.timerFimFase:finish() then  
-      self.timerFimFase:reset()
+    self.timer_fim_fase:start()
+    if self.timer_fim_fase:finish() then  
+      self.timer_fim_fase:reset()
       self:nextLevel()
       self:loadLevel()
     end

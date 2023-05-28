@@ -1,3 +1,4 @@
+_G.timer= require('useful.timer')
 _G.json= require('useful.json')
 _G.tbl= require('useful.tbl')
 _G.collision= require('useful.collision')

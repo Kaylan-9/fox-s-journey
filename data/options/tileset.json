@@ -15,6 +15,10 @@
     "imgname": "wolf.png",
     "n": {"x": 5, "y":8}
   },
+  "bat": {
+    "imgname": "bat.png",
+    "n": {"x": 6, "y":1}
+  },
   "esqueleto": {
     "imgname": "skeleton.png",
     "n": {"x": 10, "y": 6}

@@ -61,19 +61,14 @@ function Map:load()
   self.option_map= _G.tbl:deepCopy(self.options_maps[self.filename_tileset])
 end
 
-function Map:camBloqueaNoBoss()
-  if self:positcaoRealPlayer()>=(self.cam.p.f.x)-(_G.screen.w/2) then
-    _G.boss.active= true
-  end
-end
-
-function Map:positcaoRealPlayer()
+-- ! posição real do player na tela em x
+function Map:pRealPlayerX()
   return self.cam.p.x+_G.player.p.x
 end
 
 function Map:camDeveSerAtiva()
-  local p_inicial_min= (self:positcaoRealPlayer()>self.cam.p.i.x)
-  local p_final_max= (self:positcaoRealPlayer()<(self.cam.p.f.x))
+  local p_inicial_min= (self:pRealPlayerX()>self.cam.p.i.x)
+  local p_final_max= (self:pRealPlayerX()<(self.cam.p.f.x))
   self.cam.active= (p_inicial_min and p_final_max)
 end
 
@@ -100,7 +95,6 @@ function Map:update()
   local nao_ha_messages= (#_G.balloon.messages==0)
   -- permite o personagem se mover se não há mensagens
   if nao_ha_messages then
-    self:camBloqueaNoBoss()
     self:camMovement()
     self:backgroundLoad()
   end

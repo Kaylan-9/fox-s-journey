@@ -6,7 +6,8 @@ local metatable, Boss= {
     local obj= Enemy(option, boss.vel, {x= _G.map.dimensions.w-600, y= -100}, boss.messages, boss.speech_interruption, true)
     obj.s= boss.s
     obj.goto_player= true
-    obj.active= false
+    obj.name_music= boss.music
+    obj.music= love.audio.newSource('assets/audios/'..obj.name_music, 'static')
     setmetatable(obj, {__index= self})
     return obj
   end
@@ -14,13 +15,27 @@ local metatable, Boss= {
 
 setmetatable(Boss, metatable)
 
+function Boss:trocarMusicParaAfinal()
+  if _G.music~=self.music then
+    _G.music:pause()
+    _G.music=self.music
+    _G.music:play()
+  end
+
+end
+
 function Boss:update()
   if self then
     self.acc= self.acc + (_G.dt * math.random(1, 5))
     self.mov= (_G.dt * self.vel * 100) -- o quanto se move
     self:updateParameters()
     self:calcYPositionReferences()
-    self:chasePlayer()
+
+    if self:playerVisible() then
+      self:trocarMusicParaAfinal()
+      self:chasePlayer() 
+    end
+
     self:dying()
     if self.was_destroyed then goto continue end
     local pode_ser_hostil_e_atacado= (self.reached_the_player and not self:verSeExisteDialogoQueIterrompe() and #_G.balloon.messages==0)
