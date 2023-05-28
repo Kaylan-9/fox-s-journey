@@ -3,9 +3,12 @@ local FlyingCharacter= require('models.flyingCharacter')
 local metatable, Enemy= {
   __call=function(self, option_props, running_speed, starting_position, messages, speech_interruption, goto_player)
     --tileset recebe o nome de option_props pois eles são iguais, ou seja menos um argumento
-    local obj= option_props.type=='walking' and 
-      Character(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption) or
-      FlyingCharacter(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption)
+    local obj= {} 
+    if option_props.type=='walking' then
+      obj= Character(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption)
+    else
+      obj= FlyingCharacter(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption)
+    end
     obj.goto_player= goto_player
     obj.active= false
     obj.lock_movement= {

@@ -5,6 +5,7 @@ local NPCs= require('controllers.npcs')
 local Boss= require('controllers.boss')
 local Balloon= require('controllers.balloon')
 local Player= require('controllers.player')
+local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 20)
 
 local metatable, Game= {
   __call=function(self)
@@ -64,6 +65,7 @@ end
 -- !!!!!!!!!!!!!!!
 
 function Game:load()
+  love.graphics.setFont(mainFont)
   love.graphics.setDefaultFilter("nearest", "nearest")
   love.audio.setVolume(0.1)
   self:nextLevel()

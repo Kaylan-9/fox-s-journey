@@ -1,8 +1,8 @@
 local Character= require('models.character')
 local FlyingCharacter, metatable= {}, {
   __index=Character,
-  __call=function(self, option_props, running_speed, starting_position, messages, speech_interruption, goto_player)
-    local obj= Character(option_props, running_speed, starting_position, messages, speech_interruption, goto_player)  
+  __call=function(self, option_props, running_speed, starting_position, observadoPelaCamera, tileset, messages, speech_interruption)
+    local obj= Character(option_props, running_speed, starting_position, observadoPelaCamera, tileset, messages, speech_interruption)  
     setmetatable(obj, {__index= self})
     obj:whereToFly()
     return obj
