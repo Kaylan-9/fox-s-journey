@@ -1,7 +1,6 @@
 local Character= require('models.character')
 local FlyingCharacter= require('models.flyingCharacter')
 local metatable, Enemy= {
-  __index= FlyingCharacter,
   __call=function(self, option_props, running_speed, starting_position, messages, speech_interruption, goto_player)
     --tileset recebe o nome de option_props pois eles são iguais, ou seja menos um argumento
     local obj= option_props.type=='walking' and 
@@ -18,7 +17,11 @@ local metatable, Enemy= {
   end
 }, {}
 
-setmetatable(Enemy, metatable)
+local function definirTipo(enemy)
+  return enemy.type=='walking' and Character or FlyingCharacter
+end
+
+setmetatable(Enemy, { __index= definirTipo(Enemy), __call= metatable.__call})
 
 -- #executado para verificar se o NPC tem a respectiva animação com base no frame_positions, caso não tenha ele pula a função ou executa sem esperar animação
 function Enemy:temAnim(name_anim)
