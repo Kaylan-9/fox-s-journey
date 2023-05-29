@@ -25,6 +25,16 @@
     "h": {"tile": 53, "behavior": "up_and_down"},
     "t": {"tile": 61, "behavior": "none"},
     "T": {"tile": 62, "behavior": "none"},
-    "y": {"tile": 63, "behavior": "none"}
+    "y": {"tile": 63, "behavior": "none"},
+    "others": {
+      "objects": {
+        "estalactite": {
+          "tile": 45, 
+          "n": 10,
+          "vel": 2,
+          "behavior": "falling"
+        }
+      }
+    }
   }
 }

@@ -131,7 +131,7 @@ function Game:keypressed(key, scancode, isrepeat)
 end
 
 function Game:controlesTela(key)
-  if key == 'escape' then self.pause= true
+  if key == 'escape' then self.pause= not self.pause
   elseif key == 'f11' then self:alternarResolucao() 
   end
 end

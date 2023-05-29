@@ -20,6 +20,7 @@ local Map, metatable= {}, {
     obj.background.img.size= {}
     obj.background.img.size.w= obj.background.img.obj:getWidth()
     obj.background.img.size.h= obj.background.img.obj:getHeight()
+    obj.objects_in_the_scenery= {}
     setmetatable(obj, {__index= self})
     obj:backgroundLoad()
     obj:load()
@@ -59,6 +60,7 @@ function Map:load()
   self.cam.p.i.x= (_G.screen.w/2)
   self.cam.p.f.x= (self.dimensions.w-(_G.screen.w/2))
   self.option_map= _G.tbl:deepCopy(self.options_maps[self.filename_tileset])
+  self:carregarOutrosObjects()
 end
 
 -- ! posição real do player na tela em x
@@ -91,13 +93,62 @@ function Map:camMovement()
   end
 end
 
-function Map:update()
+function Map:carregarOutrosObjects()
+  local existem_outros_objetos= true
+  if existem_outros_objetos then
+    for k, object_props in pairs(self.option_map.others.objects) do
+      self:newObject(k, object_props)
+    end
+  end
+end
+
+--behavior serve para indicar qual função ele vai executar no update, e mesmo sendo comportamentos diferentes se utiliza o performBehavior para executar mesmo que sejam funções diferentes
+function Map:newObject(k, object_props)
+  local object= object_props
+  object.name= k
+  object.p= {x=0, y=0}
+  object.tileset= self.tileset
+  object.cam= self.cam
+  object.draw= self.drawObject
+  object.posicionaObject= self[object.name..'Posiciona']
+  object.performBehavior= self[object.behavior..'Behavior']
+  object.posicionaObject(object, self.dimensions.w)
+  table.insert(self.objects_in_the_scenery, object_props)
+end
+
+function Map:drawObject()
+  love.graphics.draw(
+    self.tileset.obj, 
+    self.tileset.tiles[self.tile],
+    self.p.x-self.cam.p.x, self.p.y,
+    0,
+    2, 2,
+    self.tileset.size.w/2,
+    0
+  )
+end 
+
+function Map:estalactitePosiciona(tamanho_max_map_x)
+  self.p.x= math.random(0, tamanho_max_map_x)
+end
+
+function Map:fallingBehavior()
+  if _G.player.p.y>=(self.p.x-self.cam.p.x)-20 and _G.player.p.y<=(self.p.x-self.cam.p.x)+20 then
+    self.p.x= _G.player.p.x + (_G.dt * self.vel * 100)
+  end
+end
+
+function Map:updateSceneryAndGround()
   local nao_ha_messages= (#_G.balloon.messages==0)
   -- permite o personagem se mover se não há mensagens
   if nao_ha_messages then
     self:camMovement()
     self:backgroundLoad()
   end
+end
+
+function Map:update()
+  
 end
 
 function Map:tileAtualX(imaginary_px)
@@ -160,7 +211,7 @@ function Map:tileDraw(i, j, id_tile, symbol)
   end
 end
 
-function Map:draw()
+function Map:drawSceneryAndGround()
   love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
   for i = 0, #self.matriz-1 do                             
     for j = 0, #self.matriz[i+1]-1 do                     
@@ -170,6 +221,17 @@ function Map:draw()
       end
     end
   end
+end
+
+function Map:drawSceneryObjects()
+  for i=1 ,#self.objects_in_the_scenery do
+    self.objects_in_the_scenery[i]:draw()
+  end 
+end
+
+function Map:draw()
+  self:drawSceneryAndGround()
+  self:drawSceneryObjects()
 end
 
 return Map
