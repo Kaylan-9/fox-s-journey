@@ -30,15 +30,8 @@ function Character:setAnimProps()
 end
 
 function Character:setAudioProps()
-  self.audio_em_tantos_s= 2
-  self:resetTempoAudio()
+  self.timer_sem_tocar_audio_ha= _G.timer:new(2)
   self:loadAudios()
-end
-
-function Character:resetTempoAudio()
-  self.audio_sem_tocar_ha= 0
-  self.fim_sem_audio_tempo= 0
-  self.ini_sem_audio_tempo= 0
 end
 
 function Character:loadAudios()

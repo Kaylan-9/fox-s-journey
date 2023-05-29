@@ -98,18 +98,14 @@ end
 
 function Player:exeAudioPulo()
   -- reseta o tempo se o canjump é true
-  if self.p.y>=self.new_y then self:resetTempoAudio() end 
-  -- não executa há
-  self.audio_sem_tocar_ha= self.fim_sem_audio_tempo - self.ini_sem_audio_tempo
+  if self.p.y>=self.new_y then self.timer_sem_tocar_audio_ha:reset() end 
   -- nennhum audio do player foi tocado e o audio não está tocando
   if not self.audios.jumping:isPlaying() then
-    if self.audio_sem_tocar_ha>=self.audio_em_tantos_s then
+    if self.timer_sem_tocar_audio_ha:finish() then
       self.audios.jumping:play()  
-      self.fim_sem_audio_tempo, self.ini_sem_audio_tempo= 0, 0
-    else 
-      self.fim_sem_audio_tempo= love.timer.getTime()
+      self.timer_sem_tocar_audio_ha:reset()
     end 
-  else self.ini_sem_audio_tempo= love.timer.getTime()
+  else self.timer_sem_tocar_audio_ha:start()
   end
 end
 
