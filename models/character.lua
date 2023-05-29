@@ -36,11 +36,19 @@ end
 
 function Character:loadAudios()
   self.audios= {}
-  for k, v in pairs(self.frame_positions) do
+  for k, _ in pairs(self.frame_positions) do
     if self.frame_positions[k].audio~=nil then
       self.audios[k]= love.audio.newSource('assets/audios/'..self.frame_positions[k].audio, 'static')
     end
   end
+end
+
+function Character:pauseAudios()
+  for k, _ in pairs(self.frame_positions) do
+    if self.frame_positions[k].audio~=nil then
+      self.audios[k]:stop()
+    end
+  end 
 end
 
 function Character:setPositionProps(starting_position)

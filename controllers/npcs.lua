@@ -50,7 +50,11 @@ function NPCs:update()
   self:removeMortos()
 end
 
-
+function NPCs:pauseAudios()
+  for i=1, #self.on_the_screen do
+    self.on_the_screen[i]:pauseAudios()
+  end
+end
 
 function NPCs:keypressed(key, scancode, isrepeat)
   for i=1, #self.on_the_screen do

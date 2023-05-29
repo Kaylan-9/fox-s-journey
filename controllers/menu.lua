@@ -30,6 +30,10 @@ function Menu:buttonSair()
 end
 
 function Menu:buttonComecar()
+  if self.escrito=='começar' then
+    self.escrito='voltar'
+    self.body.w= font:getWidth(self.escrito)
+  end
   _G.game.pause= false
 end
 
@@ -83,7 +87,7 @@ function Menu:mouseClickOnTheButton(func)
       
       if mouse.down then
         Menu:playMouseClickSound()
-        func()
+        func(self)
       end
     else
       self.extra_size= _G.tbl:deepCopy(Menu.button_default.extra_size)

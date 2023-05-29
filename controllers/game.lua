@@ -76,6 +76,9 @@ end
 
 function Game:update()
   menu:update()
+ 
+
+
   if self.pause==false then
     if self.game_stage==0 then
       self:nextLevel()
@@ -89,7 +92,16 @@ function Game:update()
     items:update()
     balloon:update()
     if not boss.was_destroyed then boss:update() end
+    if music then music:play() end
+
     self:levelEnded()
+  else 
+
+    if npcs then npcs:pauseAudios() end
+    if player then player:pauseAudios() end
+    if boss and not boss.was_destroyed then boss:pauseAudios() end
+    if music then music:pause() end
+
   end
 end
 
@@ -119,7 +131,7 @@ function Game:keypressed(key, scancode, isrepeat)
 end
 
 function Game:controlesTela(key)
-  if key == 'escape' then love.event.quit()
+  if key == 'escape' then self.pause= true
   elseif key == 'f11' then self:alternarResolucao() 
   end
 end
