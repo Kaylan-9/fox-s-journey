@@ -5,7 +5,9 @@ local NPCs= require('controllers.npcs')
 local Boss= require('controllers.boss')
 local Balloon= require('controllers.balloon')
 local Player= require('controllers.player')
-local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 14)
+
+local menu= require('controllers.menu')
+local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 13)
 
 local metatable, Game= {
   __call=function(self)
@@ -68,40 +70,52 @@ end
 function Game:load()
   love.graphics.setFont(mainFont)
   love.graphics.setDefaultFilter("nearest", "nearest")
+  menu:load()
   love.audio.setVolume(0.1)
-  self:nextLevel()
-  self:loadLevel()
 end
 
 function Game:update()
-  displayers:update()
-  map:update()
-  npcs:update()
-  player:update()
-  items:update()
-  balloon:update()
-  if not boss.was_destroyed then boss:update() end
-  self:levelEnded()
+  menu:update()
+  if self.pause==false then
+    if self.game_stage==0 then
+      self:nextLevel()
+      self:loadLevel()
+    end
+
+    displayers:update()
+    map:update()
+    npcs:update()
+    player:update()
+    items:update()
+    balloon:update()
+    if not boss.was_destroyed then boss:update() end
+    self:levelEnded()
+  end
 end
 
 function Game:draw()
-  if map then map:draw() end
-  player:drawExpression()
-  npcs:draw()
-  if not boss.was_destroyed then boss:draw() end
-  items:draw()
-  player:draw()
-  balloon:draw()
-  displayers:draw()
+  if self.pause==false then
+    if map then map:draw() end
+    player:drawExpression()
+    npcs:draw()
+    if not boss.was_destroyed then boss:draw() end
+    items:draw()
+    player:draw()
+    balloon:draw()
+    displayers:draw()
+  else
+    menu:draw()
+  end
 end
 
 function Game:keypressed(key, scancode, isrepeat)
-  items:keypressed(key)
-
-  if not boss.was_destroyed then boss:keypressed(key, scancode, isrepeat) end
-  npcs:keypressed(key, scancode, isrepeat)
-  player:keypressed(key, scancode, isrepeat)
   self:controlesTela(key)
+  if self.pause==false then
+    items:keypressed(key)
+    if not boss.was_destroyed then boss:keypressed(key, scancode, isrepeat) end
+    npcs:keypressed(key, scancode, isrepeat)
+    player:keypressed(key, scancode, isrepeat)
+  end
 end
 
 function Game:controlesTela(key)
@@ -114,7 +128,7 @@ function Game:parametersToGoToNextStage()
   local boss_morto= _G.boss.was_destroyed
   local zero_npcs= #_G.npcs.on_the_screen==0 and boss_morto
   local ultimo_frame_finishing= _G.player.frame==_G.player.frame_positions.finishing.f
-  return zero_npcs and ultimo_frame_finishing
+  return (zero_npcs and ultimo_frame_finishing)
 end 
 
 function Game:levelEnded()

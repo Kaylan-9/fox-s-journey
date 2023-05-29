@@ -7,7 +7,7 @@ _G.options_npcs= json.import('data/options/npcs.json')
 _G.options_tileset= json.import('data/options/tileset.json')
 
 local Game= require('controllers.game')
-local game= Game()
+_G.game= Game()
 
 function love.load()  
   game:load()
