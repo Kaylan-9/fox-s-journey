@@ -5,7 +5,7 @@ local NPCs= require('controllers.npcs')
 local Boss= require('controllers.boss')
 local Balloon= require('controllers.balloon')
 local Player= require('controllers.player')
-local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 20)
+local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 14)
 
 local metatable, Game= {
   __call=function(self)
@@ -22,6 +22,7 @@ local metatable, Game= {
 
     obj.fases= json.import('data/fases.json')
     obj.game_stage= 0
+    obj.pause= true
     obj.timer_fim_fase= timer:new(1)
     return obj 
   end 

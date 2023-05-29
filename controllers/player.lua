@@ -41,19 +41,28 @@ function Player:setExpressionProps()
   self.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
 end
 
-function Player:updateFrame()
+function Player:markPressedKeys()
+  self.pressed.soco= love.keyboard.isDown("x") 
   self.pressed.mov= love.keyboard.isDown("right", "d", "left", "a")
   self.pressed.run= self.pressed.mov and love.keyboard.isDown("space")
   self.pressed.jump= love.keyboard.isDown("up", "w")
-  self.pressed.soco= love.keyboard.isDown("x") or (self.frame>=self.frame_positions.attacking.i and self.frame<=self.frame_positions.attacking.f-1)
+end
 
-  local sendo_controlado= self.pressed.mov or self.pressed.run or self.pressed.jump or self.pressed.soco
-  local mudanca_frame= 
-    self.animation=='finishing' or 
-    self.pressed.soco or 
-    (sendo_controlado and #_G.balloon.messages==0) or 
-    (self.canjump==false) or 
-    (self.pressed.jump==false and self.p.y<self.p.f.y)
+function Player:sendoControlado()
+  local controlando= false
+  for k, _ in pairs(self.pressed) do
+    if self.pressed[k] then
+      controlando= true
+      break
+    end     
+  end
+  return controlando
+end
+
+function Player:updateFrame()
+  local esperando_soco= (self.animation=='attacking' and self.frame>=self.frame_positions.attacking.i and self.frame<=self.frame_positions.attacking.f-1)
+  local mudanca_frame= (self:sendoControlado() and #_G.balloon.messages==0) or (self.pressed.jump==false and self.p.y<self.p.f.y) or (#_G.balloon.messages==0 and esperando_soco)
+  
 
   self:defaultUpdateFrame(mudanca_frame)
 end
@@ -120,27 +129,6 @@ function Player:pulo()
   end
 end
 
--- serve para verificar se a animação começa 
-function Player:animComecaExec()         
-                               -- animação não é continua                                        -- É o frame final para terminar a animação     
-  return self.animation=='' or not self.frame_positions[self.animation].type=='until_finished' or self.frame_positions[self.animation].f==self.frame
-end
-
-function Player:exeCicloAnimMov()
-  -- se não está pressionado o botão de pulo & o Player pode pular
-  if self:animComecaExec() then
-    if self.pressed.jump==false and self.canjump and self.pressed.mov then
-      self.animation= not love.keyboard.isDown("space") and 'walking' or 'running'
-    end
-  end
-end
-
-function Player:mudancaDirecao()
-  if love.keyboard.isDown("left", "a") then self.s.x= -math.abs(self.s.x)
-  elseif love.keyboard.isDown("right", "d") then self.s.x= math.abs(self.s.x)
-  end
-end 
-
 function Player:parametersToAllowMoveWhenTyingToWalk(param)
   local posicao_cam_inativa_e_igual= (_G.map.cam.p.x+self.p.x<=_G.map.cam.p.i.x+(self.vel*2)) or (_G.map.cam.p.x+self.p.x>=_G.map.cam.p.f.x-self.vel)
   --limite na tela com base no controle do Player
@@ -157,12 +145,19 @@ function Player:parametersToAllowMoveWhenTyingToWalk(param)
   return (ver_padrao[param] and lim[param])
 end
 
-function Player:andar()
-  local mov= (_G.dt * self.vel * 100)
-  if self.pressed.mov then self:exeCicloAnimMov() end
-  if self:parametersToAllowMoveWhenTyingToWalk('left') then self.p.x= self.p.x-mov end
-  if self:parametersToAllowMoveWhenTyingToWalk('right') then self.p.x= self.p.x+mov end
+function Player:corrida()
+  self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
+end 
+
+function Player:permitirMove()
+  return #_G.balloon.messages==0 and self.animation~='finishing'
 end
+
+function Player:mudancaDirecao()
+  if love.keyboard.isDown("left", "a") then self.s.x= -math.abs(self.s.x)
+  elseif love.keyboard.isDown("right", "d") then self.s.x= math.abs(self.s.x)
+  end
+end 
 
 function Player:soco()
   if self:animComecaExec() then
@@ -172,12 +167,31 @@ function Player:soco()
   end
 end
 
-function Player:corrida()
-  self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
-end 
+function Player:exeCicloAnimMov()
+  -- se não está pressionado o botão de pulo & o Player pode pular
+  if self:animComecaExec() then
+    if self.pressed.jump==false and self.canjump and self.pressed.mov then
 
-function Player:permitirMove()
-  return #_G.balloon.messages==0 and self.animation~='finishing'
+      if self.pressed.run then
+        self.animation= 'running'
+      elseif self.pressed.mov then
+        self.animation= 'walking'
+      end
+
+    end
+  end
+end
+
+function Player:andar()
+  local mov= (_G.dt * self.vel * 100)
+  if self.pressed.mov then self:exeCicloAnimMov() end
+  if self:parametersToAllowMoveWhenTyingToWalk('left') then self.p.x= self.p.x-mov end
+  if self:parametersToAllowMoveWhenTyingToWalk('right') then self.p.x= self.p.x+mov end
+end
+
+-- serve para verificar se a animação começa 
+function Player:animComecaExec()         
+  return self.animation=='' or self.frame_positions[self.animation].type~='until_finished' or self.frame_positions[self.animation].f==self.frame      
 end
 
 function Player:controlando()
@@ -193,6 +207,7 @@ end
 function Player:update()
   self:updateParameters()
   self:calcYPositionReferences()
+  self:markPressedKeys()
   self:updateFrame()
   self:queda()
   self:controlando()
