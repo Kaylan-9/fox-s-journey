@@ -21,6 +21,7 @@ local Map, metatable= {}, {
     obj.background.img.size.w= obj.background.img.obj:getWidth()
     obj.background.img.size.h= obj.background.img.obj:getHeight()
     obj.objects_in_the_scenery= {}
+    obj.player_px= 0
     setmetatable(obj, {__index= self})
     obj:backgroundLoad()
     obj:load()
@@ -65,7 +66,10 @@ end
 
 -- ! posição real do player na tela em x
 function Map:pRealPlayerX()
-  return self.cam.p.x+_G.player.p.x
+  if not _G.player.was_destroyed then
+    self.player_px= _G.player.p.x
+  end
+  return self.cam.p.x+self.player_px
 end
 
 function Map:camDeveSerAtiva()
@@ -113,7 +117,10 @@ function Map:newObject(k, object_props)
   object.draw= self.drawObject
   object.posicionaObject= self[object.name..'Posiciona']
   object.performBehavior= self[object.behavior..'Behavior']
+  object.loadResource= self[object.name..'LoadResource']
+  object.reset= self[object.name..'Reset']
   object.posicionaObject(object, self.dimensions.w)
+  object.loadResource(object)
   object= _G.tbl:deepCopy(object)
   object.cam= self.cam
   object.dimensions= self.dimensions
@@ -126,39 +133,65 @@ function Map:drawObject()
     self.tileset.tiles[self.tile],
     self.p.x-self.cam.p.x, self.p.y,
     0,
-    3, 3,
-    (self.tileset.tileSize.w/6),
-    0
+    self.s.x, self.s.y,
+    (self.tileset.tileSize.w/6), (self.tileset.tileSize.w/6)
   )
 end 
+
+function Map:estalactiteLoadResource()
+  self.impact_sound= love.audio.newSource("assets/audios/"..self.audio, "static")
+  self.s= {
+    x=3, 
+    y=3
+  }
+  self.body= {
+    w= self.tileset.tileSize.w*self.s.x,
+    h= self.tileset.tileSize.h*self.s.y,
+  }
+end
 
 function Map:estalactitePosiciona(tamanho_max_map_x)
   self.p.x= math.random(0, tamanho_max_map_x)
   self.active= false
 end
 
+function Map:estalactiteReset()
+  self:posicionaObject(self.p.x+1000)
+  self.p.y= 0
+end
+
+
 function Map:fallingBehavior()
   if self.active==false then 
-    if _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.tileset.tileSize.w/2)*3 and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.tileset.tileSize.w/2)*3 then
-      self.active= true
+    if not _G.player.was_destroyed then
+      if _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.body.w/2) and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.body.w/2) then
+        self.active= true
+      end
     end
   end
 
   if self.active then 
     local distance= 0
-    if _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.tileset.tileSize.w/2)*3 and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.tileset.tileSize.w/2)*3 then
-      distance= (_G.player.p.x-(self.tileset.tileSize.w/2)*3)/((self.tileset.tileSize.w/2)*3*2)
+    if not _G.player.was_destroyed and _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.body.w/2) and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.body.w/2) then
+      distance= (_G.player.p.x-(self.body.w/2))/self.body.w
     else 
       distance= 0.25
     end
 
     self.p.y= self.p.y + (_G.dt * math.random(self.vel, self.vel*4*distance) * 100)
+
+    if not _G.player.was_destroyed then
+      if _G.collision:quad(self, _G.player, self.cam) then
+        _G.player.life= _G.player.life-self.damage
+        self.impact_sound:play()
+        self:reset()
+      end
+    end
   end
 
   -- passou da tela em y
   if self.p.y>_G.screen.h then 
-    self:posicionaObject(self.p.x+1000)
-    self.p.y= 0
+    self:reset()
   end
 end
 
@@ -242,8 +275,7 @@ function Map:tileDraw(i, j, id_tile, symbol)
   end
 end
 
-function Map:drawSceneryAndGround()
-  love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
+function Map:drawGround()
   for i = 0, #self.matriz-1 do                             
     for j = 0, #self.matriz[i+1]-1 do                     
       -- acessando configuração do tileset do mapa atual para desenhar o tile correto
@@ -254,15 +286,20 @@ function Map:drawSceneryAndGround()
   end
 end
 
-function Map:drawSceneryObjects()
+function Map:drawObjects()
   for i=1 ,#self.objects_in_the_scenery do
     self.objects_in_the_scenery[i]:draw()
   end 
 end
 
+function Map:drawScenery()
+  love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
+end
+
 function Map:draw()
-  self:drawSceneryAndGround()
-  self:drawSceneryObjects()
+  self:drawScenery()
+  self:drawObjects()
+  self:drawGround()
 end
 
 return Map

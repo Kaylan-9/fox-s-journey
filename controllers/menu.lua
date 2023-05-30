@@ -38,29 +38,45 @@ function Menu:buttonComecar()
 end
 
 function Menu:loadButtons()
-  self:newButton('começar', self.buttonComecar, {x= _G.screen.w/2, y= _G.screen.h/2})
-  self:newButtonAbaixoDoAnterior('sair', self.buttonSair)
+  self:newButton('começar', self.buttonComecar, {x= _G.screen.w/2, y= _G.screen.h/2}, nil, true)
+  self:newButtonAbaixoDoAnterior('reiniciar', self.resetGame, false, self.enableResetButton)
+  self:newButtonAbaixoDoAnterior('sair', self.buttonSair, true)
 end
 
-function Menu:newButtonAbaixoDoAnterior(escrito, func)
+function Menu:resetGame()
+  _G.game.pause= false
+  _G.game.game_stage= 0
+end
+
+function Menu:enableResetButton()
+  if _G.game.game_stage>0 then
+    self.active= true
+  else 
+    self.active= false
+  end
+end
+
+function Menu:newButtonAbaixoDoAnterior(escrito, func, active, activateButton)
   local last_button= self:lastButton()
   local p= {
     x= last_button.p.x,
     y= last_button.p.y+last_button.body.h+self.button_default.distancia.y
   }
-  self:newButton(escrito, func, p)
+  self:newButton(escrito, func, p, nil, active, activateButton)
 end
 
-function Menu:newButton(escrito, func, p, size)
+function Menu:newButton(escrito, func, p, size, active, activateButton)
   local new_button= {
     escrito= escrito,
     p= p,
+    active= active,
     body= {
       w= font:getWidth(escrito),
       h= font:getHeight(),
     },
     extra_size= _G.tbl:deepCopy(self.button_default.extra_size),
     draw= self.drawButton,
+    activateButton= activateButton or false,
     clickingMouse= self:mouseClickOnTheButton(func)
   }
 
@@ -73,24 +89,26 @@ end
 
 function Menu:mouseClickOnTheButton(func)
   return function(self, mouse)
-    local left = self.p.x-((self.body.w/2)*self.size.x)
-    local right= self.p.x+((self.body.w/2)*self.size.x)
-    local top= self.p.y-((self.body.h/2)*self.size.y)
-    local bottom= self.p.y+((self.body.h/2)*self.size.y)
-    if mouse.p.x>left and mouse.p.x<right and mouse.p.y>top and mouse.p.y<bottom then
-      local p_relacao_botao= {
-        x= math.abs(self.p.x-mouse.p.x),
-        y= math.abs(self.p.y-mouse.p.y)
-      }
-      self.extra_size.x= (1-(p_relacao_botao.x/((self.body.w/2)*self.size.x)))*Menu.button_default.extra_size_max.x
-      self.extra_size.y= (1-(p_relacao_botao.y/((self.body.h/2)*self.size.y)))*Menu.button_default.extra_size_max.y
-      
-      if mouse.down then
-        Menu:playMouseClickSound()
-        func(self)
+    if self.active then
+      local left = self.p.x-((self.body.w/2)*self.size.x)
+      local right= self.p.x+((self.body.w/2)*self.size.x)
+      local top= self.p.y-((self.body.h/2)*self.size.y)
+      local bottom= self.p.y+((self.body.h/2)*self.size.y)
+      if mouse.p.x>left and mouse.p.x<right and mouse.p.y>top and mouse.p.y<bottom then
+        local p_relacao_botao= {
+          x= math.abs(self.p.x-mouse.p.x),
+          y= math.abs(self.p.y-mouse.p.y)
+        }
+        self.extra_size.x= (1-(p_relacao_botao.x/((self.body.w/2)*self.size.x)))*Menu.button_default.extra_size_max.x
+        self.extra_size.y= (1-(p_relacao_botao.y/((self.body.h/2)*self.size.y)))*Menu.button_default.extra_size_max.y
+        
+        if mouse.down then
+          Menu:playMouseClickSound()
+          func(self)
+        end
+      else
+        self.extra_size= _G.tbl:deepCopy(Menu.button_default.extra_size)
       end
-    else
-      self.extra_size= _G.tbl:deepCopy(Menu.button_default.extra_size)
     end
   end
 end
@@ -108,6 +126,9 @@ end
 function Menu:updateButtons()
   for i=1, #self.button_list do 
     self.button_list[i]:clickingMouse(self.mouse)
+    if self.button_list[i].activateButton then
+      self.button_list[i]:activateButton()
+    end
   end
 end
 
@@ -117,13 +138,15 @@ function Menu:update()
 end
 
 function Menu:drawButton()
-  love.graphics.print(
-    self.escrito, 
-    self.p.x, self.p.y, 
-    0, 
-    self.size.x+self.extra_size.x, self.size.y+self.extra_size.y, 
-    self.body.w/2, self.body.h/2
-  )
+  if self.active then
+    love.graphics.print(
+      self.escrito, 
+      self.p.x, self.p.y, 
+      0, 
+      self.size.x+self.extra_size.x, self.size.y+self.extra_size.y, 
+      self.body.w/2, self.body.h/2
+    )
+  end
 end
 
 function Menu:drawButtons()

@@ -32,7 +32,9 @@
           "tile": 45, 
           "n": 50,
           "vel": 2,
-          "behavior": "falling"
+          "behavior": "falling",
+          "audio": "boulder_drop.mp3",
+          "damage": 1
         }
       }
     }

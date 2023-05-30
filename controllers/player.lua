@@ -27,19 +27,12 @@ local metatable= {
     obj.pressed= {}
     obj.canjump= true
     setmetatable(obj, {__index= self})
-    obj:setExpressionProps()
     return obj
   end
 }
 
 setmetatable(Player, metatable)
 
-function Player:setExpressionProps()
-  self.expression= {}
-  self.expression.s= {x= 1.5, y= 1.5}
-  self.expression.frame= 1
-  self.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
-end
 
 function Player:markPressedKeys()
   self.pressed.soco= love.keyboard.isDown("x") 
@@ -209,7 +202,15 @@ function Player:update()
   self:controlando()
   self:finalizando()
   self.acc= self.acc+(_G.dt * math.random(1, 3))
+  self:dying()
 end
+
+
+function Player:dying()
+  if self.life<=0 then
+    self:destroy()
+  end
+end 
 
 function Player:calcYPositionReferences()
   -- incia a posição máxima de y
@@ -233,17 +234,8 @@ function Player:finalizando()
   end
 end
 
-function Player:drawExpression()
-  love.graphics.draw(
-    self.expression.tileset.obj, 
-    self.expression.tileset.tiles[self.expression.frame], 
-    0, 
-    _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 
-    0, 
-    self.expression.s.x, 
-    self.expression.s.y
-  )
-  _G.collision:quadDraw(self)
+function Player:frameAoTerminarFase()
+  return self.frame==self.frame_positions.finishing.f
 end
 
 return Player

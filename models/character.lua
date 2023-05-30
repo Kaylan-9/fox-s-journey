@@ -76,7 +76,11 @@ end
 
 function Character:destroy()
   for k, v in pairs(self) do
-    self[k] = nil
+    if k=='update' or k=='draw' then 
+      self[k] = function()end
+    else
+      self[k] = nil
+    end
   end
   setmetatable(self, nil)
   self.was_destroyed= true

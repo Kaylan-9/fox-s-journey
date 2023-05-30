@@ -67,6 +67,13 @@ end
 
 -- !!!!!!!!!!!!!!!
 
+function Game:reset()
+  if self.game_stage==0 then
+    self:nextLevel()
+    self:loadLevel()
+  end
+end
+
 function Game:load()
   love.graphics.setFont(mainFont)
   love.graphics.setDefaultFilter("nearest", "nearest")
@@ -76,19 +83,14 @@ end
 
 function Game:update()
   menu:update()
- 
-
 
   if self.pause==false then
-    if self.game_stage==0 then
-      self:nextLevel()
-      self:loadLevel()
-    end
+    self:reset()
 
     displayers:update()
     map:update()
     npcs:update()
-    player:update()
+    if not _G.player.was_destroyed then _G.player:update() end
     items:update()
     balloon:update()
     if not boss.was_destroyed then boss:update() end
@@ -96,23 +98,20 @@ function Game:update()
 
     self:levelEnded()
   else 
-
     if npcs then npcs:pauseAudios() end
-    if player then player:pauseAudios() end
+    if player and not player.was_destroyed then player:pauseAudios() end
     if boss and not boss.was_destroyed then boss:pauseAudios() end
     if music then music:pause() end
-
   end
 end
 
 function Game:draw()
   if self.pause==false then
     if map then map:draw() end
-    player:drawExpression()
     npcs:draw()
     if not boss.was_destroyed then boss:draw() end
     items:draw()
-    player:draw()
+    if not player.was_destroyed then player:draw() end
     balloon:draw()
     displayers:draw()
   else
@@ -126,7 +125,7 @@ function Game:keypressed(key, scancode, isrepeat)
     items:keypressed(key)
     if not boss.was_destroyed then boss:keypressed(key, scancode, isrepeat) end
     npcs:keypressed(key, scancode, isrepeat)
-    player:keypressed(key, scancode, isrepeat)
+    if not _G.player.was_destroyed then player:keypressed(key, scancode, isrepeat) end
   end
 end
 
@@ -139,8 +138,7 @@ end
 function Game:parametersToGoToNextStage()
   local boss_morto= _G.boss.was_destroyed
   local zero_npcs= #_G.npcs.on_the_screen==0 and boss_morto
-  local ultimo_frame_finishing= _G.player.frame==_G.player.frame_positions.finishing.f
-  return (zero_npcs and ultimo_frame_finishing)
+  return (zero_npcs and _G.player:frameAoTerminarFase())
 end 
 
 function Game:levelEnded()

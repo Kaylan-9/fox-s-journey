@@ -22,11 +22,31 @@ local Displayers, metatable= {}, {
     }
     obj.p_incial_para_o_proximo_draw= { w= 0, h= 0 }
     setmetatable(obj, { __index= self })
+    obj:setExpressionProps()
     return obj
   end
 }
 
 setmetatable(Displayers, metatable)
+
+function Displayers:drawExpression()
+  love.graphics.draw(
+    self.expression.tileset.obj, 
+    self.expression.tileset.tiles[self.expression.frame], 
+    0, 
+    _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 
+    0, 
+    self.expression.s.x, 
+    self.expression.s.y
+  )
+end
+
+function Displayers:setExpressionProps()
+  self.expression= {}
+  self.expression.s= {x= 1.5, y= 1.5}
+  self.expression.frame= 1
+  self.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
+end
 
 function Displayers:drawCollectibles()
   for k, v in pairs(self.props_items) do  
@@ -82,22 +102,25 @@ function Displayers:drawInventory()
 end
 
 function Displayers:drawLifeBar()
-  love.graphics.draw(
-    self.props_lifeBar.tileset.obj, 
-    self.props_lifeBar.tileset.tiles[self.props_lifeBar.frame], 
-    0, 
-    0, 
-    0, 
-    self.props_lifeBar.s.x, 
-    self.props_lifeBar.s.y
-  )
-  self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+(self.props_lifeBar.tileset.tileSize.w*self.props_lifeBar.s.x)
+  if not _G.player.was_destroyed and _G.player.life>0 then
+    love.graphics.draw(
+      self.props_lifeBar.tileset.obj, 
+      self.props_lifeBar.tileset.tiles[self.props_lifeBar.frame], 
+      0, 
+      0, 
+      0, 
+      self.props_lifeBar.s.x, 
+      self.props_lifeBar.s.y
+    )
+    self.p_incial_para_o_proximo_draw.w= self.p_incial_para_o_proximo_draw.w+(self.props_lifeBar.tileset.tileSize.w*self.props_lifeBar.s.x)
+  end
 end
 
 function Displayers:draw()
   self:drawLifeBar()
   self:drawInventory()
   self:drawCollectibles()
+  self:drawExpression()
 end
 
 function Displayers:atualizaTileSetListItems()
@@ -114,9 +137,11 @@ end
 
 function Displayers:update()
   --frame correto da barra de vida
-  self:atualizaTileSetListItems()
-  self:atualizaFrameLifeBar()
-  self.p_incial_para_o_proximo_draw.w= 0
+  if not _G.player.was_destroyed then
+    self:atualizaTileSetListItems()
+    self:atualizaFrameLifeBar()
+    self.p_incial_para_o_proximo_draw.w= 0
+  end
 end
 
 return Displayers

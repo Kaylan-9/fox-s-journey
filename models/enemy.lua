@@ -122,7 +122,7 @@ function Enemy:attackPlayer()
     self:dealsDamage(pula_anim)
     self:defaultUpdateFrame()  
     -- expressão de raiva
-    _G.player.expression.frame= 3
+    _G.displayers.expression.frame= 3
   end
 end 
 
