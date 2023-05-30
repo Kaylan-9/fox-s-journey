@@ -30,7 +30,7 @@
       "objects": {
         "estalactite": {
           "tile": 45, 
-          "n": 10,
+          "n": 50,
           "vel": 2,
           "behavior": "falling"
         }

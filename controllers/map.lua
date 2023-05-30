@@ -97,7 +97,9 @@ function Map:carregarOutrosObjects()
   local existem_outros_objetos= true
   if existem_outros_objetos then
     for k, object_props in pairs(self.option_map.others.objects) do
-      self:newObject(k, object_props)
+      for i=1, object_props.n do
+        self:newObject(k, object_props)
+      end
     end
   end
 end
@@ -108,12 +110,14 @@ function Map:newObject(k, object_props)
   object.name= k
   object.p= {x=0, y=0}
   object.tileset= self.tileset
-  object.cam= self.cam
   object.draw= self.drawObject
   object.posicionaObject= self[object.name..'Posiciona']
   object.performBehavior= self[object.behavior..'Behavior']
   object.posicionaObject(object, self.dimensions.w)
-  table.insert(self.objects_in_the_scenery, object_props)
+  object= _G.tbl:deepCopy(object)
+  object.cam= self.cam
+  object.dimensions= self.dimensions
+  table.insert(self.objects_in_the_scenery, object)
 end
 
 function Map:drawObject()
@@ -122,19 +126,39 @@ function Map:drawObject()
     self.tileset.tiles[self.tile],
     self.p.x-self.cam.p.x, self.p.y,
     0,
-    2, 2,
-    self.tileset.size.w/2,
+    3, 3,
+    (self.tileset.tileSize.w/6),
     0
   )
 end 
 
 function Map:estalactitePosiciona(tamanho_max_map_x)
   self.p.x= math.random(0, tamanho_max_map_x)
+  self.active= false
 end
 
 function Map:fallingBehavior()
-  if _G.player.p.y>=(self.p.x-self.cam.p.x)-20 and _G.player.p.y<=(self.p.x-self.cam.p.x)+20 then
-    self.p.x= _G.player.p.x + (_G.dt * self.vel * 100)
+  if self.active==false then 
+    if _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.tileset.tileSize.w/2)*3 and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.tileset.tileSize.w/2)*3 then
+      self.active= true
+    end
+  end
+
+  if self.active then 
+    local distance= 0
+    if _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.tileset.tileSize.w/2)*3 and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.tileset.tileSize.w/2)*3 then
+      distance= (_G.player.p.x-(self.tileset.tileSize.w/2)*3)/((self.tileset.tileSize.w/2)*3*2)
+    else 
+      distance= 0.25
+    end
+
+    self.p.y= self.p.y + (_G.dt * math.random(self.vel, self.vel*4*distance) * 100)
+  end
+
+  -- passou da tela em y
+  if self.p.y>_G.screen.h then 
+    self:posicionaObject(self.p.x+1000)
+    self.p.y= 0
   end
 end
 
@@ -147,8 +171,15 @@ function Map:updateSceneryAndGround()
   end
 end
 
+function Map:updateObjects()
+  for k, object in pairs(self.objects_in_the_scenery) do
+    object:performBehavior()
+  end
+end
+
 function Map:update()
-  
+  self:updateSceneryAndGround()  
+  self:updateObjects()
 end
 
 function Map:tileAtualX(imaginary_px)
