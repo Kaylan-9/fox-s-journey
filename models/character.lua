@@ -88,7 +88,7 @@ end
 
 
 function Character:calcNewFloorPosition()
-  local imaginary_px= self.observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x
+  local imaginary_px= (self.observadoPelaCamera and _G.cam) and _G.cam:actualPlayerPosition() or self.p.x
   self.new_y= _G.map:positionCharacter(
     self.p, 
     imaginary_px,
@@ -103,7 +103,7 @@ function Character:updateParameters()
 end
 
 function Character:draw()
-  local x= self.observadoPelaCamera and self.p.x or self.p.x-_G.map.cam.p.x
+  local x= self.observadoPelaCamera and self.p.x or self.p.x-(_G.cam and _G.cam.p.x or 0)
   love.graphics.draw(
     self.tileset.obj,
     self.tileset.tiles[self.frame],
@@ -118,7 +118,7 @@ function Character:draw()
 end
 
 function Character:getSide(direction)
-  local movimento_de_camera= self.observadoPelaCamera and 0 or _G.map.cam.p.x
+  local movimento_de_camera= self.observadoPelaCamera and 0 or _G.cam.p.x
   return self.p.x+(direction=='left' and -(self.body.w/2) or (self.body.w/2))-movimento_de_camera
 end
 

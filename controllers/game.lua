@@ -5,8 +5,10 @@ local NPCs= require('controllers.npcs')
 local Boss= require('controllers.boss')
 local Balloon= require('controllers.balloon')
 local Player= require('controllers.player')
+local Cam= require('controllers.cam')
 
-local menu= require('controllers.menu')
+local menu= require('controllers.screens.menu')
+local gameover= require('controllers.screens.gameover')
 local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 13)
 
 local metatable, Game= {
@@ -14,23 +16,26 @@ local metatable, Game= {
     local obj= {}
     obj.timer= 0
     setmetatable(obj, {__index=self})
-
-    _G.screen= {
-      w= love.graphics.getWidth(),
-      h= love.graphics.getHeight()
-    }
     _G.fullscreen, _G.fstype= love.window.getFullscreen()
     _G.dt= 0
-
     obj.fases= json.import('data/fases.json')
     obj.game_stage= 0
     obj.pause= true
     obj.timer_fim_fase= timer:new(1)
+    setmetatable(obj, {__index= self})
+    obj:setScreen()
     return obj 
   end 
 }, {}
 
 setmetatable(Game, metatable)
+
+function Game:setScreen()
+  _G.screen= {
+    w= love.graphics.getWidth(),
+    h= love.graphics.getHeight()
+  }
+end
 
 function Game:nextLevel()
   if self.game_stage<#self.fases then
@@ -48,9 +53,11 @@ function Game:loadMusic()
 end
 
 function Game:loadLevel()
+  
   self:loadMusic()
   self:loadItems()
   _G.map= Map(self.fase.map)
+  _G.cam= Cam()
   if type(self.fase.boss.name)=='string' then _G.boss= Boss(self.fase.boss) end
   _G.npcs= NPCs(self.fase.npcs)
   _G.displayers= Displayers()
@@ -78,6 +85,7 @@ function Game:load()
   love.graphics.setFont(mainFont)
   love.graphics.setDefaultFilter("nearest", "nearest")
   menu:load()
+  gameover:load()
   love.audio.setVolume(0.1)
 end
 
@@ -88,15 +96,19 @@ function Game:update()
     self:reset()
 
     displayers:update()
-    map:update()
-    npcs:update()
-    if not _G.player.was_destroyed then _G.player:update() end
+    if not _G.player.was_destroyed then 
+      player:update() 
+      npcs:update()
+      if not boss.was_destroyed then boss:update() end
+    end
     items:update()
+    map:update()
     balloon:update()
-    if not boss.was_destroyed then boss:update() end
+    _G.cam:update()
     if music then music:play() end
-
     self:levelEnded()
+
+    gameover:update()
   else 
     if npcs then npcs:pauseAudios() end
     if player and not player.was_destroyed then player:pauseAudios() end
@@ -114,6 +126,7 @@ function Game:draw()
     if not player.was_destroyed then player:draw() end
     balloon:draw()
     displayers:draw()
+    gameover:draw()
   else
     menu:draw()
   end

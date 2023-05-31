@@ -64,7 +64,7 @@ end
 
 function Enemy:playerVisible()
   local metade_tela= (_G.screen.w/2)
-  local res= math.abs(_G.map:pRealPlayerX()-self.p.x)<=metade_tela
+  local res= _G.cam and math.abs(_G.cam:actualPlayerPosition()-self.p.x)<=metade_tela
   if res then self:deveVoarAoPlayerSeAproximar() end
   return res
 end
@@ -78,8 +78,8 @@ function Enemy:drawLifeBar()
   }
   local bottom= self.p.y-(self.body.w/2)-10
   local top= bottom-tamanhoAtual.h
-  local left= self.p.x-(tamanhoAtual.w/2)-_G.map.cam.p.x
-  local right= self.p.x+(tamanhoAtual.w/2)-_G.map.cam.p.x
+  local left= self.p.x-(tamanhoAtual.w/2)-_G.cam.p.x
+  local right= self.p.x+(tamanhoAtual.w/2)-_G.cam.p.x
   local vertices= {
     left, top,
     right, top,
@@ -93,26 +93,28 @@ function Enemy:drawLifeBar()
 end
 
 function Enemy:chasePlayer()
-  local left= (self.p.x-(self.body.w/2)-1)-_G.map.cam.p.x
-  local right= (self.p.x+(self.body.w/2)+1)-_G.map.cam.p.x
+  if not _G.player.was_destroyed then 
+    local left= (self.p.x-(self.body.w/2)-1)-_G.cam.p.x
+    local right= (self.p.x+(self.body.w/2)+1)-_G.cam.p.x
 
-  local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
-  local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
+    local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
+    local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
 
-  if (left>playersRightSide) and self.goto_player then
-    self.animation= self.type=='flying' and 'flying' or 'walking'
-    self:defaultUpdateFrame()
-    self.s.x= -math.abs(self.s.x)*self.direction
-    self.p.x= (self.p.x - self.mov)
-    self.reached_the_player= false
-  elseif (right<playersLeftSide) and self.goto_player then
-    self.animation= self.type=='flying' and 'flying' or 'walking'
-    self:defaultUpdateFrame()
-    self.s.x= math.abs(self.s.x)*self.direction
-    self.p.x= (self.p.x + self.mov)
-    self.reached_the_player= false
-  else 
-    self.reached_the_player= true
+    if (left>playersRightSide) and self.goto_player then
+      self.animation= self.type=='flying' and 'flying' or 'walking'
+      self:defaultUpdateFrame()
+      self.s.x= -math.abs(self.s.x)*self.direction
+      self.p.x= (self.p.x - self.mov)
+      self.reached_the_player= false
+    elseif (right<playersLeftSide) and self.goto_player then
+      self.animation= self.type=='flying' and 'flying' or 'walking'
+      self:defaultUpdateFrame()
+      self.s.x= math.abs(self.s.x)*self.direction
+      self.p.x= (self.p.x + self.mov)
+      self.reached_the_player= false
+    else 
+      self.reached_the_player= true
+    end
   end
 end
 
@@ -127,17 +129,19 @@ function Enemy:attackPlayer()
 end 
 
 function Enemy:takesDamage()
-  if _G.collision:ellipse(_G.player.p, self.p, (self.body.w/2), (self.body.h/2), (self.body.w/2)) then
-    if type(_G.player.hostile.attack_frame)=='table' then
-      for j=1, #_G.player.hostile.attack_frame do
-        if _G.player.frame==_G.player.hostile.attack_frame[j] then
-          if _G.player.acc>=_G.player.freq_frames then
-            _G.player.audios['attacking']:play()
-            if self.life > 0 then
-              self.life= self.life - _G.player.hostile.damage
+  if not _G.player.was_destroyed then
+    if _G.collision:ellipse(_G.player.p, self.p, (self.body.w/2), (self.body.h/2), (self.body.w/2)) then
+      if type(_G.player.hostile.attack_frame)=='table' then
+        for j=1, #_G.player.hostile.attack_frame do
+          if _G.player.frame==_G.player.hostile.attack_frame[j] then
+            if _G.player.acc>=_G.player.freq_frames then
+              _G.player.audios['attacking']:play()
+              if self.life > 0 then
+                self.life= self.life - _G.player.hostile.damage
+              end
             end
-          end
-        end 
+          end 
+        end
       end
     end
   end
@@ -145,7 +149,7 @@ end
 
 
 function Enemy:dealsDamage(pula_anim)  
-  if not pula_anim then
+  if not _G.player.was_destroyed and not pula_anim then
     if _G.collision:ellipse(_G.player.p, self.p, (self.body.w/2), (self.body.h/2), (self.body.w/2)) then
       -- quando o frame troca o dano é aplicado
       if self.acc>=(self.freq_frames) and self.hostile.attack_frame==self.frame then

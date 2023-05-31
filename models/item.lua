@@ -35,7 +35,7 @@ function Item:disableInInventory() self.activateInInventory= false end
 function Item:activateInInventory() self.activateInInventory= true end
 
 function Item:calcNewFloorPosition()
-  local imaginary_px= self.observadoPelaCamera and _G.map.cam.p.x+self.p.x or self.p.x
+  local imaginary_px= self.observadoPelaCamera and _G.cam.p.x+self.p.x or self.p.x
   self.new_y= _G.map:positionCharacter(
     self.p, 
     imaginary_px,
@@ -76,7 +76,7 @@ function Item:draw()
   love.graphics.draw(
     self.tileset.obj,
     self.tileset.tiles[self.frame],
-    self.p.x-_G.map.cam.p.x, 
+    self.p.x-_G.cam.p.x, 
     self.p.y,
     self.angle,
     self.s.x,

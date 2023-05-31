@@ -5,14 +5,6 @@ local Map, metatable= {}, {
     obj.options_maps= json.import('data/options/maps.json')
     obj.matriz= {}
     obj.s= {x= 2, y= 2}
-    obj.cam= {}
-    obj.cam.active= false
-    obj.cam.acc= 0
-    obj.cam.p= {}
-    obj.cam.p.x= 0
-    obj.cam.p.y= 0
-    obj.cam.p.i= {x= 0}
-    obj.cam.p.f= {x= 0}
     obj.background= {}
     obj.background.s= {}
     obj.background.img= {}
@@ -21,7 +13,6 @@ local Map, metatable= {}, {
     obj.background.img.size.w= obj.background.img.obj:getWidth()
     obj.background.img.size.h= obj.background.img.obj:getHeight()
     obj.objects_in_the_scenery= {}
-    obj.player_px= 0
     setmetatable(obj, {__index= self})
     obj:backgroundLoad()
     obj:load()
@@ -58,44 +49,11 @@ function Map:load()
     w= #self.matriz[#self.matriz]*self.tileset.tileSize.w,
     h= #self.matriz*self.tileset.tileSize.h,
   }
-  self.cam.p.i.x= (_G.screen.w/2)
-  self.cam.p.f.x= (self.dimensions.w-(_G.screen.w/2))
+  
   self.option_map= _G.tbl:deepCopy(self.options_maps[self.filename_tileset])
   self:carregarOutrosObjects()
 end
 
--- ! posição real do player na tela em x
-function Map:pRealPlayerX()
-  if not _G.player.was_destroyed then
-    self.player_px= _G.player.p.x
-  end
-  return self.cam.p.x+self.player_px
-end
-
-function Map:camDeveSerAtiva()
-  local p_inicial_min= (self:pRealPlayerX()>self.cam.p.i.x)
-  local p_final_max= (self:pRealPlayerX()<(self.cam.p.f.x))
-  self.cam.active= (p_inicial_min and p_final_max)
-end
-
-function Map:camMovement()
-  self:camDeveSerAtiva()
-  if self.cam.active then
-    self.cam.acc= math.ceil(_G.dt * _G.player.vel * 100)
-
-    if love.keyboard.isDown("right", "d") then
-      self.cam.p.x= self.cam.p.x+self.cam.acc
-      if self.cam.p.x+_G.player.p.x>self.cam.p.f.x then
-        self.cam.acc= math.ceil((self.cam.p.x+_G.player.p.x)-self.cam.p.f.x)
-        self.cam.p.x= self.cam.p.x-self.cam.acc
-      end
-    elseif love.keyboard.isDown("left", "a") then
-      self.cam.p.x= self.cam.p.x-self.cam.acc
-      if self.cam.p.x<0 then self.cam.p.x = 0 end
-    end
-
-  end
-end
 
 function Map:carregarOutrosObjects()
   local existem_outros_objetos= true
@@ -122,7 +80,6 @@ function Map:newObject(k, object_props)
   object.posicionaObject(object, self.dimensions.w)
   object.loadResource(object)
   object= _G.tbl:deepCopy(object)
-  object.cam= self.cam
   object.dimensions= self.dimensions
   table.insert(self.objects_in_the_scenery, object)
 end
@@ -131,7 +88,7 @@ function Map:drawObject()
   love.graphics.draw(
     self.tileset.obj, 
     self.tileset.tiles[self.tile],
-    self.p.x-self.cam.p.x, self.p.y,
+    self.p.x-(_G.cam and _G.cam.p.x or 0), self.p.y,
     0,
     self.s.x, self.s.y,
     (self.tileset.tileSize.w/6), (self.tileset.tileSize.w/6)
@@ -163,8 +120,8 @@ end
 
 function Map:fallingBehavior()
   if self.active==false then 
-    if not _G.player.was_destroyed then
-      if _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.body.w/2) and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.body.w/2) then
+    if _G.cam and not _G.player.was_destroyed then
+      if _G.cam:actualPlayerPosition()>=(self.p.x)-(self.body.w/2) and _G.cam:actualPlayerPosition()<=(self.p.x)+(self.body.w/2) then
         self.active= true
       end
     end
@@ -172,7 +129,7 @@ function Map:fallingBehavior()
 
   if self.active then 
     local distance= 0
-    if not _G.player.was_destroyed and _G.player.p.x+self.cam.p.x>=(self.p.x)-(self.body.w/2) and _G.player.p.x+self.cam.p.x<=(self.p.x)+(self.body.w/2) then
+    if not _G.player.was_destroyed and _G.cam:actualPlayerPosition()>=(self.p.x)-(self.body.w/2) and _G.cam:actualPlayerPosition()<=(self.p.x)+(self.body.w/2) then
       distance= (_G.player.p.x-(self.body.w/2))/self.body.w
     else 
       distance= 0.25
@@ -181,7 +138,7 @@ function Map:fallingBehavior()
     self.p.y= self.p.y + (_G.dt * math.random(self.vel, self.vel*4*distance) * 100)
 
     if not _G.player.was_destroyed then
-      if _G.collision:quad(self, _G.player, self.cam) then
+      if _G.collision:quad(self, _G.player, _G.cam) then
         _G.player.life= _G.player.life-self.damage
         self.impact_sound:play()
         self:reset()
@@ -195,15 +152,6 @@ function Map:fallingBehavior()
   end
 end
 
-function Map:updateSceneryAndGround()
-  local nao_ha_messages= (#_G.balloon.messages==0)
-  -- permite o personagem se mover se não há mensagens
-  if nao_ha_messages then
-    self:camMovement()
-    self:backgroundLoad()
-  end
-end
-
 function Map:updateObjects()
   for k, object in pairs(self.objects_in_the_scenery) do
     object:performBehavior()
@@ -211,7 +159,7 @@ function Map:updateObjects()
 end
 
 function Map:update()
-  self:updateSceneryAndGround()  
+  self:backgroundLoad()
   self:updateObjects()
 end
 
@@ -266,7 +214,7 @@ function Map:tileDraw(i, j, id_tile, symbol)
     love.graphics.draw(
       self.tileset.obj,
       self.tileset.tiles[id_tile],
-      (j*self.tileset.tileSize.w)-self.cam.p.x,
+      (j*self.tileset.tileSize.w)-(_G.cam and _G.cam.p.x or 0),
       _G.screen.h-self.dimensions.h+(i*(self.tileset.tileSize.h)),
       0,
       self.tileset.scale.x,

@@ -20,12 +20,16 @@
     "J": {"tile": 39, "behavior": "none"}
   },
   "cave_tileset.png": {
-    "g": {"tile": 51, "behavior": "down_and_up"},
-    "G": {"tile": 52, "behavior": "floor"},
-    "h": {"tile": 53, "behavior": "up_and_down"},
-    "t": {"tile": 61, "behavior": "none"},
+    "p": {"tile": 63, "behavior": "none"},
     "T": {"tile": 62, "behavior": "none"},
-    "y": {"tile": 63, "behavior": "none"},
+    "t": {"tile": 61, "behavior": "none"},
+    "Y": {"tile": 52, "behavior": "none"},
+    "y": {"tile": 51, "behavior": "none"},
+    "u": {"tile": 41, "behavior": "floor"},
+    "Z": {"tile": 42, "behavior": "floor"},
+    "i": {"tile": 53, "behavior": "floor"},
+    "o": {"tile": 43, "behavior": "none"},
+    "z": {"tile": 31, "behavior": "none"},
     "others": {
       "objects": {
         "estalactite": {

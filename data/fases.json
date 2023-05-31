@@ -5,7 +5,7 @@
     "map": {
       "filename_background": "cave_background.png",
       "filename_tileset": "cave_tileset.png",
-      "filename": "1.txt",
+      "filename": "2.txt",
       "n": {"x": 10, "y": 7}
     },
     "difficulty": 2,

@@ -46,6 +46,7 @@ function NPCs:update()
     end
     ::continue::
   end
+  
 
   self:removeMortos()
 end
@@ -77,7 +78,7 @@ function NPCs:draw()
   for i=1, #self.on_the_screen do
     self.on_the_screen[i]:draw()
     self.on_the_screen[i]:drawLifeBar()
-    _G.collision:quadDraw(self.on_the_screen[i], _G.map.cam)
+    _G.collision:quadDraw(self.on_the_screen[i], _G.cam)
   end
 end
 
@@ -105,7 +106,7 @@ function NPCs:impedirMovimentacaoPlayer(i)
   local playersLeftSide= _G.player:getSide('left')
   local playersRightSide= _G.player:getSide('right')
 
-  local collisao= collision:quad(self.on_the_screen[i], _G.player, _G.map.cam)
+  local collisao= collision:quad(self.on_the_screen[i], _G.player, _G.cam)
   if collisao then
     if npcLeftSide<=playersRightSide and playersRightSide<=self.on_the_screen[i].p.x-10 then
       self.on_the_screen[i].lock_movement.right= false

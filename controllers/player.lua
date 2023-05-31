@@ -119,7 +119,7 @@ function Player:pulo()
 end
 
 function Player:parametersToAllowMoveWhenTyingToWalk(param)
-  local posicao_cam_inativa_e_igual= (_G.map.cam.p.x+self.p.x<=_G.map.cam.p.i.x+(self.vel*2)) or (_G.map.cam.p.x+self.p.x>=_G.map.cam.p.f.x-self.vel)
+  local posicao_cam_inativa_e_igual= (_G.cam.p.x+self.p.x<=_G.cam.p.i.x+(self.vel*2)) or (_G.cam.p.x+self.p.x>=_G.cam.p.f.x-self.vel)
   --limite na tela com base no controle do Player
   local lim= {
     left= (self.p.x>(self.vel*2)) and posicao_cam_inativa_e_igual,
