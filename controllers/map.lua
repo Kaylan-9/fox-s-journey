@@ -209,13 +209,13 @@ end
 
 -- Tem o propósito de diminuir o código: serve para indicar que o símbolo na tela será renderizado como o "tile" correspondente ao id_tile (índice da tabela de tiles)
 
-function Map:tileDraw(i, j, id_tile, symbol)
+function Map:tileDraw(i, j, id_tile, symbol, move_n_y_tile)
   if self.matriz[i+1][j+1]==symbol then
     love.graphics.draw(
       self.tileset.obj,
       self.tileset.tiles[id_tile],
       (j*self.tileset.tileSize.w)-(_G.cam and _G.cam.p.x or 0),
-      _G.screen.h-self.dimensions.h+(i*(self.tileset.tileSize.h)),
+      _G.screen.h-self.dimensions.h+((i+(not move_n_y_tile and 0 or move_n_y_tile))*(self.tileset.tileSize.h)),
       0,
       self.tileset.scale.x,
       self.tileset.scale.y
@@ -228,7 +228,7 @@ function Map:drawGround()
     for j = 0, #self.matriz[i+1]-1 do                     
       -- acessando configuração do tileset do mapa atual para desenhar o tile correto
       for k, v in pairs(self.option_map) do
-        self:tileDraw(i, j, v.tile, k)
+        self:tileDraw(i, j, v.tile, k, v.move_n_y_tile)
       end
     end
   end
