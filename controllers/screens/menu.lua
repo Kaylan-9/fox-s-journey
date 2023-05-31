@@ -33,5 +33,9 @@ function Menu:loadButtons()
   self:newButtonAbaixoDoAnterior('sair', self.buttonSair, true)
 end
 
+-- para a Class screen avaliar se deve aparecer na tela ou não
+function Menu:activeWhen()
+  return _G.game.pause
+end
 
 return Menu

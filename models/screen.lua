@@ -128,8 +128,10 @@ function Screen:updateButtons()
 end
 
 function Screen:update()
-  self:updateMouse()
-  self:updateButtons()
+  if self:activeWhen() then
+    self:updateMouse()
+    self:updateButtons()
+  end
 end
 
 function Screen:drawObject()
@@ -151,7 +153,9 @@ function Screen:drawButtons()
 end
 
 function Screen:draw()
-  self:drawButtons()
+  if self:activeWhen() then
+    self:drawButtons()
+  end
 end
 
 return Screen

@@ -6,10 +6,9 @@ local Boss= require('controllers.boss')
 local Balloon= require('controllers.balloon')
 local Player= require('controllers.player')
 local Cam= require('controllers.cam')
-
-local menu= require('controllers.screens.menu')
-local gameover= require('controllers.screens.gameover')
 local mainFont= love.graphics.newFont('assets/PixelifySans-Black.otf', 13)
+
+_G.screens= require('controllers.screens.screens')
 
 local metatable, Game= {
   __call=function(self)
@@ -53,7 +52,6 @@ function Game:loadMusic()
 end
 
 function Game:loadLevel()
-  
   self:loadMusic()
   self:loadItems()
   _G.map= Map(self.fase.map)
@@ -84,17 +82,15 @@ end
 function Game:load()
   love.graphics.setFont(mainFont)
   love.graphics.setDefaultFilter("nearest", "nearest")
-  menu:load()
-  gameover:load()
+  screens:load()
   love.audio.setVolume(0.1)
 end
 
 function Game:update()
-  menu:update()
+  screens:update()
 
   if self.pause==false then
     self:reset()
-
     displayers:update()
     if not _G.player.was_destroyed then 
       player:update() 
@@ -107,8 +103,6 @@ function Game:update()
     _G.cam:update()
     if music then music:play() end
     self:levelEnded()
-
-    gameover:update()
   else 
     if npcs then npcs:pauseAudios() end
     if player and not player.was_destroyed then player:pauseAudios() end
@@ -126,10 +120,8 @@ function Game:draw()
     if not player.was_destroyed then player:draw() end
     balloon:draw()
     displayers:draw()
-    gameover:draw()
-  else
-    menu:draw()
   end
+  screens:draw()
 end
 
 function Game:keypressed(key, scancode, isrepeat)

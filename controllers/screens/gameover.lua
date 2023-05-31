@@ -22,10 +22,14 @@ function GameOver:enableMessage()
   end
 end
 
-
 function GameOver:resetGame()
   _G.game.pause= false
   _G.game.game_stage= 0
+end
+
+-- para a Class screens avaliar se deve aparecer na tela ou não
+function GameOver:activeWhen()
+  return _G.game.game_stage>0 and _G.player.was_destroyed
 end
 
 return GameOver
