@@ -89,12 +89,15 @@ end
 
 function Character:calcNewFloorPosition()
   local imaginary_px= (self.observadoPelaCamera and _G.cam) and _G.cam:actualPlayerPosition() or self.p.x
-  self.new_y= _G.map:positionCharacter(
+  local new_y= _G.map:positionCharacter(
     self.p, 
     imaginary_px,
     self.tileset.tileSize.h, 
     self.s.x
   ).y
+  if new_y then 
+    self.new_y= new_y
+  end
 end
 
 -- terá que ser chamado em todo update para funcionar

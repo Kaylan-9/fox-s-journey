@@ -36,6 +36,7 @@ function Screens:draw()
   end
 end
 
+-- método para voltar para as opções princípais do jogo
 function Screens:keypressed(key)
   if key == 'escape' then 
     if self.current_screen=='menu' then

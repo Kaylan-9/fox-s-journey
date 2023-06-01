@@ -56,7 +56,6 @@ function Player:updateFrame()
   local esperando_soco= (self.animation=='attacking' and self.frame>=self.frame_positions.attacking.i and self.frame<=self.frame_positions.attacking.f-1)
   local mudanca_frame= (self:sendoControlado() and #_G.balloon.messages==0) or (self.pressed.jump==false and self.p.y<self.p.f.y) or (#_G.balloon.messages==0 and esperando_soco)
   
-
   self:defaultUpdateFrame(mudanca_frame)
 end
 

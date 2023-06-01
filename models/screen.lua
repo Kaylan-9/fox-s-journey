@@ -154,6 +154,7 @@ function Screen:drawButtons()
   end
 end
 
+-- Serve para centralizar as posições em x dos botões na tela e centralizar o primeiro botão em y, mas os posteriores ao primeiro serão dispostos um após o outro com uma distancia padrão definida em uma variável local no próprio arquivo  
 function Screen:updateButtonPositions()
   for i=1, #self.obj_list do
     self.obj_list[i].p.x= (_G.screen.w/2)

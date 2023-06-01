@@ -173,22 +173,36 @@ function Map:behaviorTileAtual(i, j, behavior)
   end
 end
 
-function Map:indicePY(i, tile_percentage)
-  return #self.matriz+tile_percentage-i
+function Map:indicePY(i, height_relative_to_floor_tile)
+  return #self.matriz+height_relative_to_floor_tile-i
 end 
 
-function Map:calcFloorTileAtual(i, j, indice_inicial, imaginary_px, character_h, character_sx)
-  local reajuste_meio_personagem= math.abs((character_h*character_sx)/2.2)
-  local tile_percentage= 0
-  if self:behaviorTileAtual(i, j, 'floor') then tile_percentage= indice_inicial
+-- Calcula a posição final do chão, que será usada como referencia para o personagem 
+-- o parâmetro "imaginary_px' se refere a soma da posição x da câmera com a do player ou a apenas ao x do personagem se ele não é o player
+-- o parâmetro "py"
+function Map:calcTheFinalPositionForTheFloor(i, j, indice_inicial, py, imaginary_px, character_h, character_sx)
+  local height_relative_to_floor_tile= 0 -- altura em relação ao tile de chão
+  if self:behaviorTileAtual(i, j, 'floor') then 
+    -- height_relative_to_floor_tile= indice_inicial
+    local new_position_for_the_ground= self:calcNewPositionForTheGround(i, indice_inicial, character_h, character_sx)
+    if py==0 or math.ceil(py)<=math.ceil(new_position_for_the_ground) then
+      height_relative_to_floor_tile= indice_inicial
+    end
+      
                                                                            --1 inverte o sentido aumentando o y 
-  elseif self:behaviorTileAtual(i, j, 'down_and_up') then tile_percentage= 1-(j-(imaginary_px/self.tileset.tileSize.w))
-  elseif self:behaviorTileAtual(i, j, 'up_and_down') then tile_percentage= (j-(imaginary_px/self.tileset.tileSize.w))
+  elseif self:behaviorTileAtual(i, j, 'down_and_up') then height_relative_to_floor_tile= 1-(j-(imaginary_px/self.tileset.tileSize.w))
+  elseif self:behaviorTileAtual(i, j, 'up_and_down') then height_relative_to_floor_tile= (j-(imaginary_px/self.tileset.tileSize.w))
   end
+  if height_relative_to_floor_tile~=0 then
+    return self:calcNewPositionForTheGround(i, height_relative_to_floor_tile, character_h, character_sx)
+  end
+end
 
-  if tile_percentage~=0 then 
-    return _G.screen.h-(self:indicePY(i, tile_percentage)*(self.tileset.tileSize.h))-reajuste_meio_personagem
-  end
+-- Calcula a posição do chão relativo a posição do personagem no eixo x
+-- método está separado para caso seja necessário verificar o valor do chão antes de ser destinado ao player como referencia do chão
+function Map:calcNewPositionForTheGround(i, height_relative_to_floor_tile, character_h, character_sx)
+  local reajuste_meio_personagem= math.abs((character_h*character_sx)/2.2)
+  return _G.screen.h-(self:indicePY(i, height_relative_to_floor_tile)*(self.tileset.tileSize.h))-reajuste_meio_personagem
 end
 
 function Map:positionCharacter(position, imaginary_px, character_h, character_sx)
@@ -196,11 +210,11 @@ function Map:positionCharacter(position, imaginary_px, character_h, character_sx
   local new_positiony
   local j = self:tileAtualX(imaginary_px)
   for i=indice_inicial, #self.matriz do
-    new_positiony= self:calcFloorTileAtual(i, j, indice_inicial, imaginary_px, character_h, character_sx)
-    if new_positiony then 
-      break 
-    end 
+    new_positiony= self:calcTheFinalPositionForTheFloor(i, j, indice_inicial, position.y, imaginary_px, character_h, character_sx) -- calcula aonde é o chão 
+    if new_positiony then break end 
   end
+  
+
   return {
     x= position.x,
     y= new_positiony
