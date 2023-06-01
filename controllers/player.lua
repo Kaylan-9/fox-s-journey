@@ -33,7 +33,7 @@ local metatable= {
 
 setmetatable(Player, metatable)
 
-
+-- Cria propriedades dentro de pressed para indicar se as teclas respectivas das determinadas ações são executadas, não necessariamente ao pressionar a ação ele deve ser executada, por exemplo: ao pressionar o soco ele deve socar só se as condições para o soco forem positivas
 function Player:markPressedKeys()
   self.pressed.soco= love.keyboard.isDown("x") 
   self.pressed.mov= love.keyboard.isDown("right", "d", "left", "a")
@@ -138,6 +138,7 @@ function Player:corrida()
   self.vel= love.keyboard.isDown("space") and self.max_vel or self.vel
 end 
 
+-- método para verificar se personagem deve ou não se mover, ele é utilizado em um "if"
 function Player:permitirMove()
   return #_G.balloon.messages==0 and self.animation~='finishing'
 end

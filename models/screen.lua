@@ -8,8 +8,9 @@ local button_default= {
 }
 
 local metatable, Screen= {
-  __call =function(self)
+  __call =function(self, id) -- inicia com um identificador para verificar posteriormente com a classe controladora screens para determinar se a tela vai aparecer
     local obj= {}
+    obj.id= id
     obj.mouse= {}
     obj.obj_list= {}
     setmetatable(obj, {__index= self})
@@ -127,8 +128,9 @@ function Screen:updateButtons()
   end
 end
 
-function Screen:update()
-  if self:activeWhen() then
+function Screen:update(current_screen)
+  if self:activeWhen() and current_screen==self.id then
+    _G.screens.current_screen= self.id -- define tela ativa se há parâmetros conflitantes
     self:updateMouse()
     self:updateButtons()
   end
@@ -152,8 +154,8 @@ function Screen:drawButtons()
   end
 end
 
-function Screen:draw()
-  if self:activeWhen() then
+function Screen:draw(current_screen)
+  if self:activeWhen() and current_screen==self.id then
     self:drawButtons()
   end
 end
