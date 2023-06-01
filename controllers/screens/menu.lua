@@ -11,6 +11,7 @@ function Menu:buttonComecar()
     self.escrito='voltar'
     self.body.w= font:getWidth(self.escrito)
   end
+  _G.screens.current_screen= 'game'
   _G.game.pause= false
 end
 
@@ -19,6 +20,7 @@ function Menu:buttonEnableSettingsScreen()
 end
 
 function Menu:resetGame()
+  _G.screens.current_screen= 'game'
   _G.game.pause= false
   _G.game.game_stage= 0
 end
@@ -34,8 +36,8 @@ end
 function Menu:loadButtons()
   self:newButton('começar', self.buttonComecar, {x= _G.screen.w/2, y= _G.screen.h/2}, nil, true)
   self:newButtonAbaixoDoAnterior('reiniciar', self.resetGame, false, self.enableResetButton)
-  self:newButtonAbaixoDoAnterior('sair', self.buttonSair, true)
   self:newButtonAbaixoDoAnterior('configurações', self.buttonEnableSettingsScreen, true)
+  self:newButtonAbaixoDoAnterior('sair', self.buttonSair, true)
 end
 
 -- para a classe screen avaliar se deve aparecer na tela ou não

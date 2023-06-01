@@ -15,27 +15,18 @@ local metatable, Game= {
   __call=function(self)
     local obj= {}
     setmetatable(obj, {__index=self})
-    _G.fullscreen, _G.fstype= love.window.getFullscreen() -- verifica se está em tela cheia
+    _G.screens.fullscreen, _G.screens.fstype= love.window.getFullscreen() -- verifica se está em tela cheia
     _G.dt= 0 -- variável ambiente para o dt presente no update para não precisar passar como parâmetro de cada update (para poluir menos o código)
     obj.fases= json.import('data/fases.json') -- carrega as informações das fases, além desse arquivo há o arquivo "data/options/maps.json" que será usado para carregar as informações do tileset e qual tile o específico símbolo no seu arquivo "map" apresentará na tela (uma forma de reutilizar símbolos para outros tilesets de mapa)
     obj.game_stage= 0 -- fase atual, com base no indice do arquivo "data/fases.json", o 0 indica nenhuma fase
     obj.pause= true -- propriedade para determinar 
     obj.timer_fim_fase= timer:new(1) -- Um timer criado a classe timer, presente na pasta "useful", esse timer serve para esperar 1 segundo após o termino da fase
     setmetatable(obj, {__index= self})
-    obj:setScreen()
     return obj 
   end 
 }, {}
 
 setmetatable(Game, metatable)
-
--- Responsável por armazenar as dimensões da tela para serem utilizados por todo o jogo como uma variável de ambiente
-function Game:setScreen()
-  _G.screen= {
-    w= love.graphics.getWidth(),
-    h= love.graphics.getHeight()
-  }
-end
 
 -- Serve para atualizar o número da fase e o que será carregado em tela, a propriedade fases serve fornecer as configurações da fase que não se referem ao Tileset dela (para isso há o arquivo "data/fases.json")
 function Game:nextLevel()
@@ -145,19 +136,12 @@ end
 
 -- Algumas classes possuem o método keypressed, eles são chamados aqui
 function Game:keypressed(key, scancode, isrepeat)
-  self:controlesTela(key)
+  screens:keypressed(key)
   if self.pause==false then
     items:keypressed(key)
     if not boss.was_destroyed then boss:keypressed(key, scancode, isrepeat) end
     npcs:keypressed(key, scancode, isrepeat)
     if not _G.player.was_destroyed then player:keypressed(key, scancode, isrepeat) end
-  end
-end
-
--- Controles para a tela 
-function Game:controlesTela(key)
-  if key == 'escape' then self.pause= not self.pause
-  elseif key == 'f11' then self:alternarResolucao() 
   end
 end
 
@@ -180,12 +164,5 @@ function Game:levelEnded()
   end
 end
 
-
-function Game:alternarResolucao()
-  if not self.fullscreen then self.fullscreen= love.window.setFullscreen(true)
-  else self.fullscreen= not love.window.setFullscreen(false) 
-  end
-  self:setScreen()
-end
 
 return Game

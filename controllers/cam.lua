@@ -10,15 +10,23 @@ local metatable, Cam= {
 
 setmetatable(Cam, metatable)
 
+
+-- Determinando posição inicial da câmera
 function Cam:setPosition(x, y)
   self.p= {i={}, f={}}
   self.player= {p= {}}
   self.p.x= x
   self.p.y= y
-  self.p.i.x= (_G.screen.w/2)
-  self.p.f.x= (_G.map.dimensions.w-(_G.screen.w/2))
+  self:setStartAndEndPosition()
   self.player.p.x= 0
 end
+
+-- Atualizando posição final e inicial para indicar onde a câmera deve se mover 
+function Cam:setStartAndEndPosition()
+  self.p.i.x= (_G.screen.w/2)
+  self.p.f.x= (_G.map.dimensions.w-(_G.screen.w/2))
+end
+
 
 function Cam:pressingRight() return love.keyboard.isDown("right", "d") end
 function Cam:pressingLeft() return love.keyboard.isDown("left", "a") end

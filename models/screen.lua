@@ -12,7 +12,6 @@ local metatable, Screen= {
     local obj= {}
     obj.id= id
     obj.mouse= {}
-    obj.obj_list= {}
     setmetatable(obj, {__index= self})
     return obj 
   end
@@ -25,6 +24,7 @@ function Screen:lastObject()
 end
 
 function Screen:load()
+  self.obj_list= {}
   self:loadMouse()
   self:loadButtons()
 end 
@@ -153,6 +153,17 @@ function Screen:drawButtons()
     self.obj_list[i]:draw()
   end
 end
+
+function Screen:updateButtonPositions()
+  for i=1, #self.obj_list do
+    self.obj_list[i].p.x= (_G.screen.w/2)
+    if i>1 then 
+      self.obj_list[i].p.y= self.obj_list[i-1].p.y+self.obj_list[i-1].body.h+button_default.distancia.y
+    else
+      self.obj_list[i].p.y= (_G.screen.h/2)
+    end
+  end
+end 
 
 function Screen:draw(current_screen)
   if self:activeWhen() and current_screen==self.id then
