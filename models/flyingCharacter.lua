@@ -13,7 +13,7 @@ setmetatable(FlyingCharacter, metatable)
 
 function FlyingCharacter:whereToFly()
   local naoPodeAtrevessarChaoQuanPlayerAbaixo= function()
-    local floor= self.new_y
+    local floor= self.y_from_the_current_floor
     if self.p.y<floor then
       self.flight_direction= 'down'
     else 
@@ -21,7 +21,7 @@ function FlyingCharacter:whereToFly()
     end
   end
   local seEstaAbaixoDoChaoNoIntervaloPlayer= function()
-    local floor= self.new_y
+    local floor= self.y_from_the_current_floor
     if self.p.y>floor then
       self.flight_direction= 'up'
     else

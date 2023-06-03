@@ -8,6 +8,7 @@ local Character, metatable= {}, {
     local obj= option_props
     obj.observadoPelaCamera= observadoPelaCamera 
     obj.tileset= Tileset('assets/graphics/'..options_tileset[tileset].imgname, options_tileset[tileset].n, options_tileset[tileset].adjustment)
+    obj.mov= 0
     setmetatable(obj, {__index= self}) -- relacionar os atributos da classe com a metatable
     obj:setAnimProps()
     obj:setAudioProps()
@@ -26,7 +27,7 @@ function Character:setAnimProps()
   self.hold_animation= false
   self.previous_animation= {}
   self.animation= ''
-  self.acc= 0
+  self.frame_acc= 0
 end
 
 function Character:setAudioProps()
@@ -55,7 +56,7 @@ function Character:setPositionProps(starting_position)
   self.p= starting_position
   self.p.i= {y=-100}
   self.p.f= {y=-100}
-  self.new_y= 0
+  self.y_from_the_current_floor= 0
 end
 
 function Character:setLimitersProps(running_speed)
@@ -86,22 +87,23 @@ function Character:destroy()
   self.was_destroyed= true
 end
 
+-- função retorna a posição em relação ao comprimento do mapa
+function Character:actualPositionInX()
+  return (self.observadoPelaCamera and _G.cam) and _G.cam:actualPlayerPosition() or self.p.x
+end
+
+-- devolve a coordenada y da parte de baixo do personagem
+function Character:yFromTheBottom()
+  return (self.p.y-(math.abs(self.tileset.tileSize.h*self.s.x)/2))
+end
+
 
 function Character:calcNewFloorPosition()
-  local imaginary_px= (self.observadoPelaCamera and _G.cam) and _G.cam:actualPlayerPosition() or self.p.x
-  local new_y= _G.map:positionCharacter(
-    self.p, 
-    imaginary_px,
-    self.tileset.tileSize.h, 
-    self.s.x
-  ).y
-  if new_y then 
-    self.new_y= new_y
-  end
+  _G.map:createSceneRefsCharacterAndInsertBehaviors(self) -- cria referências para o personagem em relação ao cenário do mapa, armazenando nas propriedades do próprio personagem, e o método também modifica as propriedades do persoangem, por exemplo: para a física do cenário
 end
 
 -- terá que ser chamado em todo update para funcionar
-function Character:updateParameters()
+function Character:updateProperties()
   self:calcNewFloorPosition()
 end
 
@@ -127,9 +129,9 @@ end
 
 function Character:defaultUpdateFrame(alternar)
   if self.animation~='' and (alternar==nil or alternar or self.frame_positions[self.animation].type=='infinite') then
-    if self.acc>=(self.freq_frames) then
+    if self.frame_acc>=(self.freq_frames) then
       self.frame= self.frame + 1
-      self.acc= 0
+      self.frame_acc= 0
 
       -- A primeira estrutura condicional serve para recomeçar uma animação, após f ele recomeça a animação no frame i
       -- hold_animation é uma propriedade que serve para travar de um frame a outro até a animação anterior chegar ao seu f

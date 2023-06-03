@@ -30,9 +30,9 @@ end
 function NPCs:update()
   for i=1, #self.on_the_screen do
     if self.on_the_screen[i] then
-      self.on_the_screen[i].acc= self.on_the_screen[i].acc + (_G.dt * math.random(1, 5))
+      self.on_the_screen[i].frame_acc= self.on_the_screen[i].frame_acc + (_G.dt * math.random(1, 5))
       self.on_the_screen[i].mov= (_G.dt * self.on_the_screen[i].vel * 100) -- o quanto se move
-      self.on_the_screen[i]:updateParameters()
+      self.on_the_screen[i]:updateProperties()
       self.on_the_screen[i]:calcYPositionReferences()
       if self.on_the_screen[i]:playerVisible() then self.on_the_screen[i]:chasePlayer() end
       self.on_the_screen[i]:dying()

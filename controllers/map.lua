@@ -56,7 +56,7 @@ end
 
 
 function Map:carregarOutrosObjects()
-  local existem_outros_objetos= true
+  local existem_outros_objetos= self.option_map.others
   if existem_outros_objetos then
     for k, object_props in pairs(self.option_map.others.objects) do
       for i=1, object_props.n do
@@ -180,45 +180,64 @@ end
 -- Calcula a posição final do chão, que será usada como referencia para o personagem 
 -- o parâmetro "imaginary_px' se refere a soma da posição x da câmera com a do player ou a apenas ao x do personagem se ele não é o player
 -- o parâmetro "py"
-function Map:calcTheFinalPositionForTheFloor(i, j, indice_inicial, py, imaginary_px, character_h, character_sx)
+function Map:calcTheFinalPositionForTheFloor(i, j, indice_inicial, character, new_position_for_the_ground)
   local height_relative_to_floor_tile= 0 -- altura em relação ao tile de chão
+  local actual_position_in_x= character:actualPositionInX()
   if self:behaviorTileAtual(i, j, 'floor') then 
-    -- height_relative_to_floor_tile= indice_inicial
-    local new_position_for_the_ground= self:calcNewPositionForTheGround(i, indice_inicial, character_h, character_sx)
-    if py==0 or math.ceil(py)<=math.ceil(new_position_for_the_ground) then
+    if character.p.y==0 or character:yFromTheBottom()<=new_position_for_the_ground then -- Verifica se o player está em uma posição em y impossível no caso 0 ou se ele está numa posição acima do chão (como as coordenadas da tela em y se iniciam no topo da tela e terminam no parte inferior da tela, o y do personagem deve ser menor que o chão)
       height_relative_to_floor_tile= indice_inicial
     end
-      
-                                                                           --1 inverte o sentido aumentando o y 
-  elseif self:behaviorTileAtual(i, j, 'down_and_up') then height_relative_to_floor_tile= 1-(j-(imaginary_px/self.tileset.tileSize.w))
-  elseif self:behaviorTileAtual(i, j, 'up_and_down') then height_relative_to_floor_tile= (j-(imaginary_px/self.tileset.tileSize.w))
+  elseif self:behaviorTileAtual(i, j, 'down_and_up') then height_relative_to_floor_tile= 1-(j-(actual_position_in_x/self.tileset.tileSize.w)) --1 inverte o sentido aumentando o y 
+  elseif self:behaviorTileAtual(i, j, 'up_and_down') then height_relative_to_floor_tile= (j-(actual_position_in_x/self.tileset.tileSize.w))
   end
   if height_relative_to_floor_tile~=0 then
-    return self:calcNewPositionForTheGround(i, height_relative_to_floor_tile, character_h, character_sx)
+    return self:calcNewPositionForTheGround(i, height_relative_to_floor_tile, character.tileset.tileSize.h, character.s.x)
   end
 end
+
+
+function Map:avoidCharacterGoingThroughTheWall(i, j, character, new_position_for_the_ground)
+  if self:behaviorTileAtual(i, j, 'floor') then 
+    if character:yFromTheBottom()>new_position_for_the_ground then
+      if character.s.x>0 then
+
+        if _G.cam:mustMove() then _G.cam.p.x= _G.cam.p.x-character.mov
+        else character.p.x= character.p.x-character.mov
+        end
+
+      elseif character.s.x<0 then
+
+        if _G.cam:mustMove() then _G.cam.p.x= _G.cam.p.x+character.mov
+        else character.p.x= character.p.x+character.mov
+        end
+        
+      end
+    end 
+  end
+end
+
 
 -- Calcula a posição do chão relativo a posição do personagem no eixo x
 -- método está separado para caso seja necessário verificar o valor do chão antes de ser destinado ao player como referencia do chão
 function Map:calcNewPositionForTheGround(i, height_relative_to_floor_tile, character_h, character_sx)
-  local reajuste_meio_personagem= math.abs((character_h*character_sx)/2.2)
+  local reajuste_meio_personagem= math.abs((character_h*character_sx)/2) -- como a referência do personagem em y é o meio dele então é necessário fazer essa subtração no calculo da altura correta
   return _G.screen.h-(self:indicePY(i, height_relative_to_floor_tile)*(self.tileset.tileSize.h))-reajuste_meio_personagem
 end
 
-function Map:positionCharacter(position, imaginary_px, character_h, character_sx)
+function Map:createSceneRefsCharacterAndInsertBehaviors(character)
   local indice_inicial= 1
-  local new_positiony
-  local j = self:tileAtualX(imaginary_px)
+  local j = self:tileAtualX(character:actualPositionInX()) -- calcula indice j da matriz
+  -- Procura na coluna o indice mais próximo com a referência para o chão
   for i=indice_inicial, #self.matriz do
-    new_positiony= self:calcTheFinalPositionForTheFloor(i, j, indice_inicial, position.y, imaginary_px, character_h, character_sx) -- calcula aonde é o chão 
-    if new_positiony then break end 
+    local new_position_for_the_ground= self:calcNewPositionForTheGround(i, indice_inicial, character.tileset.tileSize.h, character.s.x) -- Calculo que serve para verificar o valor final antes de atualizar como a nova posição do chão
+    self:avoidCharacterGoingThroughTheWall(i, j, character, new_position_for_the_ground) -- O método aproveita a validação de que o tile tem o tipo chão e depois confere se o personagem não está numa altura adequada para subir para o próximo piso, movendo à posição contraria com a mesma intensidade
+    local y_from_the_current_floor= self:calcTheFinalPositionForTheFloor(i, j, indice_inicial, character, new_position_for_the_ground) -- calcula a coordenada y do chão 
+    if y_from_the_current_floor then -- se não é vazio uma nova referência e passada para o persoangem 
+      character.y_from_the_current_floor= y_from_the_current_floor
+      break 
+    end 
   end
   
-
-  return {
-    x= position.x,
-    y= new_positiony
-  }
 end
 
 -- Tem o propósito de diminuir o código: serve para indicar que o símbolo na tela será renderizado como o "tile" correspondente ao id_tile (índice da tabela de tiles)

@@ -36,7 +36,7 @@ function Item:activateInInventory() self.activateInInventory= true end
 
 function Item:calcNewFloorPosition()
   local imaginary_px= self.observadoPelaCamera and _G.cam.p.x+self.p.x or self.p.x
-  self.new_y= _G.map:positionCharacter(
+  self.y_from_the_current_floor= _G.map:positionCharacter(
     self.p, 
     imaginary_px,
     self.tileset.tileSize.h, 

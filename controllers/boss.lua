@@ -26,9 +26,9 @@ end
 
 function Boss:update()
   if self then
-    self.acc= self.acc + (_G.dt * math.random(1, 5))
+    self.frame_acc= self.frame_acc + (_G.dt * math.random(1, 5))
     self.mov= (_G.dt * self.vel * 100) -- o quanto se move
-    self:updateParameters()
+    self:updateProperties()
     self:calcYPositionReferences()
 
     if self:playerVisible() then

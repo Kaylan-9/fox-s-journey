@@ -98,6 +98,7 @@ end
 -- pois quando um personagem morre todas as suas propriedades são apagadas recebendo uma nova chamada "was_destroyed", isso é tratada aqui e também na classe NPCs que gerencia os personagens da fase
 function Game:running()
   self:reset()
+  map:update()
   displayers:update()
   if not _G.player.was_destroyed then 
     player:update() 
@@ -105,7 +106,7 @@ function Game:running()
     if not boss.was_destroyed then boss:update() end
   end
   items:update()
-  map:update()
+  
   balloon:update()
   _G.cam:update()
   if music then music:play() end

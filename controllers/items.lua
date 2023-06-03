@@ -20,7 +20,7 @@ setmetatable(Items, metatable)
 
 function Items:calcYPositionReferences(i)
   if self.in_the_game_stage[i].p.f.y==-100 then
-    self.in_the_game_stage[i].p.y= self.in_the_game_stage[i].new_y end
+    self.in_the_game_stage[i].p.y= self.in_the_game_stage[i].y_from_the_current_floor end
 end
 
 function Items:load(items)
@@ -36,7 +36,7 @@ end
 
 function Items:create(option, tileset, x)
   local new_item= Item(option.name, option.frame, {x=x, y=-100}, option.s, option.type, option.val_mod_em_interacao, tileset)
-  new_item.new_y= 0
+  new_item.y_from_the_current_floor= 0
   table.insert(self.in_the_game_stage, new_item)
 end
 

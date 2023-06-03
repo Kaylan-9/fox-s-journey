@@ -36,7 +36,9 @@ setmetatable(Player, metatable)
 -- Cria propriedades dentro de pressed para indicar se as teclas respectivas das determinadas ações são executadas, não necessariamente ao pressionar a ação ele deve ser executada, por exemplo: ao pressionar o soco ele deve socar só se as condições para o soco forem positivas
 function Player:markPressedKeys()
   self.pressed.soco= love.keyboard.isDown("x") 
-  self.pressed.mov= love.keyboard.isDown("right", "d", "left", "a")
+  self.pressed.mov_left= love.keyboard.isDown("left", "a")
+  self.pressed.mov_right= love.keyboard.isDown("right", "d")
+  self.pressed.mov= self.pressed.mov_left or self.pressed.mov_right
   self.pressed.run= self.pressed.mov and love.keyboard.isDown("space")
   self.pressed.jump= love.keyboard.isDown("up", "w")
 end
@@ -90,7 +92,7 @@ end
 
 function Player:exeAudioPulo()
   -- reseta o tempo se o canjump é true
-  if self.p.y>=self.new_y then self.timer_sem_tocar_audio_ha:reset() end 
+  if self.p.y>=self.y_from_the_current_floor then self.timer_sem_tocar_audio_ha:reset() end 
   -- nennhum audio do player foi tocado e o audio não está tocando
   if not self.audios.jumping:isPlaying() then
     if self.timer_sem_tocar_audio_ha:finish() then
@@ -172,10 +174,10 @@ function Player:exeCicloAnimMov()
 end
 
 function Player:andar()
-  local mov= (_G.dt * self.vel * 100)
+  self.mov= math.ceil(_G.dt * self.vel * 100)
   if self.pressed.mov then self:exeCicloAnimMov() end
-  if self:parametersToAllowMoveWhenTyingToWalk('left') then self.p.x= self.p.x-mov end
-  if self:parametersToAllowMoveWhenTyingToWalk('right') then self.p.x= self.p.x+mov end
+  if self:parametersToAllowMoveWhenTyingToWalk('left') then self.p.x= self.p.x-self.mov end
+  if self:parametersToAllowMoveWhenTyingToWalk('right') then self.p.x= self.p.x+self.mov end
 end
 
 -- serve para verificar se a animação começa 
@@ -184,6 +186,7 @@ function Player:animComecaExec()
 end
 
 function Player:controlando()
+  self:markPressedKeys()
   if self:permitirMove() then
     self:soco()
     self:mudancaDirecao()
@@ -194,14 +197,13 @@ function Player:controlando()
 end
 
 function Player:update()
-  self:updateParameters()
+  self:updateProperties()
   self:calcYPositionReferences()
-  self:markPressedKeys()
   self:updateFrame()
   self:queda()
   self:controlando()
   self:finalizando()
-  self.acc= self.acc+(_G.dt * math.random(1, 3))
+  self.frame_acc= self.frame_acc+(_G.dt * math.random(1, 3))
   self:dying()
 end
 
@@ -215,7 +217,7 @@ end
 function Player:calcYPositionReferences()
   -- incia a posição máxima de y
   -- incia posição de y do Player na tela
-  if self.p.f.y==-100 then self.p.i.y, self.p.y, self.p.f.y= self.new_y-90, self.new_y, self.new_y end
+  if self.p.f.y==-100 then self.p.i.y, self.p.y, self.p.f.y= self.y_from_the_current_floor-90, self.y_from_the_current_floor, self.y_from_the_current_floor end
 
   --controla, mudando a sua propriedade de permissão do pulo e corrige o valor de y para o máximo || mínimo
   if self.p.y>=self.p.f.y then 
@@ -224,8 +226,8 @@ function Player:calcYPositionReferences()
   elseif self.p.y<=self.p.i.y then self.canjump= false end
 
   -- compara se o personagem está próximo da elevação mais próxima
-  if (self.p.y==self.p.f.y) or (self.p.y>=self.new_y) then self.p.f.y= self.new_y end
-  if  (self.p.y==self.p.f.y) then self.p.i.y= self.new_y-90 end
+  if (self.p.y==self.p.f.y) or (self.p.y>=self.y_from_the_current_floor) then self.p.f.y= self.y_from_the_current_floor end
+  if  (self.p.y==self.p.f.y) then self.p.i.y= self.y_from_the_current_floor-90 end
 end
 
 function Player:finalizando()

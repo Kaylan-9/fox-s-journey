@@ -43,7 +43,7 @@ function Enemy:dying()
     if not pula_anim then
       if not self.audios.dying:isPlaying() then self.audios.dying:play() end
       if self.frame==self.frame_positions['dying'].f then
-        if self.acc>=(self.freq_frames) then
+        if self.frame_acc>=(self.freq_frames) then
           self:destroy()
         end
       else  
@@ -134,7 +134,7 @@ function Enemy:takesDamage()
       if type(_G.player.hostile.attack_frame)=='table' then
         for j=1, #_G.player.hostile.attack_frame do
           if _G.player.frame==_G.player.hostile.attack_frame[j] then
-            if _G.player.acc>=_G.player.freq_frames then
+            if _G.player.frame_acc>=_G.player.freq_frames then
               _G.player.audios['attacking']:play()
               if self.life > 0 then
                 self.life= self.life - _G.player.hostile.damage
@@ -152,7 +152,7 @@ function Enemy:dealsDamage(pula_anim)
   if not _G.player.was_destroyed and not pula_anim then
     if _G.collision:ellipse(_G.player.p, self.p, (self.body.w/2), (self.body.h/2), (self.body.w/2)) then
       -- quando o frame troca o dano é aplicado
-      if self.acc>=(self.freq_frames) and self.hostile.attack_frame==self.frame then
+      if self.frame_acc>=(self.freq_frames) and self.hostile.attack_frame==self.frame then
         if math.ceil((_G.player.life*#_G.displayers.props_lifeBar.tileset.tiles)/_G.player.maximum_life)>1 then 
           _G.player.life= _G.player.life-self.hostile.damage
         end 
@@ -173,7 +173,7 @@ end
 function Enemy:calcYPositionReferences()
   local posiciona_no_chao= not type(self.flight_direction)=='string' or self.flight_direction==nil
   if posiciona_no_chao then
-    if self.p.f.y==-100 then self.p.y= self.new_y end
+    if self.p.f.y==-100 then self.p.y= self.y_from_the_current_floor end
   end 
 end
 
