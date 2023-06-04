@@ -1,5 +1,5 @@
 local Tileset= require('models.tileset')
-local Character= require('models.character')
+local Character= require('models.character.character')
 local Player= {}
 local metatable= {
   __index= Character,

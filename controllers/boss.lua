@@ -1,4 +1,4 @@
-local Enemy= require('models.enemy')
+local Enemy= require('models.character.enemy')
 local metatable, Boss= {
   __index=Enemy,
   __call=function(self, boss)

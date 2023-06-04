@@ -22,31 +22,11 @@ local Displayers, metatable= {}, {
     }
     obj.p_incial_para_o_proximo_draw= { w= 0, h= 0 }
     setmetatable(obj, { __index= self })
-    obj:setExpressionProps()
     return obj
   end
 }
 
 setmetatable(Displayers, metatable)
-
-function Displayers:drawExpression()
-  love.graphics.draw(
-    self.expression.tileset.obj, 
-    self.expression.tileset.tiles[self.expression.frame], 
-    0, 
-    _G.screen.h-(self.expression.tileset.tileSize.h*1.5), 
-    0, 
-    self.expression.s.x, 
-    self.expression.s.y
-  )
-end
-
-function Displayers:setExpressionProps()
-  self.expression= {}
-  self.expression.s= {x= 1.5, y= 1.5}
-  self.expression.frame= 1
-  self.expression.tileset= Tileset('assets/graphics/sprMidiF.png', {x=4, y=3}, {w=-0.34, h=0.5})
-end
 
 function Displayers:drawCollectibles()
   for k, v in pairs(self.props_items) do  
@@ -120,7 +100,6 @@ function Displayers:draw()
   self:drawLifeBar()
   self:drawInventory()
   self:drawCollectibles()
-  self:drawExpression()
 end
 
 function Displayers:atualizaTileSetListItems()

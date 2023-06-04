@@ -23,6 +23,7 @@ local Map, metatable= {}, {
 setmetatable(Map, metatable)
 
 function Map:backgroundLoad()
+  -- redimensiona imagem para o tamanho onde o cenário mais aparece
   if _G.screen.w>_G.screen.h then
     self.background.s.x= _G.screen.w/self.background.img.size.w
     self.background.s.y= self.background.s.x
@@ -237,7 +238,20 @@ function Map:createSceneRefsCharacterAndInsertBehaviors(character)
       break 
     end 
   end
-  
+end
+
+function Map:createSceneRefsItemAndInsertBehaviors(item)
+  local indice_inicial= 1
+  local j = self:tileAtualX(item:actualPositionInX()) -- calcula indice j da matriz
+  -- Procura na coluna o indice mais próximo com a referência para o chão
+  for i=indice_inicial, #self.matriz do
+    local new_position_for_the_ground= self:calcNewPositionForTheGround(i, indice_inicial, item.tileset.tileSize.h, item.s.x) -- Calculo que serve para verificar o valor final antes de atualizar como a nova posição do chão
+    local y_from_the_current_floor= self:calcTheFinalPositionForTheFloor(i, j, indice_inicial, item, new_position_for_the_ground) -- calcula a coordenada y do chão 
+    if y_from_the_current_floor then -- se não é vazio uma nova referência e passada para o persoangem 
+      item.y_from_the_current_floor= y_from_the_current_floor
+      break 
+    end 
+  end
 end
 
 -- Tem o propósito de diminuir o código: serve para indicar que o símbolo na tela será renderizado como o "tile" correspondente ao id_tile (índice da tabela de tiles)

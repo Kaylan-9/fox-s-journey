@@ -34,18 +34,16 @@ setmetatable(Item, metatable)
 function Item:disableInInventory() self.activateInInventory= false end
 function Item:activateInInventory() self.activateInInventory= true end
 
-function Item:calcNewFloorPosition()
-  local imaginary_px= self.observadoPelaCamera and _G.cam.p.x+self.p.x or self.p.x
-  self.y_from_the_current_floor= _G.map:positionCharacter(
-    self.p, 
-    imaginary_px,
-    self.tileset.tileSize.h, 
-    self.s.x
-  ).y
+function Item:actualPositionInX()
+  return self.observadoPelaCamera and _G.cam.p.x+self.p.x or self.p.x
+end
+
+function Item:yFromTheBottom()
+  return (self.p.y-(math.abs(self.tileset.tileSize.h*self.s.x)/2))
 end
 
 function Item:updateParameters()
-  self:calcNewFloorPosition()
+  _G.map:createSceneRefsItemAndInsertBehaviors(self)
 end
 
 -- Substituir valor ao personagem desejado

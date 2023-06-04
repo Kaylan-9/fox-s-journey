@@ -1,37 +1,16 @@
-local Character= require('models.character')
-local FlyingCharacter= require('models.flyingCharacter')
+local NPC= require('models.character.npc')
 local metatable, Enemy= {
+  __index= NPC,
   __call=function(self, option_props, running_speed, starting_position, messages, speech_interruption, goto_player)
     --tileset recebe o nome de option_props pois eles são iguais, ou seja menos um argumento
-    local obj= {} 
-    if option_props.type=='walking' then
-      obj= Character(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption)
-    else
-      obj= FlyingCharacter(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption)
-    end
-    obj.goto_player= goto_player
+    local obj= NPC(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption, goto_player)
     obj.active= false
-    obj.lock_movement= {
-      left= false, 
-      right= false
-    }
     setmetatable(obj, {__index= self})
     return obj
   end
 }, {}
 
-local function definirTipo(enemy)
-  return enemy.type=='walking' and Character or FlyingCharacter
-end
-
-setmetatable(Enemy, { __index= definirTipo(Enemy), __call= metatable.__call})
-
--- #executado para verificar se o NPC tem a respectiva animação com base no frame_positions, caso não tenha ele pula a função ou executa sem esperar animação
-function Enemy:temAnim(name_anim)
-  local res= self.frame_positions[name_anim]
-  if res then self.animation=name_anim end
-  return res
-end
+setmetatable(Enemy, metatable)
 
 -- como possui a função de executar a morte de um NPC, a função tem que remover diretamente da lista de NPCs, por isso que o método pertence a classe NPCs
 function Enemy:dying()
@@ -54,19 +33,6 @@ function Enemy:dying()
     end 
 
   end 
-end
-
-function Enemy:deveVoarAoPlayerSeAproximar()
-  if self.type=='flying' then 
-    self:fly()
-  end
-end
-
-function Enemy:playerVisible()
-  local metade_tela= (_G.screen.w/2)
-  local res= _G.cam and math.abs(_G.cam:actualPlayerPosition()-self.p.x)<=metade_tela
-  if res then self:deveVoarAoPlayerSeAproximar() end
-  return res
 end
 
 function Enemy:drawLifeBar()
@@ -92,39 +58,11 @@ function Enemy:drawLifeBar()
   love.graphics.polygon('line', vertices)
 end
 
-function Enemy:chasePlayer()
-  if not _G.player.was_destroyed then 
-    local left= (self.p.x-(self.body.w/2)-1)-_G.cam.p.x
-    local right= (self.p.x+(self.body.w/2)+1)-_G.cam.p.x
-
-    local playersLeftSide= _G.player.p.x-(_G.player.body.w/2)
-    local playersRightSide= _G.player.p.x+(_G.player.body.w/2)
-
-    if (left>playersRightSide) and self.goto_player then
-      self.animation= self.type=='flying' and 'flying' or 'walking'
-      self:defaultUpdateFrame()
-      self.s.x= -math.abs(self.s.x)*self.direction
-      self.p.x= (self.p.x - self.mov)
-      self.reached_the_player= false
-    elseif (right<playersLeftSide) and self.goto_player then
-      self.animation= self.type=='flying' and 'flying' or 'walking'
-      self:defaultUpdateFrame()
-      self.s.x= math.abs(self.s.x)*self.direction
-      self.p.x= (self.p.x + self.mov)
-      self.reached_the_player= false
-    else 
-      self.reached_the_player= true
-    end
-  end
-end
-
 function Enemy:attackPlayer()
   if self.hostile then
     local pula_anim= not self:temAnim('attacking')
     self:dealsDamage(pula_anim)
     self:defaultUpdateFrame()  
-    -- expressão de raiva
-    _G.displayers.expression.frame= 3
   end
 end 
 

@@ -1,4 +1,4 @@
-local Enemy= require('models.enemy')
+local Enemy= require('models.character.enemy')
 
 local NPCs, metatable= {}, {
   __call= function(self, npcs)
@@ -84,40 +84,3 @@ end
 
 return NPCs
 
---[[
-& Em construção
-Esse mecânismo serve para a função impedirMovimentaçãoPlayer, invés de subtrair a soma de movimentação do player na horizontal é melhor travar a sua posição com base em uma propriedade para cada NPC
-function NPCs:naoPermiteSeMoverPara(direcao)
-  local pode= false
-  for i=1, #self.on_the_screen do
-    if self.on_the_screen-count_empty_death_rate].lock_movement[direcao] then
-      pode= true
-      break 
-    end
-  end
-  return pode
-end
-
-
-function NPCs:impedirMovimentacaoPlayer(i)
-  local npcLeftSide= self.on_the_screen[i]:getSide('left')
-  local npcRightSide= self.on_the_screen[i]:getSide('right')
-
-  local playersLeftSide= _G.player:getSide('left')
-  local playersRightSide= _G.player:getSide('right')
-
-  local collisao= collision:quad(self.on_the_screen[i], _G.player, _G.cam)
-  if collisao then
-    if npcLeftSide<=playersRightSide and playersRightSide<=self.on_the_screen[i].p.x-10 then
-      self.on_the_screen[i].lock_movement.right= false
-      self.on_the_screen[i].lock_movement.left= true
-    elseif npcRightSide>=playersLeftSide and playersLeftSide>=self.on_the_screen[i].p.x+10 then
-      self.on_the_screen[i].lock_movement.left= false
-      self.on_the_screen[i].lock_movement.right= true
-    end
-  else 
-    self.on_the_screen[i].lock_movement.right= false
-    self.on_the_screen[i].lock_movement.left= false
-  end
-end 
-]]

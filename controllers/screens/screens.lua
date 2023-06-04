@@ -57,6 +57,7 @@ function Screens:updateScreenReferencesIfResized()
     if _G.map then _G.cam:setStartAndEndPosition() end
     for k, _ in pairs(self.objs) do 
       self.objs[k]:updateButtonPositions()
+      if self.objs[k].repositioningElements then self.objs[k]:repositioningElements() end
     end 
   end
 end

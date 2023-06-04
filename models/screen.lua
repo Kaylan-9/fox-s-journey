@@ -27,6 +27,7 @@ function Screen:load()
   self.obj_list= {}
   self:loadMouse()
   self:loadButtons()
+  if self.loadSpecificProperties then self:loadSpecificProperties() end
 end 
 
 function Screen:loadMouse()
@@ -149,9 +150,11 @@ function Screen:drawObject()
 end
 
 function Screen:drawButtons()
+  love.graphics.setColor(1, 68/255, 0)
   for i=1, #self.obj_list do 
     self.obj_list[i]:draw()
   end
+  love.graphics.setColor(1, 1, 1)
 end
 
 -- Serve para centralizar as posições em x dos botões na tela e centralizar o primeiro botão em y, mas os posteriores ao primeiro serão dispostos um após o outro com uma distancia padrão definida em uma variável local no próprio arquivo  
@@ -168,6 +171,7 @@ end
 
 function Screen:draw(current_screen)
   if self:activeWhen() and current_screen==self.id then
+    if self.drawBeforeButtons then self:drawBeforeButtons() end
     self:drawButtons()
   end
 end
