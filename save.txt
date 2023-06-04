@@ -1,75 +1,65 @@
-// {
-  //   "name": "Parte calma da floresta de Elísea",
-  //   "music": "music_florest.mp3",
-  //   "difficulty": 1,
-  //   "map": {
-  //     "filename": "1.txt",
-  //     "filename_background": "tilesetOpenGameBackground.png",
-  //     "filename_tileset": "tilesetOpenGame.png",
-  //     "n": {"x": 10, "y": 6}
-  //   },
-  //   "npcs": [
-  //     {
-  //       "name": "bat", 
-  //       "goto_player": true,
-  //       "p": {"x": 500, "y": 9},
-  //       "vel": 1,
-  //       "messages": [
-  //         "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
-  //         "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
-  //       ],
-  //       "speech_interruption": true
-  //     }
-  //   ],
-  //   "boss": {
-  //     "name": "lobo", 
-  //     "music": "boss_florest_music.mp3",
-  //     "goto_player": true,
-  //     "s": {"x": 2, "y": 2},
-  //     "vel": 1,
-  //     "messages": [
-  //       "Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!"        
-  //     ],
-  //     "speech_interruption": true
-  //   },
-  //   "items": [
-  //     {
-  //       "name": "morango",
-  //       "p": {
-  //         "x": 70
-  //       }
-  //     },
-  //     {
-  //       "name": "maca",
-  //       "p": {
-  //         "x": 770
-  //       }
-  //     },
-  //     {
-  //       "name": "uvas",
-  //       "p": {
-  //         "x": 1570
-  //       }
-  //     }, 
-  //     {
-  //       "name": "uvas",
-  //       "p": {
-  //         "x": 1570
-  //       }
-  //     },
-  //     {
-  //       "name": "gema_red",
-  //       "p": {
-  //         "x": 900
-  //       }
-  //     },
-  //     {
-  //       "name": "gema_green",
-  //       "p": {
-  //         "xi": 1100,
-  //         "xf": 4000
-  //       }
-  //     }
+  {
+    "name": "Parte calma da floresta de Elísea",
+    "music": "music_florest.mp3",
+    "difficulty": 1,
+    "map": {
+      "filename": "1.txt",
+      "filename_background": "tilesetOpenGameBackground.png",
+      "filename_tileset": "tilesetOpenGame.png",
+      "n": {"x": 10, "y": 6}
+    },
+    "npcs": [
+      
+    ],
+    "boss": {
+      "name": "lobo", 
+      "music": "boss_florest_music.mp3",
+      "goto_player": true,
+      "s": {"x": 2, "y": 2},
+      "vel": 5,
+      "messages": [
+        "Eu sou o Alfa, o líder supremo dos lobisomens. Prepare-se para ser dilacerado!"        
+      ],
+      "speech_interruption": true
+    },
+    "items": [
+      {
+        "name": "morango",
+        "p": {
+          "x": 70
+        }
+      },
+      {
+        "name": "maca",
+        "p": {
+          "x": 770
+        }
+      },
+      {
+        "name": "uvas",
+        "p": {
+          "x": 1570
+        }
+      }, 
+      {
+        "name": "uvas",
+        "p": {
+          "x": 1570
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "x": 900
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 1100,
+          "xf": 4000
+        }
+      }
 
-  //   ]
-  // }, 
+    ]
+  }, 

@@ -38,7 +38,7 @@ function Boss:update()
 
     self:dying()
     if self.was_destroyed then goto continue end
-    local pode_ser_hostil_e_atacado= (self.reached_the_player and not self:verSeExisteDialogoQueIterrompe() and #_G.balloon.messages==0)
+    local pode_ser_hostil_e_atacado= (self.reached_the_player and self:verSeExisteDialogoQueIterrompe()==false and #_G.balloon.messages==0)
 
     if pode_ser_hostil_e_atacado then
       self:attackPlayer()

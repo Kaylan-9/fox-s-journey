@@ -24,6 +24,20 @@
     "direction": -1,
     "body": {"w":150, "h":120}
   },
+  "owl": {
+    "name": "owl",
+    "hostile": {
+      "damage": 1,
+      "attack_frame": [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48]
+    },
+    "s": {"x": 3, "y": 3},
+    "frame_positions": {
+      "flying": {"i": 17, "f": 32, "type": "default"}
+    },
+    "type":"flying",
+    "direction": -1,
+    "body": {"w":40, "h":20}
+  },
   "bat": {
     "name": "bat",
     "hostile": {

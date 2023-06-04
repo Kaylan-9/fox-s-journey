@@ -3,7 +3,7 @@ local metatable, Enemy= {
   __index= NPC,
   __call=function(self, option_props, running_speed, starting_position, messages, speech_interruption, goto_player)
     --tileset recebe o nome de option_props pois eles são iguais, ou seja menos um argumento
-    local obj= NPC(option_props, running_speed, starting_position, false, option_props.name, messages, speech_interruption, goto_player)
+    local obj= NPC(option_props, running_speed, starting_position, messages, speech_interruption, goto_player)
     obj.active= false
     setmetatable(obj, {__index= self})
     return obj
@@ -75,6 +75,12 @@ function Enemy:takesDamage()
             if _G.player.frame_acc>=_G.player.freq_frames then
               _G.player.audios['attacking']:play()
               if self.life > 0 then
+                
+                if self.type=='flying' then  -- marca se o inimigo do tipo flying foi atacado 
+                  self.recently_attacked:start()  -- inicia timer de 9 segundos para que o inimigo não ataque e se afaste
+                  self.center_radius= self.p.x+((self.s.x>0 and 1 or -1)*150) -- define a distância até onde o inimigo deve se afastar, valor de distância constante
+                end
+
                 self.life= self.life - _G.player.hostile.damage
               end
             end
@@ -99,40 +105,15 @@ function Enemy:dealsDamage(pula_anim)
   end
 end
 
-function Enemy:verSeExisteDialogoQueIterrompe()
-  if self.speech_interruption then
-    _G.balloon.messages= self.messages
-    self.speech_interruption= false
-    return true 
-  end
-  return false
-end
-
 function Enemy:calcYPositionReferences()
   local posiciona_no_chao= not type(self.flight_direction)=='string' or self.flight_direction==nil
   if posiciona_no_chao then
-    if self.p.f.y==-100 then self.p.y= self.y_from_the_current_floor end
-  end 
-end
-
-function Enemy:iniciarDialogo(key, scancode, isrepeat)
-  if key=='f' then 
-    local pode_iniciar_dialogo= (#_G.balloon.messages==0)
-
-    if self.reached_the_player then
-      if pode_iniciar_dialogo then 
-        _G.balloon.messages= self.messages
-      else
-        if _G.balloon.indice>=#_G.balloon.messages then 
-          _G.balloon.indice= 1
-          _G.balloon.messages= {}
-        else
-          _G.balloon.indice= _G.balloon.indice + 1
-        end
+    if self.p.f.y==-100 then 
+      if self.type=='walking' then
+        self.p.y= self.y_from_the_current_floor 
       end
-    end 
-    
-  end
+    end
+  end 
 end
 
 return Enemy
