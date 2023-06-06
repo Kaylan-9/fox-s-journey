@@ -1,5 +1,216 @@
 [
-
+  {
+    "name": "Parte calma da floresta de Elísea",
+    "music": "music_florest.mp3",
+    "difficulty": 1,
+    "map": {
+      "filename": "1.txt",
+      "filename_background": "tilesetOpenGameBackground.png",
+      "filename_tileset": "tilesetOpenGame.png",
+      "n": {"x": 10, "y": 6}
+    },
+    "npcs": [
+      {
+        "name": "minotauro", 
+        "goto_player": true,
+        "p": {"x": 1060, "y": 0},
+        "vel": 5.24,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "minotauro", 
+        "goto_player": true,
+        "p": {"x": 440, "y": 0},
+        "vel": 2.14,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "minotauro", 
+        "goto_player": true,
+        "p": {"x": 2060, "y": 0},
+        "vel": 3.34,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "minotauro", 
+        "goto_player": true,
+        "p": {"x": 1760, "y": 0},
+        "vel": 3.05,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "minotauro", 
+        "goto_player": true,
+        "p": {"x": 550, "y": 0},
+        "vel": 1.1,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "minotauro", 
+        "goto_player": true,
+        "p": {"x": 120, "y": 0},
+        "vel": 1.6,
+        "messages": [],
+        "speech_interruption": false
+      }
+    ],
+    "boss": {
+      "name": "lobo", 
+      "music": "boss_florest_music.mp3",
+      "goto_player": true,
+      "s": {"x": 2, "y": 2},
+      "vel": 5,
+      "messages": [
+        "Eu sou Clarence e você não vai passar por aqui, essa área é restrita!!!!",
+        "Ela me pertence agora e também a gangue dos Predadores Urbanos, por isso sofrera as consequencias!!"
+      ],
+      "speech_interruption": true
+    },
+    "items": [
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 100,
+          "xf": 400
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "xi": 440,
+          "xf": 740
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 780,
+          "xf": 1180
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "xi": 1220,
+          "xf": 1520
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 1560,
+          "xf": 1860
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "xi": 1900,
+          "xf": 2200
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 2240,
+          "xf": 2540
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "xi": 2580,
+          "xf": 2880
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 2920,
+          "xf": 3220
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "xi": 3260,
+          "xf": 3560
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 3600,
+          "xf": 3900
+        }
+      }, 
+      {
+        "name": "uvas",
+        "p": {
+          "x": 3940
+        }
+      }, 
+      {
+        "name": "morango",
+        "p": {
+          "x": 4140
+        }
+      },
+      {
+        "name": "morango",
+        "p": {
+          "x": 4180
+        }
+      },
+      {
+        "name": "maca",
+        "p": {
+          "x": 3980
+        }
+      },
+      {
+        "name": "maca",
+        "p": {
+          "x": 4220
+        }
+      },
+      {
+        "name": "uvas",
+        "p": {
+          "x": 4260
+        }
+      },
+      {
+        "name": "maca",
+        "p": {
+          "x": 4300
+        }
+      },
+      {
+        "name": "uvas",
+        "p": {
+          "x": 60
+        }
+      },
+      {
+        "name": "uvas",
+        "p": {
+          "x": 4390
+        }
+      },
+      {
+        "name": "uvas",
+        "p": {
+          "x": 5000
+        }
+      }
+    ]
+  }, 
   {
     "name": "Cavernas Misteriosas",
     "music": "music_cave.mp3",
@@ -9,21 +220,103 @@
       "filename": "2.txt",
       "n": {"x": 10, "y": 7}
     },
-    "difficulty": 2,
     "npcs": [
+      {
+        "name": "bat", 
+        "goto_player": true,
+        "p": {"x": 6460, "y": 1020},
+        "vel": 5.24,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "bat", 
+        "goto_player": true,
+        "p": {"x": 3660, "y": 712},
+        "vel": 2.64,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "bat", 
+        "goto_player": true,
+        "p": {"x": 2460, "y": 820},
+        "vel": 1.24,
+        "messages": [],
+        "speech_interruption": false
+      },
       {
         "name": "bat", 
         "goto_player": true,
         "p": {"x": 500, "y": 9},
         "vel": 1,
-        "messages": [
-          "Intruso! Prepare-se para enfrentar a fúria do lobisomem!",
-          "Raposa insolente, sua presença aqui é uma afronta! Prepare-se para a batalha!"
-        ],
-        "speech_interruption": true
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "bat", 
+        "goto_player": true,
+        "p": {"x": 4500, "y": 9},
+        "vel": 3,
+        "messages": [],
+        "speech_interruption": false
+      },
+      {
+        "name": "bat", 
+        "goto_player": true,
+        "p": {"x": 1000, "y": 589},
+        "vel": 2,
+        "messages": [],
+        "speech_interruption": false
+      }, 
+      {
+        "name": "bat", 
+        "goto_player": true,
+        "p": {"x": 2000, "y": 1589},
+        "vel": 2.5,
+        "messages": [],
+        "speech_interruption": false
       }
     ],
-    "items": [],
+    "items": [
+      {
+        "name": "morango",
+        "p": {
+          "x": 70
+        }
+      },
+      {
+        "name": "maca",
+        "p": {
+          "x": 770
+        }
+      },
+      {
+        "name": "uvas",
+        "p": {
+          "x": 1570
+        }
+      }, 
+      {
+        "name": "uvas",
+        "p": {
+          "x": 1570
+        }
+      },
+      {
+        "name": "gema_red",
+        "p": {
+          "x": 900
+        }
+      },
+      {
+        "name": "gema_green",
+        "p": {
+          "xi": 1100,
+          "xf": 4000
+        }
+      }
+    ],
     "boss": {
       "name": "owl", 
       "music": "boss_cave_music.mp3",
@@ -31,7 +324,9 @@
       "goto_player": true,
       "vel": 5,
       "messages": [
-        "Eu sou Elaine, a sábia, como ousa invadir o meu lar!!" 
+        "Na majestosa e misteriosa caverna da venerável sábia, Elaine, a graciosa fada coruja, desperto com interesse sobre o motivo que me conduziu até este lugar sagrado.",
+        "Com palavras carregadas de delicadeza e sabedoria, aviso-lhe solenemente:",
+        "caso tenha a ousadia de prosseguir, erguendo-se contra mim, sua alma será imersa em um conflito indesejado. Suplico-lhe, com afeto e compaixão, retire-se prontamente, pois não desejo que arrependimentos dilacerem nossos corações entrelaçados."
       ],
       "speech_interruption": true
     }

@@ -118,7 +118,10 @@ function Map:estalactiteReset()
   self.p.y= 0
 end
 
-
+-- Dentro da pasta de data/options existe o arquivo que contém a configuração de todos os mapas de cada fase para um respectivo tileset 
+-- demarcando os comportamentos de cada tile e o seu simbolo para que junto de um arquivo "map" tipo "txt" possam ser usadas para a construção de um mapa
+-- além disso também há a configuração de elementos que participam do tileset do mapa da fase
+-- Nesse caso esse método é a lógica para as estalactites cairem, por isso ela termina com o nome "Behavior"
 function Map:fallingBehavior()
   if self.active==false then 
     if _G.cam and not _G.player.was_destroyed then
@@ -165,7 +168,7 @@ function Map:update()
 end
 
 function Map:tileAtualX(imaginary_px)
-  return math.ceil((imaginary_px)/self.tileset.tileSize.w)
+  return math.ceil((imaginary_px)/self.tileset.tileSize.w) -- atraves da largura dos tiles do mapa descobre-se a posição do personagem com base na posição real dele 
 end
 
 function Map:behaviorTileAtual(i, j, behavior)
@@ -174,6 +177,7 @@ function Map:behaviorTileAtual(i, j, behavior)
   end
 end
 
+-- Calcula uma referência de cima para baixo a quantidade de tiles que serão usados de referencia para determinar a posição y do chão do personagem
 function Map:indicePY(i, height_relative_to_floor_tile)
   return #self.matriz+height_relative_to_floor_tile-i
 end 
@@ -181,9 +185,8 @@ end
 -- Calcula a posição final do chão, que será usada como referencia para o personagem 
 -- o parâmetro "imaginary_px' se refere a soma da posição x da câmera com a do player ou a apenas ao x do personagem se ele não é o player
 -- o parâmetro "py"
-function Map:calcTheFinalPositionForTheFloor(i, j, character, new_position_for_the_ground)
+function Map:calcTheFinalPositionForTheFloor(i, j, character, actual_position_in_x, new_position_for_the_ground)
   local height_relative_to_floor_tile= 0 -- altura em relação ao tile de chão
-  local actual_position_in_x= character:actualPositionInX()
   if self:behaviorTileAtual(i, j, 'floor') then 
     if character.p.y==0 or character:yFromTheBottom()<=new_position_for_the_ground then -- Verifica se o player está em uma posição em y impossível no caso 0 ou se ele está numa posição acima do chão (como as coordenadas da tela em y se iniciam no topo da tela e terminam no parte inferior da tela, o y do personagem deve ser menor que o chão)
       height_relative_to_floor_tile= 1
@@ -201,17 +204,13 @@ function Map:avoidCharacterGoingThroughTheWall(i, j, character, new_position_for
   if self:behaviorTileAtual(i, j, 'floor') then 
     if character:yFromTheBottom()>new_position_for_the_ground then
       if character.s.x>0 then
-
-        if _G.cam:mustMove() then _G.cam.p.x= _G.cam.p.x-character.mov
+        if character.observadoPelaCamera and _G.cam:mustMove() then _G.cam.p.x= _G.cam.p.x-character.mov
         else character.p.x= character.p.x-character.mov
         end
-
       elseif character.s.x<0 then
-
-        if _G.cam:mustMove() then _G.cam.p.x= _G.cam.p.x+character.mov
+        if character.observadoPelaCamera and _G.cam:mustMove() then _G.cam.p.x= _G.cam.p.x+character.mov
         else character.p.x= character.p.x+character.mov
         end
-        
       end
     end 
   end
@@ -227,12 +226,13 @@ end
 
 function Map:createSceneRefsCharacterAndInsertBehaviors(character)
   local indice_inicial= 1
-  local j = self:tileAtualX(character:actualPositionInX()) -- calcula indice j da matriz
+  local actual_position_in_x= character:actualPositionInX() -- pega a posição x do personagem
+  local j = self:tileAtualX(actual_position_in_x) -- calcula indice j da matriz
   -- Procura na coluna o indice mais próximo com a referência para o chão
   for i=indice_inicial, #self.matriz do
     local new_position_for_the_ground= self:calcNewPositionForTheGround(i, 1, character.tileset.tileSize.h, character.s.x) -- Calculo que serve para verificar o valor final antes de atualizar como a nova posição do chão
     self:avoidCharacterGoingThroughTheWall(i, j, character, new_position_for_the_ground) -- O método aproveita a validação de que o tile tem o tipo chão e depois confere se o personagem não está numa altura adequada para subir para o próximo piso, movendo à posição contraria com a mesma intensidade
-    local y_from_the_current_floor= self:calcTheFinalPositionForTheFloor(i, j, character, new_position_for_the_ground) -- calcula a coordenada y do chão 
+    local y_from_the_current_floor= self:calcTheFinalPositionForTheFloor(i, j, character, actual_position_in_x, new_position_for_the_ground) -- calcula a coordenada y do chão 
     if y_from_the_current_floor then -- se não é vazio uma nova referência e passada para o persoangem 
       character.y_from_the_current_floor= y_from_the_current_floor
       break 
@@ -242,11 +242,12 @@ end
 
 function Map:createSceneRefsItemAndInsertBehaviors(item)
   local indice_inicial= 1
+  local actual_position_in_x= item:actualPositionInX() -- pega a posição x do item
   local j = self:tileAtualX(item:actualPositionInX()) -- calcula indice j da matriz
   -- Procura na coluna o indice mais próximo com a referência para o chão
   for i=indice_inicial, #self.matriz do
     local new_position_for_the_ground= self:calcNewPositionForTheGround(i, 1, item.tileset.tileSize.h, item.s.x) -- Calculo que serve para verificar o valor final antes de atualizar como a nova posição do chão
-    local y_from_the_current_floor= self:calcTheFinalPositionForTheFloor(i, j, item, new_position_for_the_ground) -- calcula a coordenada y do chão 
+    local y_from_the_current_floor= self:calcTheFinalPositionForTheFloor(i, j, item, actual_position_in_x, new_position_for_the_ground) -- calcula a coordenada y do chão 
     if y_from_the_current_floor then -- se não é vazio uma nova referência e passada para o persoangem 
       item.y_from_the_current_floor= y_from_the_current_floor
       break 
@@ -287,12 +288,12 @@ function Map:drawObjects()
   end 
 end
 
-function Map:drawScenery()
+function Map:drawBackground()
   love.graphics.draw(self.background.img.obj, 0, 0, 0, self.background.s.x, self.background.s.y)  
 end
 
 function Map:draw()
-  self:drawScenery()
+  self:drawBackground()
   self:drawObjects()
   self:drawGround()
 end

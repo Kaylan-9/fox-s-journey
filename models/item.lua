@@ -63,7 +63,7 @@ end
 
 function Item:playerPodeOuNaoColetar()
   local can= false
-  if collision:circle(_G.player.p, self.p, (_G.player.body.w/2)) then
+  if not _G.player.was_destroyed and collision:circle(_G.player.p, self.p, (_G.player.body.w/2)) then
     can= (self.type=='colecionável' or love.keyboard.isDown('f'))
   end
   if can then self.audio_collecting_item:play() end

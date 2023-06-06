@@ -23,8 +23,8 @@
     "imgname": "owl.png",
     "n": {"x": 8, "y":6}
   },
-  "esqueleto": {
-    "imgname": "skeleton.png",
-    "n": {"x": 10, "y": 6}
+  "minotauro": {
+    "imgname": "minotauro.png",
+    "n": {"x": 5, "y": 3}
   }
 }

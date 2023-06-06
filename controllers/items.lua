@@ -94,11 +94,13 @@ function Items:verSeTeclaInventarioPress(key)
   for i=1, #self.inventory do
     if key==tostring(i) then
       if self.inventory[i].val_mod_em_interacao.life~=nil then
-        local aBarraVidaVaziaSuficiente= _G.player.life+self.inventory[i].val_mod_em_interacao.life<=_G.player.maximum_life
-        if aBarraVidaVaziaSuficiente then
-          self.inventory[i].activateInInventory= true
-          break
-        end 
+        if not _G.player.was_destroyed then
+          local aBarraVidaVaziaSuficiente= _G.player.life+self.inventory[i].val_mod_em_interacao.life<=_G.player.maximum_life
+          if aBarraVidaVaziaSuficiente then
+            self.inventory[i].activateInInventory= true
+            break
+          end 
+        end
       end
     end
   end 

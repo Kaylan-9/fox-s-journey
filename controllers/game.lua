@@ -33,6 +33,9 @@ function Game:nextLevel()
   if self.game_stage<#self.fases then
     self.game_stage= self.game_stage + 1
     self.fase= self.fases[self.game_stage]
+  else
+    self.game_stage= 0
+    self.pause= true
   end
 end 
 
@@ -72,6 +75,8 @@ function Game:reset()
   if self.game_stage==0 then
     self:nextLevel()
     self:loadLevel()
+    _G.items.inventory= {}
+    _G.items.collectibles= {}
   end
 end
 

@@ -209,7 +209,7 @@ end
 
 
 function Player:dying()
-  if self.life<=0 then
+  if math.ceil(self.life)<=0 then
     self:destroy()
   end
 end 

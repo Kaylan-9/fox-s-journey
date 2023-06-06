@@ -99,7 +99,7 @@ end
 
 
 function Character:calcNewFloorPosition()
-  _G.map:createSceneRefsCharacterAndInsertBehaviors(self) -- cria referências para o personagem em relação ao cenário do mapa, armazenando nas propriedades do próprio personagem, e o método também modifica as propriedades do persoangem, por exemplo: para a física do cenário
+  local calcNewFloorPosition= _G.map:createSceneRefsCharacterAndInsertBehaviors(self) -- cria referências para o personagem em relação ao cenário do mapa, armazenando nas propriedades do próprio personagem, e o método também modifica as propriedades do persoangem, por exemplo: para a física do cenário
 end
 
 -- terá que ser chamado em todo update para funcionar

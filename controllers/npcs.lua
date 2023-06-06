@@ -78,7 +78,6 @@ function NPCs:draw()
   for i=1, #self.on_the_screen do
     self.on_the_screen[i]:draw()
     self.on_the_screen[i]:drawLifeBar()
-    _G.collision:quadDraw(self.on_the_screen[i], _G.cam)
   end
 end
 

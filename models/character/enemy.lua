@@ -60,12 +60,12 @@ end
 
 function Enemy:attackPlayer()
   if self.hostile then
-    local pula_anim= not self:temAnim('attacking')
-    self:dealsDamage(pula_anim)
+    self:dealsDamage(self:temAnim('attacking'))
     self:defaultUpdateFrame()  
   end
 end 
 
+-- método que verifica se o inimigo foi atacado
 function Enemy:takesDamage()
   if not _G.player.was_destroyed then
     if _G.collision:ellipse(_G.player.p, self.p, (self.body.w/2), (self.body.h/2), (self.body.w/2)) then
@@ -92,14 +92,24 @@ function Enemy:takesDamage()
 end
 
 
-function Enemy:dealsDamage(pula_anim)  
-  if not _G.player.was_destroyed and not pula_anim then
+function Enemy:dealsDamage()  
+  if not _G.player.was_destroyed then
     if _G.collision:ellipse(_G.player.p, self.p, (self.body.w/2), (self.body.h/2), (self.body.w/2)) then
-      -- quando o frame troca o dano é aplicado
-      if self.frame_acc>=(self.freq_frames) and self.hostile.attack_frame==self.frame then
-        if math.ceil((_G.player.life*#_G.displayers.props_lifeBar.tileset.tiles)/_G.player.maximum_life)>1 then 
-          _G.player.life= _G.player.life-self.hostile.damage
-        end 
+      
+      local executed_attack_frame= false -- variável determina se o inimigo desenhou frame, ou um dos frames de ataque
+      if type(self.hostile.attack_frame)=='table' then
+        for j=1, #self.hostile.attack_frame do
+          if self.hostile.attack_frame[j]==self.frame then
+            executed_attack_frame= true 
+            break
+          end
+        end
+      elseif type(self.hostile.attack_frame)=='number' and self.hostile.attack_frame==self.frame then
+        executed_attack_frame= true
+      end
+    -- quando o frame troca o dano é aplicado
+      if self.frame_acc>=(self.freq_frames) and executed_attack_frame then
+        _G.player.life= _G.player.life-self.hostile.damage
       end
     end
   end

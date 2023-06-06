@@ -82,7 +82,7 @@ function Displayers:drawInventory()
 end
 
 function Displayers:drawLifeBar()
-  if not _G.player.was_destroyed and _G.player.life>0 then
+  if not player.was_destroyed and self.props_lifeBar.frame<#self.props_lifeBar.tileset.tiles+1 then
     love.graphics.draw(
       self.props_lifeBar.tileset.obj, 
       self.props_lifeBar.tileset.tiles[self.props_lifeBar.frame], 

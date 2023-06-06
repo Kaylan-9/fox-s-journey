@@ -21,11 +21,18 @@ function NPC:setPropsForFlyingCharacter()
 end
 
 function NPC:playerVisible()
-  local metade_tela= (_G.screen.w/2)
-  local res= _G.cam and math.abs(_G.cam:actualPlayerPosition()-self.p.x)<=metade_tela
-  if res then self:fly() end
+  local res= self.field_of_view==true or ((type(self.field_of_view)~='boolean' and _G.cam and math.abs(_G.cam:actualPlayerPosition()-self.p.x)<=self.field_of_view))
+  if res then 
+    self:fly() 
+    self:bossChasesPlayerAcrossMap() -- ao encontrar com o player o boss persegue o player independente de onde ele esteja na fase
+  end
   return res
 end
+
+function NPC:bossChasesPlayerAcrossMap()
+  if self.its_the_boss then self.field_of_view= true end 
+end
+
 
 -- #executado para verificar se o NPC tem a respectiva animação com base no frame_positions, caso não tenha ele pula a função ou executa sem esperar animação
 function NPC:temAnim(name_anim)
