@@ -7,7 +7,7 @@ local metatable= {
     trajectory.walking_speed= new_trajectory.walking_speed
     trajectory.current_walking_speed= new_trajectory.walking_speed.min
     trajectory.previous_positions= {}
-    trajectory.max_n_positions= 10
+    trajectory.max_n_positions= 49
     setmetatable(trajectory, {__index= self})
     return trajectory
   end

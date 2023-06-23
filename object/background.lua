@@ -5,6 +5,7 @@ local metatable= {
   __index= Object,
   __call= function(self)
     local background= Object(
+      'background',
       {
         right_edge_image= 1,
         scale_factor= {x= 7, y= 7},

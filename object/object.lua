@@ -4,8 +4,9 @@ local Trajectory= require('trajectory')
 
 local Object= {}
 local metatable= {
-  __call=function(self, new_object, animate, physics, trajectory)
+  __call=function(self, name, new_object, animate, physics, trajectory)
     local object= {}
+    object.name= name
     object.right_edge_image= new_object.right_edge_image -- se é 1 a imagem aponta para a direita, caso se -1 para a esquerda
     object.scale_factor= new_object.scale_factor -- right_edge_image é usado para posicionar corretamente o scale_factor, ou seja ele é usado no draw
     object.p= new_object.initial_position

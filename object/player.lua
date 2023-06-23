@@ -5,6 +5,7 @@ local metatable= {
   __index= Object,
   __call= function(self, objects)
     local player= Object(
+      'player',
       {
         right_edge_image= 1,
         scale_factor= {x= 2, y= 2},
@@ -17,7 +18,7 @@ local metatable= {
       {
         fixed= false,
         objects= objects,
-        energy_preservation= 0.24,
+        energy_preservation= 0.44,
         mass= 3.5,
         body= {
           w= 32,
@@ -25,7 +26,7 @@ local metatable= {
         }
       },
       {
-        walking_speed= {min= 10, max= 15},
+        walking_speed= {min= 5, max= 8},
       }
     )
     player.keys_used= {}
@@ -39,8 +40,8 @@ setmetatable(Player, metatable)
 function Player:loadAnimationSettings()
   self.animate:createAnimation('walking', 'normal', {i=17, f=24})
   self.animate:createAnimation('running', 'normal', {i=33, f=40})
-  self.animate:createAnimation('jumping', 'persistent', {i=9, f=11})
-  self.animate:createAnimation('falling', 'persistent', {i=12, f=16})
+  self.animate:createAnimation('jumping', 'normal', {i=9, f=11})
+  self.animate:createAnimation('falling', 'normal', {i=12, f=16})
 end
 
 function Player:markKeyUsed(name_behavior, keys, condition)
@@ -79,7 +80,6 @@ end
 function Player:walking()
   if self:getKeyUsed('left') or self:getKeyUsed('right') then self.animate:setAnimation('walking')
   elseif self:getKeyUsed('run') then self.animate:setAnimation('running')
-  else self.animate:setAnimation('stopped')
   end
   if self:getKeyUsed('left') then
     self:setPoint('left')
@@ -91,18 +91,19 @@ function Player:walking()
 end
 
 function Player:falling()
-  if self.physics.force_acc.y>0 then
+  if mathK:around(self.physics.force_acc.y)>0 then
     self.animate:setAnimation('falling')
+  elseif mathK:around(self.physics.force_acc.y)<0 then
+    self.animate:setAnimation('jumping')
+  else
+    if not self:getKeyUsed('move') then
+      self.animate:setAnimation('stopped')
+    end
   end
 end
 
 function Player:jumping()
   if self:getKeyUsed('jump') then
-
-    if self.physics.force_acc.y<0 then
-      self.animate:setAnimation('jumping')
-    end
-
     if self.physics.force_acc.y>-6 then
       self.physics.force_acc.y= self.physics.force_acc.y-2
     end

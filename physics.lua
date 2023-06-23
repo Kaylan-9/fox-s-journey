@@ -18,12 +18,26 @@ setmetatable(Physics, metatable)
 
 function Physics:update()
   self:collisions()
+  self:aboveAndWithinTheRangeX(
+    function(this, object)
+      if object.physics then
+        local meter_s= 2
+        this.force_acc.y= this.force_acc.y + math.sqrt((meter_s*object.physics.mass)/(object.p.y-this.main_object.p.y))
+      end
+    end
+  )
+  self:thereIsNoObjectBelow(
+    function(this)
+      local meter_s= 1
+      this.force_acc.y= this.force_acc.y + (meter_s*0.1)
+    end
+  )
   if self.fixed~=true then self:applicationOfForce() end
 end
 
 function Physics:inside_the_area_of_y(object, previous_position)
   local distanceInYIgnoredAtTop=(self.force_acc.y>=0 and self.force_acc.y or 1)
-  local distanceInYIgnoredAtBottom=(self.force_acc.y>=0 and self.force_acc.y or -1)
+  local distanceInYIgnoredAtBottom=(self.force_acc.y<=0 and self.force_acc.y or -1)
   return (
     self.main_object:getSide('bottom', previous_position)>object:getSide('top')+distanceInYIgnoredAtTop and
     self.main_object:getSide('top', previous_position)<object:getSide('bottom')+distanceInYIgnoredAtBottom
@@ -45,7 +59,6 @@ function Physics:collisions()
       end
     end
   end
-  self:aboveAndWithinTheRangeX(function() self.force_acc.y= self.force_acc.y+(0.1) end)
 end
 
 function Physics:fastCollisionWithElements(object)
@@ -68,7 +81,7 @@ function Physics:collision(object)
     if (
       self.main_object:getSide('right')>object:getSide('left')-self.main_object.trajectory.current_walking_speed and
       self.main_object:getSide('right')<object.p.x
-    ) then 
+    ) then
       self.main_object.p.x= object:getSide('left')-(self.main_object.body.w/2)
       -- self.force_acc.x= self.force_acc.x-self:impact_force(object)
     elseif (
@@ -83,14 +96,14 @@ function Physics:collision(object)
   if self:inside_the_area_of_x(object) then
     if (
       self.main_object:getSide('bottom')>object:getSide('top') and
-      self.main_object:getSide('bottom')<object:getSide('top')+(self.force_acc.y*5)
+      self.main_object:getSide('bottom')<object:getSide('top')+(self.force_acc.y*2)
     ) then
-      self.force_acc.y= mathK:around((self.force_acc.y*-1)*self.energy_preservation)
+      self.force_acc.y= mathK:around((self.force_acc.y~=0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
       self.main_object.p.y= object:getSide('top')-(self.main_object.body.h/2)
       -- self.force_acc.y= self.force_acc.y-(0.05)
     elseif (
       self.main_object:getSide('top')<object:getSide('bottom') and
-      self.main_object:getSide('top')>object:getSide('bottom')+(self.force_acc.y*5)
+      self.main_object:getSide('top')>object:getSide('bottom')+(self.force_acc.y*2)
     ) then
       self.force_acc.y= 0
       self.main_object.p.y= object:getSide('bottom')+(self.main_object.body.h/2)
@@ -99,13 +112,34 @@ function Physics:collision(object)
   end
 end
 
-function Physics:aboveAndWithinTheRangeX(func) -- dentro do intervalo x em relação a outro objeto, onde este está abaixo 
+function Physics:thereIsNoObjectBelow(func)
+  local effect= true
+  local x_range, y_range
   for _, object in pairs(self.objects) do
-    if self~=object then
-      if self:inside_the_area_of_x(object) then
-        if self.main_object:getSide('bottom')<object:getSide('top') then
-          func(self)
+    if self.main_object~=object then
+      x_range= (self.main_object:getSide('right')>object:getSide('left') and self.main_object:getSide('left')<object:getSide('right'))
+      if x_range then
+        y_range= (self.main_object:getSide('bottom')>object:getSide('top') and self.main_object:getSide('top')<object:getSide('bottom'))
+        if y_range then
+          effect= false
+          break
         end
+      end
+    end
+  end
+  if effect then
+    func(self)
+  end
+end
+
+function Physics:aboveAndWithinTheRangeX(func_objs) -- dentro do intervalo x em relação a outro objeto, onde este está abaixo 
+  local x_range
+  for _, object in pairs(self.objects) do
+    x_range= self.main_object~=object and (self.main_object:getSide('right')>object:getSide('left') and self.main_object:getSide('left')<object:getSide('right'))
+    if x_range then
+      if self.main_object:getSide('bottom')<object:getSide('top') then
+        func_objs(self, object)
+        break
       end
     end
   end

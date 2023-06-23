@@ -4,7 +4,7 @@ local metatable= {
     local animate= {}
     animate.animations= {}
     animate.frame= 1
-    animate.frame_change= 0.05
+    animate.frame_change= 0.1
     setmetatable(animate, {__index=self})
     animate:createAnimation('stopped', 'normal', new_animate.static_frame)
     animate.animation= 'stopped'
