@@ -1,3 +1,7 @@
+_G.screen= {
+  w= love.graphics.getWidth(),
+  h= love.graphics.getHeight(),
+}
 _G.tbl= require('useful.tbl')
 _G.mathK= require('mathK')
 _G.dt= 0

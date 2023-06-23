@@ -7,9 +7,10 @@ local metatable= {
     physics.objects= customizable.objects
     physics.mass= customizable.mass
     physics.energy_preservation= customizable.energy_preservation
-    physics.force_acc= {}
-    physics.force_acc.y= 0
-    physics.force_acc.x= 0
+    physics.force_acc= {
+      y= 0,
+      x= 0
+    }
     setmetatable(physics, {__index= self})
     return physics
   end
@@ -22,7 +23,7 @@ function Physics:update()
     function(this, object)
       if object.physics then
         local meter_s= 2
-        this.force_acc.y= this.force_acc.y + math.sqrt((meter_s*object.physics.mass)/(object.p.y-this.main_object.p.y))
+        this.force_acc.y= this.force_acc.y + math.sqrt((meter_s*object.physics.mass)/(object:realPosition().y-this.main_object:realPosition().y))
       end
     end
   )
@@ -80,13 +81,13 @@ function Physics:collision(object)
   if self:inside_the_area_of_y(object) then
     if (
       self.main_object:getSide('right')>object:getSide('left')-self.main_object.trajectory.current_walking_speed and
-      self.main_object:getSide('right')<object.p.x
+      self.main_object:getSide('right')<object:realPosition().x
     ) then
       self.main_object.p.x= object:getSide('left')-(self.main_object.body.w/2)
       -- self.force_acc.x= self.force_acc.x-self:impact_force(object)
     elseif (
       self.main_object:getSide('left')<object:getSide('right')+self.main_object.trajectory.current_walking_speed and
-      self.main_object:getSide('left')>object.p.x
+      self.main_object:getSide('left')>object:realPosition().x
     ) then
       self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)
       -- self.force_acc.x= self.force_acc.x+self:impact_force(object)

@@ -1,3 +1,4 @@
+local CameraManager= require('manager.cameraManager')
 local tilesManager= require('manager.tilesManager')
 local Object= require('object.object')
 local Player= {}
@@ -9,7 +10,7 @@ local metatable= {
       {
         right_edge_image= 1,
         scale_factor= {x= 2, y= 2},
-        initial_position= {x=500, y=200},
+        initial_position= CameraManager:getPosition(),
       },
       {
         tileset= tilesManager:get('player'),
