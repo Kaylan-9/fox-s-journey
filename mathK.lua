@@ -27,4 +27,8 @@ function mathK:around(number, n_decimal_values)
   end
 end
 
+function mathK:sqrt(number, exponent)
+  return number*(1/exponent)
+end
+
 return mathK

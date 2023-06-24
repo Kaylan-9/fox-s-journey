@@ -3,7 +3,7 @@ local Object= require('object.object')
 local Block= {}
 local metatable= {
   __index= Object,
-  __call= function(self, name, objects, initial_position, p_reference)
+  __call= function(self, name, objects, initial_position, p_reference, move_every)
     name= 'block'..((type(name)=='number' or type(name)=='string') and name or '')
     local block= Object(
       name,
@@ -29,7 +29,8 @@ local metatable= {
       {
         walking_speed= {min= 5, max= 15},
       },
-      p_reference
+      p_reference,
+      move_every
     )
     setmetatable(block, {__index= self})
     return block

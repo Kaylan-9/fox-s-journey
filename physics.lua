@@ -55,7 +55,7 @@ function Physics:collisions()
   if self.fixed~=true then
     for _, object in pairs(self.objects) do
       if self~=object then
-        self:fastCollisionWithElements(object)
+        -- self:fastCollisionWithElements(object)
         self:collision(object)
       end
     end
@@ -66,10 +66,10 @@ function Physics:fastCollisionWithElements(object)
   local last_position= self.main_object.trajectory:getLastPosition()
   if last_position then
     if self:inside_the_area_of_y(object) and self:inside_the_area_of_y(object, last_position) then
-      if self.main_object:getSide('right')<object:getSide('right') and self.main_object:getSide('right', last_position)>object:getSide('left') then
+      if self.main_object:getSide('right')<object:getSide('right') and self.main_object:getSide('right', last_position)-self.main_object.p.x>object:getSide('left') then
         self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)
       end
-      if self.main_object:getSide('left')>object:getSide('left') and self.main_object:getSide('left', last_position)<object:getSide('right') then
+      if self.main_object:getSide('left')>object:getSide('left') and self.main_object:getSide('left', last_position)+self.main_object.p.x<object:getSide('right') then
         self.main_object.p.x= object:getSide('left')-(self.main_object.body.w/2)
       end
     end
@@ -84,13 +84,11 @@ function Physics:collision(object)
       self.main_object:getSide('right')<object:realPosition().x
     ) then
       self.main_object.p.x= object:getSide('left')-(self.main_object.body.w/2)
-      -- self.force_acc.x= self.force_acc.x-self:impact_force(object)
     elseif (
       self.main_object:getSide('left')<object:getSide('right')+self.main_object.trajectory.current_walking_speed and
       self.main_object:getSide('left')>object:realPosition().x
     ) then
       self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)
-      -- self.force_acc.x= self.force_acc.x+self:impact_force(object)
     end
   end
 
@@ -101,14 +99,12 @@ function Physics:collision(object)
     ) then
       self.force_acc.y= mathK:around((self.force_acc.y~=0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
       self.main_object.p.y= object:getSide('top')-(self.main_object.body.h/2)
-      -- self.force_acc.y= self.force_acc.y-(0.05)
     elseif (
       self.main_object:getSide('top')<object:getSide('bottom') and
       self.main_object:getSide('top')>object:getSide('bottom')+(self.force_acc.y*2)
     ) then
       self.force_acc.y= 0
       self.main_object.p.y= object:getSide('bottom')+(self.main_object.body.h/2)
-      -- self.force_acc.y= self.force_acc.y+(0.1)
     end
   end
 end

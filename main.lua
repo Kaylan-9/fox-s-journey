@@ -9,6 +9,7 @@ _G.dt= 0
 local ScreenManager= require('manager.screenManager')
 local ObjectManager= require('manager.objectManager')
 local TilesManager= require('manager.tilesManager')
+local KeyboardMouseManager = require("manager.keyboardMouseManager")
 
 function love.load()
   love.graphics.setLineWidth(0.5)
@@ -24,6 +25,7 @@ end
 
 function love.update(dt)
   _G.dt= dt
+  KeyboardMouseManager:update()
   ObjectManager:update()
 end
 

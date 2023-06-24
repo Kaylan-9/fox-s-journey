@@ -1,3 +1,4 @@
+local KeyboardMouseManager= require('manager.keyboardMouseManager')
 local CameraManager= require('manager.cameraManager')
 local tilesManager= require('manager.tilesManager')
 local Object= require('object.object')
@@ -30,7 +31,6 @@ local metatable= {
         walking_speed= {min= 5, max= 8},
       }
     )
-    player.keys_used= {}
     setmetatable(player, {__index= self})
     player:loadAnimationSettings()
     return player
@@ -45,22 +45,8 @@ function Player:loadAnimationSettings()
   self.animate:createAnimation('falling', 'normal', {i=12, f=16})
 end
 
-function Player:markKeyUsed(name_behavior, keys, condition)
-  self.keys_used[name_behavior]= (#keys==0 or love.keyboard.isDown(unpack(keys))) and (type(condition)=='nil' or condition)
-end
-function Player:updateKeysUsed()
-  self:markKeyUsed('left', {'a', 'left'})
-  self:markKeyUsed('right', {'d', 'right'})
-  self:markKeyUsed('jump', {'w', 'up'})
-  self:markKeyUsed('run', {'space'}, self:getKeyUsed('right') or self:getKeyUsed('left'))
-  self:markKeyUsed('move', {},  self:getKeyUsed('jump') or self:getKeyUsed('right') or self:getKeyUsed('left'))
-end
-function Player:getKeyUsed(name_behavior)
-  return self.keys_used[name_behavior]
-end
-
 function Player:controlling()
-  if self:getKeyUsed('move') then
+  if KeyboardMouseManager:getKeyUsed('move') then
     self.trajectory:setNextMove(self.trajectory.current_walking_speed*dt*100)
   end
   self:running()
@@ -69,23 +55,22 @@ function Player:controlling()
 end
 
 function Player:update()
-  self:updateKeysUsed()
   self:controlling()
   self:falling()
-  self:updateObjectBehavior(self:getKeyUsed('move'))
+  self:updateObjectBehavior(KeyboardMouseManager:getKeyUsed('move'))
 end
 
 function Player:running()
-  self.trajectory.current_walking_speed= (self:getKeyUsed('run') and self.trajectory.walking_speed.max or self.trajectory.walking_speed.min)
+  self.trajectory.current_walking_speed= (KeyboardMouseManager:getKeyUsed('run') and self.trajectory.walking_speed.max or self.trajectory.walking_speed.min)
 end
 function Player:walking()
-  if self:getKeyUsed('left') or self:getKeyUsed('right') then self.animate:setAnimation('walking')
-  elseif self:getKeyUsed('run') then self.animate:setAnimation('running')
+  if KeyboardMouseManager:getKeyUsed('left') or KeyboardMouseManager:getKeyUsed('right') then self.animate:setAnimation('walking')
+  elseif KeyboardMouseManager:getKeyUsed('run') then self.animate:setAnimation('running')
   end
-  if self:getKeyUsed('left') then
+  if KeyboardMouseManager:getKeyUsed('left') then
     self:setPoint('left')
     self.p.x=self.p.x-self.trajectory:getNextMove()
-  elseif self:getKeyUsed('right') then
+  elseif KeyboardMouseManager:getKeyUsed('right') then
     self:setPoint('right')
     self.p.x=self.p.x+self.trajectory:getNextMove()
   end
@@ -97,14 +82,14 @@ function Player:falling()
   elseif mathK:around(self.physics.force_acc.y)<0 then
     self.animate:setAnimation('jumping')
   else
-    if not self:getKeyUsed('move') then
+    if not KeyboardMouseManager:getKeyUsed('move') then
       self.animate:setAnimation('stopped')
     end
   end
 end
 
 function Player:jumping()
-  if self:getKeyUsed('jump') then
+  if KeyboardMouseManager:getKeyUsed('jump') then
     if self.physics.force_acc.y>-6 then
       self.physics.force_acc.y= self.physics.force_acc.y-2
     end

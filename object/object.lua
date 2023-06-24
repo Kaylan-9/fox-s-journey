@@ -5,10 +5,11 @@ local Trajectory= require('trajectory')
 local Object= {}
 local metatable= {
   -- p_reference -> referência de posição
-  __call=function(self, name, new_object, animate, physics, trajectory, p_reference)
+  __call=function(self, name, new_object, animate, physics, trajectory, p_reference, move_every)
     local object= {}
     object.name= name
     object.p_reference= (p_reference and p_reference or {x= 0, y= 0})
+    object.move_every= (move_every and move_every or {x= 1, y= 1})
     object.right_edge_image= new_object.right_edge_image -- se é 1 a imagem aponta para a direita, caso se -1 para a esquerda
     object.scale_factor= new_object.scale_factor -- right_edge_image é usado para posicionar corretamente o scale_factor, ou seja ele é usado no draw
     object.p= new_object.initial_position
@@ -47,8 +48,8 @@ setmetatable(Object, metatable)
 
 function Object:realPosition()
   return {
-    x= self.p.x-self.p_reference.x,
-    y= self.p.y+self.p_reference.y
+    x= self.p.x-mathK:around(self.p_reference.x*self.move_every.x),
+    y= self.p.y+mathK:around(self.p_reference.y*self.move_every.y)
   }
 end
 
