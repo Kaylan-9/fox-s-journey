@@ -49,7 +49,7 @@ setmetatable(Object, metatable)
 function Object:realPosition()
   return {
     x= self.p.x-mathK:around(self.p_reference.x*self.move_every.x),
-    y= self.p.y+mathK:around(self.p_reference.y*self.move_every.y)
+    y= self.p.y-mathK:around(self.p_reference.y*self.move_every.y)
   }
 end
 
@@ -66,8 +66,8 @@ end
 
 function Object:updateObjectBehavior(active_animation)
   self.animate:update(active_animation)
-  if self.physics then self.physics:update(self:realPosition()) end
   if self.trajectory then self.trajectory:update(self:realPosition()) end
+  if self.physics then self.physics:update(self:realPosition()) end
 end
 
 function Object:setPoint(name_side) 

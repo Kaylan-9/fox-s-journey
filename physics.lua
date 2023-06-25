@@ -19,6 +19,13 @@ setmetatable(Physics, metatable)
 
 function Physics:update()
   self:collisions()
+  if self.main_object.trajectory.modified_position.x==false then
+    self.main_object.p.x= self.main_object.p.x+self.main_object.trajectory:getCurrentMovement('x')
+  end
+  
+  self.main_object.trajectory:resetModifiedPosition()
+  self.main_object.trajectory:resetCurrentMovement()
+  self.main_object.trajectory:resetNextPosition()
   self:aboveAndWithinTheRangeX(
     function(this, object)
       if object.physics then
@@ -55,22 +62,7 @@ function Physics:collisions()
   if self.fixed~=true then
     for _, object in pairs(self.objects) do
       if self~=object then
-        -- self:fastCollisionWithElements(object)
         self:collision(object)
-      end
-    end
-  end
-end
-
-function Physics:fastCollisionWithElements(object)
-  local last_position= self.main_object.trajectory:getLastPosition()
-  if last_position then
-    if self:inside_the_area_of_y(object) and self:inside_the_area_of_y(object, last_position) then
-      if self.main_object:getSide('right')<object:getSide('right') and self.main_object:getSide('right', last_position)-self.main_object.p.x>object:getSide('left') then
-        self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)
-      end
-      if self.main_object:getSide('left')>object:getSide('left') and self.main_object:getSide('left', last_position)+self.main_object.p.x<object:getSide('right') then
-        self.main_object.p.x= object:getSide('left')-(self.main_object.body.w/2)
       end
     end
   end
@@ -78,17 +70,19 @@ end
 
 -- tipo de colisão 1
 function Physics:collision(object)
-  if self:inside_the_area_of_y(object) then
+  if self:inside_the_area_of_y(object) and self.main_object.trajectory.modified_position.x==false then
     if (
-      self.main_object:getSide('right')>object:getSide('left')-self.main_object.trajectory.current_walking_speed and
-      self.main_object:getSide('right')<object:realPosition().x
+      self.main_object:getSide('right')<=object:getSide('left')+16 and
+      self.main_object:getSide('right', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})>=object:getSide('left')
     ) then
-      self.main_object.p.x= object:getSide('left')-(self.main_object.body.w/2)
+      self.main_object.p.x= (object:getSide('left')-(self.main_object.body.w/2))-1
+      self.main_object.trajectory:setModifiedPosition('x')
     elseif (
-      self.main_object:getSide('left')<object:getSide('right')+self.main_object.trajectory.current_walking_speed and
-      self.main_object:getSide('left')>object:realPosition().x
+      self.main_object:getSide('left')>=object:getSide('right')-16 and
+      self.main_object:getSide('left', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})<=object:getSide('right')
     ) then
-      self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)
+      self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)+1
+      self.main_object.trajectory:setModifiedPosition('x')
     end
   end
 

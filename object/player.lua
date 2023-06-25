@@ -46,9 +46,6 @@ function Player:loadAnimationSettings()
 end
 
 function Player:controlling()
-  if KeyboardMouseManager:getKeyUsed('move') then
-    self.trajectory:setNextMove(self.trajectory.current_walking_speed*dt*100)
-  end
   self:running()
   self:walking()
   self:jumping()
@@ -69,10 +66,10 @@ function Player:walking()
   end
   if KeyboardMouseManager:getKeyUsed('left') then
     self:setPoint('left')
-    self.p.x=self.p.x-self.trajectory:getNextMove()
+    self.trajectory:setCurrentMovement('x' ,-self.trajectory.current_walking_speed*dt*100)
   elseif KeyboardMouseManager:getKeyUsed('right') then
     self:setPoint('right')
-    self.p.x=self.p.x+self.trajectory:getNextMove()
+    self.trajectory:setCurrentMovement('x', self.trajectory.current_walking_speed*dt*100)
   end
 end
 

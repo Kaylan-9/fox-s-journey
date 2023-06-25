@@ -2,24 +2,37 @@ local Trajectory= {}
 local metatable= {
   __call= function(self, new_trajectory)
     local trajectory= {}
-    trajectory.next_move= 0
     trajectory.p= new_trajectory.p
     trajectory.walking_speed= new_trajectory.walking_speed
     trajectory.current_walking_speed= new_trajectory.walking_speed.min
     trajectory.previous_positions= {}
     trajectory.max_n_positions= 49
     setmetatable(trajectory, {__index= self})
+    trajectory:resetModifiedPosition()
+    trajectory:resetCurrentMovement()
+    trajectory:resetNextPosition()
     return trajectory
   end
 }
 
 setmetatable(Trajectory, metatable)
 
+function Trajectory:getNextPosition(prop) return (prop and self.next_position[prop] or self.next_position) end
+function Trajectory:setNextPosition(prop) self.next_position[prop]= self.p[prop]+self.current_movement[prop] end
+function Trajectory:resetNextPosition() self.next_position= { x= 0, y= 0 } end
+
+function Trajectory:getModifiedPosition(prop) return (prop and self.modified_position[prop] or self.modified_position) end
+function Trajectory:setModifiedPosition(prop) self.modified_position[prop]= true end
+function Trajectory:resetModifiedPosition() self.modified_position= { x= false, y= false } end
+
+function Trajectory:getCurrentMovement(prop) return (prop and self.current_movement[prop] or self.current_movement) end
+function Trajectory:setCurrentMovement(prop, new_value) self.current_movement[prop]= new_value end
+function Trajectory:resetCurrentMovement() self.current_movement= { x= 0, y= 0 } end
+
 function Trajectory:update(current_position)
-  if self.next_move~=0 then
-    self:addPreviousPosition(current_position)
-    self:setNextMove(0)
-  end
+  local current_movement_x= self:getCurrentMovement('x')
+  if current_movement_x~=0 then self:addPreviousPosition(current_position) end
+  self:setNextPosition('x')
 end
 
 function Trajectory:draw()
@@ -33,8 +46,6 @@ function Trajectory:draw()
   end
 end
 
-function Trajectory:setNextMove(next_move) self.next_move= next_move end
-function Trajectory:getNextMove() return self.next_move end
 function Trajectory:addPreviousPosition(current_position)
   if #self.previous_positions<self.max_n_positions then
     table.insert(self.previous_positions, _G.tbl:deepCopy(current_position))
