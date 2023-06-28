@@ -18,14 +18,6 @@ local metatable= {
 setmetatable(Physics, metatable)
 
 function Physics:update()
-  self:collisions()
-  if self.main_object.trajectory.modified_position.x==false then
-    self.main_object:move('x', self.main_object.trajectory:getCurrentMovement('x'))
-  end
-
-  self.main_object.trajectory:resetModifiedPosition()
-  self.main_object.trajectory:resetCurrentMovement()
-  self.main_object.trajectory:resetNextPosition()
   self:aboveAndWithinTheRangeX(
     function(this, object)
       if object.physics then
@@ -36,25 +28,37 @@ function Physics:update()
   )
   self:thereIsNoObjectBelow(
     function(this)
-      local meter_s= 1
+      local meter_s= 10
       this.force_acc.y= this.force_acc.y + (meter_s*0.1)
     end
   )
+
+  if self.force_acc.y~=0 then
+    self.main_object.trajectory:setCurrentMovement('y', self.force_acc.y)
+  end
+
+  self:collisions()
+  if self.main_object.trajectory.modified_position.x==false then self.main_object:move('x', self.main_object.trajectory:getCurrentMovement('x')) end
+  -- if self.main_object.trajectory.modified_position.y==false then self.main_object:move('y', self.main_object.trajectory:getCurrentMovement('y')) end
+
+  self.main_object.trajectory:resetModifiedPosition()
+  self.main_object.trajectory:resetCurrentMovement()
+  self.main_object.trajectory:resetNextPosition()
+
+  
   if self.fixed~=true then self:applicationOfForce() end
 end
 
-function Physics:inside_the_area_of_y(object, previous_position)
-  local distanceInYIgnoredAtTop=(self.force_acc.y>=0 and self.force_acc.y or 1)
-  local distanceInYIgnoredAtBottom=(self.force_acc.y<=0 and self.force_acc.y or -1)
+function Physics:inside_the_area_of_y(object)
   return (
-    self.main_object:getSide('bottom', previous_position)>object:getSide('top')+distanceInYIgnoredAtTop and
-    self.main_object:getSide('top', previous_position)<object:getSide('bottom')+distanceInYIgnoredAtBottom
+    self.main_object:getSide('bottom')>object:getSide('top')+1 and
+    self.main_object:getSide('top')<object:getSide('bottom')-1
   )
 end
 function Physics:inside_the_area_of_x(object)
   return (
-    self.main_object:getSide('right')>object:getSide('left') and
-    self.main_object:getSide('left')<object:getSide('right')
+    self.main_object:getSide('right')>object:getSide('left')-1 and
+    self.main_object:getSide('left')<object:getSide('right')+1
   )
 end
 
@@ -72,13 +76,13 @@ end
 function Physics:collision(object)
   if self:inside_the_area_of_y(object) and self.main_object.trajectory.modified_position.x==false then
     if (
-      self.main_object:getSide('right')<=object:getSide('left')+16 and
+      self.main_object:getSide('right')<=object:getSide('left') and
       self.main_object:getSide('right', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})>=object:getSide('left')
     ) then
       self.main_object:setPosition('x', (object:getSide('left')-(self.main_object.body.w/2))-1)
       self.main_object.trajectory:setModifiedPosition('x')
     elseif (
-      self.main_object:getSide('left')>=object:getSide('right')-16 and
+      self.main_object:getSide('left')>=object:getSide('right') and
       self.main_object:getSide('left', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})<=object:getSide('right')
     ) then
       self.main_object:setPosition('x', (object:getSide('right')+(self.main_object.body.w/2)+1))
@@ -86,19 +90,21 @@ function Physics:collision(object)
     end
   end
 
-  if self:inside_the_area_of_x(object) then
+  if self:inside_the_area_of_x(object) and self.main_object.trajectory.modified_position.y==false then
     if (
-      self.main_object:getSide('bottom')>object:getSide('top') and
-      self.main_object:getSide('bottom')<object:getSide('top')+(self.force_acc.y*2)
+      self.main_object:getSide('bottom')<=object:getSide('top') and
+      self.main_object:getSide('bottom', {y= self.main_object.trajectory:getCurrentMovement('y')+self.main_object.p.y})>=object:getSide('top')
     ) then
       self.force_acc.y= mathK:around((self.force_acc.y~=0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
-      self.main_object.p.y= object:getSide('top')-(self.main_object.body.h/2)
+      self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2)-1)
+      self.main_object.trajectory:setModifiedPosition('y')
     elseif (
-      self.main_object:getSide('top')<object:getSide('bottom') and
-      self.main_object:getSide('top')>object:getSide('bottom')+(self.force_acc.y*2)
+      self.main_object:getSide('top')>=object:getSide('bottom') and
+      self.main_object:getSide('top', {y= self.main_object.trajectory:getCurrentMovement('y')+self.main_object.p.y})<=object:getSide('bottom')
     ) then
       self.force_acc.y= 0
-      self.main_object.p.y= object:getSide('bottom')+(self.main_object.body.h/2)
+      self.main_object:setPosition('y', object:getSide('bottom')+(self.main_object.body.h/2)+1)
+      self.main_object.trajectory:setModifiedPosition('y')
     end
   end
 end

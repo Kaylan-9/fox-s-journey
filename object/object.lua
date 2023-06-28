@@ -14,7 +14,9 @@ local metatable= {
     object.scale_factor= new_object.scale_factor -- right_edge_image é usado para posicionar corretamente o scale_factor, ou seja ele é usado no draw
 
     if object.name=='player' then
-      object.p= {x= 0, y= 0}
+      object.p= {}
+      object.p.x= 0
+      object.p.y= 500
       object.cam= initial_position
     else
       object.p= initial_position
@@ -52,35 +54,37 @@ function Object:getSide(name_side, position)
   return side
 end
 
-function Object:min_cam_x_move()
-  return 500
+function Object:min_cam_move(prop)
+  local props= {
+    x= 500,
+    y= 0
+  }
+  return props[prop]
 end
 
 function Object:move(prop, value)
   if value~=0 then
     if self.name=='player' then
       if prop=='x' then
-
-        if self.p.x==self:min_cam_x_move() then
+        local min_cam_x_move= self:min_cam_move('x')
+        if self.p.x==min_cam_x_move then
           self.cam.x= self.cam.x+value
-        elseif self.p.x<self:min_cam_x_move() then
-          if self.p.x+value>self:min_cam_x_move() then
-            self.cam.x= self.p.x+value-self:min_cam_x_move()
-            self.p.x= self:min_cam_x_move()
-          elseif self.p.x+value==self:min_cam_x_move() then
-            self.p.x= self:min_cam_x_move()
-          elseif self.p.x+value<self:min_cam_x_move() then
+        elseif self.p.x<min_cam_x_move then
+          if self.p.x+value>min_cam_x_move then
+            self.cam.x= self.p.x+value-min_cam_x_move
+            self.p.x= min_cam_x_move
+          elseif self.p.x+value==min_cam_x_move then
+            self.p.x= min_cam_x_move
+          elseif self.p.x+value<min_cam_x_move then
             self.p.x= self.p.x+value
           end
         end
-
         if self.cam.x<0 then
           self.p.x= self.p.x+self.cam.x
           self.cam.x= 0
         end
-        
       elseif prop=='y' then
-        self.p.y= self.p.y+value
+        self.cam.y= self.cam.y+value
       end
       return
     end
@@ -90,8 +94,10 @@ end
 
 function Object:setPosition(prop, new_value)
   if self.name=='player' then
+
     if prop=='x' then
-      local min_cam_x_move= self:min_cam_x_move()
+
+      local min_cam_x_move= self:min_cam_move('x')
       if new_value+self.cam.x>=min_cam_x_move then
         self.p.x= min_cam_x_move
         CameraManager:setPosition('x', new_value-min_cam_x_move+self.cam.x)
@@ -99,8 +105,11 @@ function Object:setPosition(prop, new_value)
         self.p.x= new_value+self.cam.x
         CameraManager:setPosition('x', 0)
       end
-      return
+
+    elseif prop=='y' then
+      CameraManager:setPosition('y', new_value-self.p.y+self.cam.y)
     end
+    return
   end
 
   self.p[prop]= new_value
@@ -130,23 +139,15 @@ function Object:draw()
   if self.extraDraw then self:extraDraw() end
   local current_position= self:realPosition()
   if self.tileset then
-    if self.name=='player' then
-      love.graphics.draw(
-        self.tileset.img,
-        self.tileset.tiles[self.animate:getFrame()],
-        self.p.x, self.p.y, 0,
-        self.scale_factor.x*self.right_edge_image, self.scale_factor.y,
-        (self.tileset.tileSize.w/2), (self.tileset.tileSize.h/2)
-      )
-    else
-      love.graphics.draw(
-        self.tileset.img,
-        self.tileset.tiles[self.animate:getFrame()],
-        current_position.x, current_position.y, 0,
-        self.scale_factor.x*self.right_edge_image, self.scale_factor.y,
-        (self.tileset.tileSize.w/2), (self.tileset.tileSize.h/2)
-      )
-    end
+    
+    love.graphics.draw(
+      self.tileset.img,
+      self.tileset.tiles[self.animate:getFrame()],
+      current_position.x, current_position.y, 0,
+      self.scale_factor.x*self.right_edge_image, self.scale_factor.y,
+      (self.tileset.tileSize.w/2), (self.tileset.tileSize.h/2)
+    )
+    
   elseif self.img then
     love.graphics.draw(
       self.img,

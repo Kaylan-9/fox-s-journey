@@ -5,6 +5,6 @@ local CameraManager= {
 }
 
 function CameraManager:getPosition() return self.p end
-function CameraManager:setPosition(prop, new_value) self.p[prop]= new_value end
+function CameraManager:setPosition(prop, new_value) self.p[prop]= mathK:around(new_value) end
 
 return CameraManager

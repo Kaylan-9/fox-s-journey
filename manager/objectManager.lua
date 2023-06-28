@@ -43,16 +43,11 @@ end
 
 function ObjectManager:load()
   self:addObjectBackground(Background())
-  self:addObject(Block(0, self:getList('objects'), {x=500, y=550}, {x=0.5, y=0.1}, CameraManager:getPosition()))
-  self:addObject(Block(1, self:getList('objects'), {x=564, y=550}, {x=0.5, y=0.1}, CameraManager:getPosition()))
-  self:addObject(Block(2, self:getList('objects'), {x=628, y=550}, {x=0.5, y=0.1}, CameraManager:getPosition()))
-  self:addObject(Block(3, self:getList('objects'), {x=692, y=525}, {x=0.5, y=0.4}, CameraManager:getPosition()))
-  self:addObject(Block(4, self:getList('objects'), {x=756, y=550}, {x=0.5, y=0.6}, CameraManager:getPosition()))
-  -- self:addObject(Block(5, self:getList('objects'), {x=810, y=525}, {x=0.5, y=0.1}, CameraManager:getPosition()))
-  -- self:addObject(Block(6, self:getList('objects'), {x=874, y=500}, {x=0.5, y=0.3}, CameraManager:getPosition()))
-  -- self:addObject(Block(7, self:getList('objects'), {x=938, y=475}, {x=0.5, y=0.1}, CameraManager:getPosition()))
-  -- self:addObject(Block(8, self:getList('objects'), {x=1002, y=425}, {x=0.5, y=0.1}, CameraManager:getPosition()))
-  -- self:addObject(Block(9, self:getList('objects'), {x=1066, y=375}, {x=0.5, y=0.1}, CameraManager:getPosition()))
+  self:addObject(Block(0, self:getList('objects'), {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(1, self:getList('objects'), {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(2, self:getList('objects'), {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(3, self:getList('objects'), {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(4, self:getList('objects'), {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Player(self:getList('objects')))
 end
 

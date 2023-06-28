@@ -30,7 +30,7 @@ local metatable= {
         objects= objects
       },
       {
-        walking_speed= {min= 1, max= 8},
+        walking_speed= {min= 8, max= 18},
       }
     )
     setmetatable(player, {__index= self})

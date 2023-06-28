@@ -35,8 +35,10 @@ function Trajectory:resetCurrentMovement() self.current_movement= { x= 0, y= 0 }
 
 function Trajectory:update(current_position)
   local current_movement_x= self:getCurrentMovement('x')
-  if current_movement_x~=0 then self:addPreviousPosition(current_position) end
+  local current_movement_y= self:getCurrentMovement('y')
+  if current_movement_x~=0 or current_movement_y~=0 then self:addPreviousPosition(current_position) end
   self:setNextPosition('x')
+  self:setNextPosition('y')
 end
 
 function Trajectory:draw()
