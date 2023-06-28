@@ -6,12 +6,16 @@ local metatable= {
   __call= function(self, name, objects, initial_position, p_reference, move_every)
     name= 'block'..((type(name)=='number' or type(name)=='string') and name or '')
     local block= Object(
-      name,
       {
+        name= name,
         right_edge_image= 1,
         scale_factor= {x= 2, y= 2},
-        initial_position= initial_position
       },
+      {
+        w= 64,
+        h= 64
+      },
+      initial_position, p_reference, move_every,
       {
         static_frame= 41,
         tileset= tilesManager:get('map'),
@@ -19,18 +23,12 @@ local metatable= {
       {
         energy_preservation= 0,
         mass= 10.5,
-        body= {
-          w= 64,
-          h= 64
-        },
         fixed= true,
         objects= objects,
       },
       {
         walking_speed= {min= 5, max= 15},
-      },
-      p_reference,
-      move_every
+      }
     )
     setmetatable(block, {__index= self})
     return block

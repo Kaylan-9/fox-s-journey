@@ -1,16 +1,16 @@
 local Physics= {}
 local metatable= {
-  __call=function(self, customizable)
+  __call=function(self, new_physics, main_object)
     local physics= {}
-    physics.fixed= customizable.fixed
-    physics.main_object= customizable.main_object
-    physics.objects= customizable.objects
-    physics.mass= customizable.mass
-    physics.energy_preservation= customizable.energy_preservation
+    physics.fixed= new_physics.fixed
+    physics.objects= new_physics.objects
+    physics.mass= new_physics.mass
+    physics.energy_preservation= new_physics.energy_preservation
     physics.force_acc= {
       y= 0,
       x= 0
     }
+    physics.main_object= main_object
     setmetatable(physics, {__index= self})
     return physics
   end
@@ -20,9 +20,9 @@ setmetatable(Physics, metatable)
 function Physics:update()
   self:collisions()
   if self.main_object.trajectory.modified_position.x==false then
-    self.main_object.p.x= self.main_object.p.x+self.main_object.trajectory:getCurrentMovement('x')
+    self.main_object:move('x', self.main_object.trajectory:getCurrentMovement('x'))
   end
-  
+
   self.main_object.trajectory:resetModifiedPosition()
   self.main_object.trajectory:resetCurrentMovement()
   self.main_object.trajectory:resetNextPosition()
@@ -75,13 +75,13 @@ function Physics:collision(object)
       self.main_object:getSide('right')<=object:getSide('left')+16 and
       self.main_object:getSide('right', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})>=object:getSide('left')
     ) then
-      self.main_object.p.x= (object:getSide('left')-(self.main_object.body.w/2))-1
+      self.main_object:setPosition('x', (object:getSide('left')-(self.main_object.body.w/2))-1)
       self.main_object.trajectory:setModifiedPosition('x')
     elseif (
       self.main_object:getSide('left')>=object:getSide('right')-16 and
       self.main_object:getSide('left', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})<=object:getSide('right')
     ) then
-      self.main_object.p.x= object:getSide('right')+(self.main_object.body.w/2)+1
+      self.main_object:setPosition('x', (object:getSide('right')+(self.main_object.body.w/2)+1))
       self.main_object.trajectory:setModifiedPosition('x')
     end
   end
@@ -141,8 +141,8 @@ function Physics:impact_force(object)
 end
 
 function Physics:applicationOfForce()
-  self.main_object.p.x= self.main_object.p.x+self.force_acc.x
-  self.main_object.p.y= self.main_object.p.y+self.force_acc.y
+  self.main_object:move('x', self.force_acc.x)
+  self.main_object:move('y', self.force_acc.y)
   self:energyLoss()
 end
 

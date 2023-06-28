@@ -1,12 +1,12 @@
 local Trajectory= {}
 local metatable= {
-  __call= function(self, new_trajectory)
+  __call= function(self, new_trajectory, main_object)
     local trajectory= {}
-    trajectory.p= new_trajectory.p
     trajectory.walking_speed= new_trajectory.walking_speed
     trajectory.current_walking_speed= new_trajectory.walking_speed.min
     trajectory.previous_positions= {}
     trajectory.max_n_positions= 49
+    trajectory.main_object= main_object
     setmetatable(trajectory, {__index= self})
     trajectory:resetModifiedPosition()
     trajectory:resetCurrentMovement()
@@ -18,7 +18,11 @@ local metatable= {
 setmetatable(Trajectory, metatable)
 
 function Trajectory:getNextPosition(prop) return (prop and self.next_position[prop] or self.next_position) end
-function Trajectory:setNextPosition(prop) self.next_position[prop]= self.p[prop]+self.current_movement[prop] end
+function Trajectory:setNextPosition(prop)
+  if self.main_object.name=='player' then
+    self.next_position[prop]= self.main_object.p[prop]-self.main_object.cam[prop]+self.current_movement[prop]
+  end
+end
 function Trajectory:resetNextPosition() self.next_position= { x= 0, y= 0 } end
 
 function Trajectory:getModifiedPosition(prop) return (prop and self.modified_position[prop] or self.modified_position) end

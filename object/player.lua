@@ -7,28 +7,30 @@ local metatable= {
   __index= Object,
   __call= function(self, objects)
     local player= Object(
-      'player',
       {
+        name= 'player',
         right_edge_image= 1,
         scale_factor= {x= 2, y= 2},
-        initial_position= CameraManager:getPosition(),
       },
       {
-        tileset= tilesManager:get('player'),
+        w= 32,
+        h= 55
+      },
+      CameraManager:getPosition(),
+      nil,
+      nil,
+      {
         static_frame= 1,
+        tileset= tilesManager:get('player')
       },
       {
-        fixed= false,
-        objects= objects,
         energy_preservation= 0.44,
         mass= 3.5,
-        body= {
-          w= 32,
-          h= 55
-        }
+        fixed= false,
+        objects= objects
       },
       {
-        walking_speed= {min= 5, max= 8},
+        walking_speed= {min= 1, max= 8},
       }
     )
     setmetatable(player, {__index= self})
@@ -95,7 +97,7 @@ end
 
 function Player:extraDraw()
   love.graphics.print('Player')
-  love.graphics.print('( x '..self.p.x..', y '..self.p.y..' )', 0, 15)
+  love.graphics.print('( x '..self.p.x..', x cam '..self.cam.x..', y '..self.p.y..' )', 0, 15)
   love.graphics.print('( force y '..self.physics.force_acc.y..')', 0, 30)
 end
 

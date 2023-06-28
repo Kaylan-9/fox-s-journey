@@ -1,11 +1,10 @@
 local CameraManager= {
-    p= {
-        x= 900, y= 0
-    }
+  p= {
+    x= 0, y= 0
+  }
 }
 
-function CameraManager:getPosition()
-    return self.p
-end
+function CameraManager:getPosition() return self.p end
+function CameraManager:setPosition(prop, new_value) self.p[prop]= new_value end
 
 return CameraManager

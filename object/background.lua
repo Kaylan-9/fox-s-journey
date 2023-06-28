@@ -5,15 +5,18 @@ local metatable= {
   __index= Object,
   __call= function(self)
     local background= Object(
-      'background',
       {
+        name= 'background',
         right_edge_image= 1,
         scale_factor= {x= 7, y= 7},
-        initial_position= {
-          x= love.graphics.getWidth()/2,
-          y= love.graphics.getHeight()/2,
-        }
       },
+      nil,
+      {
+        x= love.graphics.getWidth()/2,
+        y= love.graphics.getHeight()/2
+      },
+      nil,
+      nil,
       love.graphics.newImage('assets/graphics/background.png')
     )
     setmetatable(background, {__index= self})
