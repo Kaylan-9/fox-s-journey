@@ -42,7 +42,9 @@ function ObjectManager:executeObjectFunction(name_function)
 end
 
 function ObjectManager:load()
-  self:addObjectBackground(Background())
+  self:addObjectBackground(Background('cloud', {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObjectBackground(Background('mount', {x=0.5, y=0.35}, CameraManager:getPosition()))
+  self:addObjectBackground(Background('far_woods', {x=0.5, y=0.35}, CameraManager:getPosition()))
   self:addObject(Block(0, self:getList('objects'), {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Block(1, self:getList('objects'), {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Block(2, self:getList('objects'), {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
