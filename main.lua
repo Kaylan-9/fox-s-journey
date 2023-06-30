@@ -3,7 +3,8 @@ _G.screen= {
   h= love.graphics.getHeight(),
 }
 _G.tbl= require('useful.tbl')
-_G.mathK= require('mathK')
+_G.timer= require('useful.timer')
+_G.mathK= require('useful.mathK')
 _G.dt= 0
 
 local ScreenManager= require('manager.screenManager')

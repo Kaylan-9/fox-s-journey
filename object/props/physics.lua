@@ -5,6 +5,7 @@ local metatable= {
     physics.fixed= new_physics.fixed
     physics.objects= new_physics.objects
     physics.mass= new_physics.mass
+    physics.drop_force_application_timer= timer:new(0.05, true)
     physics.energy_preservation= new_physics.energy_preservation
     physics.force_acc= {
       y= 0,
@@ -95,7 +96,9 @@ function Physics:collision(object)
       self.main_object:getSide('bottom')<=object:getSide('top') and
       self.main_object:getSide('bottom', {y= self.main_object.trajectory:getCurrentMovement('y')+self.main_object.p.y})>=object:getSide('top')
     ) then
-      self.force_acc.y= mathK:around((self.force_acc.y~=0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
+      self.drop_force_application_timer:start(self, function ()
+        self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
+      end)
       self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2)-1)
       self.main_object.trajectory:setModifiedPosition('y')
     elseif (
@@ -147,6 +150,7 @@ function Physics:impact_force(object)
 end
 
 function Physics:applicationOfForce()
+  self.drop_force_application_timer:finish()
   self.main_object:move('x', self.force_acc.x)
   self.main_object:move('y', self.force_acc.y)
   self:energyLoss()
