@@ -50,6 +50,9 @@ function ObjectManager:load()
   self:addObject(Block(2, self:getList('objects'), {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Block(3, self:getList('objects'), {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Block(4, self:getList('objects'), {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+
+  self:addObject(Block(3, self:getList('objects'), {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+
   self:addObject(Player(self:getList('objects')))
 end
 

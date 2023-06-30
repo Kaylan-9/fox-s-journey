@@ -118,8 +118,8 @@ end
 
 function Object:realPosition()
   return {
-    x= self.p.x-mathK:around(self.p_reference.x*self.move_every.x),
-    y= self.p.y-mathK:around(self.p_reference.y*self.move_every.y)
+    x= math.ceil(self.p.x-self.p_reference.x*self.move_every.x),
+    y= math.ceil(self.p.y-self.p_reference.y*self.move_every.y)
   }
 end
 
