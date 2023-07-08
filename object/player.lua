@@ -1,11 +1,13 @@
 local KeyboardMouseManager= require('manager.keyboardMouseManager')
 local CameraManager= require('manager.cameraManager')
 local tilesManager= require('manager.tilesManager')
+local LongDistanceAttack= require('object.props.lda.long_distance_attack')
+
 local Object= require('object.object')
 local Player= {}
 local metatable= {
   __index= Object,
-  __call= function(self, objects)
+  __call= function(self, objects, objectManager)
     local player= Object(
       {
         name= 'player',
@@ -33,6 +35,7 @@ local metatable= {
         walking_speed= {min= 8, max= 18},
       }
     )
+    player.objectManager= objectManager
     setmetatable(player, {__index= self})
     player:loadAnimationSettings()
     return player
@@ -51,6 +54,15 @@ function Player:controlling()
   self:running()
   self:walking()
   self:jumping()
+  self:attacking()
+end
+
+function Player:attacking()
+  if KeyboardMouseManager:getKeyUsed('fireball') then self:releaseFireball() end
+end
+
+function Player:releaseFireball()
+  self.objectManager:addObject(LongDistanceAttack('fireball', nil, self))
 end
 
 function Player:update()

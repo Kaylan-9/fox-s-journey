@@ -12,6 +12,7 @@ function keyboardMouseManager:updateKeysUsed()
     self:markKeyUsed('jump', {'w', 'up'})
     self:markKeyUsed('run', {'space'}, self:getKeyUsed('right') or self:getKeyUsed('left'))
     self:markKeyUsed('move', {},  self:getKeyUsed('jump') or self:getKeyUsed('right') or self:getKeyUsed('left'))
+    self:markKeyUsed('fireball', {'x'})
 end
 
 function keyboardMouseManager:update()

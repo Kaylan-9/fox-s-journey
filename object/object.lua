@@ -124,7 +124,7 @@ function Object:realPosition()
 end
 
 function Object:updateObjectBehavior(active_animation)
-  self.animate:update(active_animation)
+  if active_animation then self.animate:update(active_animation) end
   if self.trajectory then self.trajectory:update(self:realPosition()) end
   if self.physics then self.physics:update(self:realPosition()) end
 end

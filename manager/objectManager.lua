@@ -53,7 +53,7 @@ function ObjectManager:load()
 
   self:addObject(Block(3, self:getList('objects'), {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
 
-  self:addObject(Player(self:getList('objects')))
+  self:addObject(Player(self:getList('objects'), self))
 end
 
 function ObjectManager:update()
