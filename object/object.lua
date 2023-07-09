@@ -6,9 +6,10 @@ local CameraManager= require('manager.cameraManager')
 local Object= {}
 local metatable= {
   -- p_reference -> referência de posição
-  __call=function(self, new_object, body, initial_position, p_reference, move_every, animate, physics, trajectory)
+  __call=function(self, objectManager, new_object, body, initial_position, p_reference, move_every, animate, physics, trajectory)
     local object= {}
 
+    object.objectManager= objectManager
     object.name= new_object.name
     object.right_edge_image= new_object.right_edge_image -- se é 1 a imagem aponta para a direita, caso se -1 para a esquerda
     object.scale_factor= new_object.scale_factor -- right_edge_image é usado para posicionar corretamente o scale_factor, ou seja ele é usado no draw
@@ -38,10 +39,38 @@ local metatable= {
 
     if physics then object.physics= Physics(physics, object) end
     setmetatable(object, {__index=self})
+    object.id= object:newId()
     return object
   end
 }
 setmetatable(Object, metatable)
+
+function Object:generateId()
+  local new_id= ''
+  local chars= {'a', 'b', 'c', 'd', 'e', 'f'}
+  for i=1, 9 do
+    local char= math.random(0, 9+#chars)
+    if char>9 then
+      char= chars[char-9]
+    end 
+    new_id= new_id..char
+  end
+  return new_id
+end
+
+function Object:newId()
+  local new_id= self:generateId()
+  -- local its_new= true
+  -- while its_new do
+  --   for _, object in pairs(self.objectManager.objects) do
+  --     if object.id==new_id then
+  --       its_new= false
+  --       break
+  --     end
+  --   end
+  -- end
+  return new_id
+end
 
 function Object:getSide(name_side, position)
   local current_position= position and position or self:realPosition()

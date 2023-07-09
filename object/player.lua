@@ -9,6 +9,7 @@ local metatable= {
   __index= Object,
   __call= function(self, objects, objectManager)
     local player= Object(
+      objectManager,
       {
         name= 'player',
         right_edge_image= 1,
@@ -35,7 +36,7 @@ local metatable= {
         walking_speed= {min= 8, max= 18},
       }
     )
-    player.objectManager= objectManager
+    player.ranged_attack_timer= timer:new(0.1, false)
     setmetatable(player, {__index= self})
     player:loadAnimationSettings()
     return player
@@ -62,7 +63,11 @@ function Player:attacking()
 end
 
 function Player:releaseFireball()
-  self.objectManager:addObject(LongDistanceAttack('fireball', nil, self))
+  self.ranged_attack_timer:start()
+  if self.ranged_attack_timer:finish() then
+    self.ranged_attack_timer:reset()
+    self.objectManager:addObject(LongDistanceAttack('fireball', { duration= 1 }, self))
+  end
 end
 
 function Player:update()

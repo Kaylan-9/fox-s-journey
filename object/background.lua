@@ -3,8 +3,9 @@ local Object= require('object.object')
 local Background= {}
 local metatable= {
   __index= Object,
-  __call= function(self, name_img, p_reference, move_every)
+  __call= function(self, name_img, p_reference, move_every, objectManager)
     local background= Object(
+      objectManager,
       {
         name= 'background',
         right_edge_image= 1,

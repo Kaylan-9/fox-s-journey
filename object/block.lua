@@ -3,9 +3,10 @@ local Object= require('object.object')
 local Block= {}
 local metatable= {
   __index= Object,
-  __call= function(self, name, objects, initial_position, p_reference, move_every)
+  __call= function(self, name, objects, objectManager, initial_position, p_reference, move_every)
     name= 'block'..((type(name)=='number' or type(name)=='string') and name or '')
     local block= Object(
+      objectManager,
       {
         name= name,
         right_edge_image= 1,

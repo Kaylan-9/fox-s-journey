@@ -9,8 +9,8 @@ local metatable= {
     if name=='fireball' then long_distance_attack= Fireball(owner)
     end
     long_distance_attack.owner= owner
-    if new_lda then
-      long_distance_attack.duration= new_lda.duration
+    long_distance_attack.timer= timer:new(new_lda.duration, false)
+    if new_lda.effects_for_enemies then
       long_distance_attack.effects_for_enemies= new_lda.effects_for_enemies
     end
     setmetatable(long_distance_attack, {__index= self})
@@ -24,6 +24,10 @@ function LongDistanceAttack:update()
   local direction= self.scale_factor.x/self.scale_factor.x
   self.trajectory:setCurrentMovement('x', direction*self.trajectory.walking_speed.min*dt*100)
   self:updateObjectBehavior()
+  self.timer:start()
+  if self.timer:finish() then
+    self.objectManager:removeObject(self.id)
+  end
 end
 
 return LongDistanceAttack

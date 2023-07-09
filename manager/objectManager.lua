@@ -11,6 +11,22 @@ local ObjectManager= {
 function ObjectManager:addObject(object)
   table.insert(self.objects, object)
 end
+function ObjectManager:removeObject(id)
+  local index_of= self:indexOfObject(id)
+  if type(index_of)=='number' then
+    table.remove(self.objects, index_of)
+  end
+end
+function ObjectManager:indexOfObject(id)
+  local index= nil
+  for i, object in pairs(self.objects) do
+    if object.id==id then
+      index= i
+      break
+    end
+  end
+  return index
+end
 
 -- captura o primeiro objeto que possui o nome buscado
 function ObjectManager:get(name)
@@ -42,17 +58,15 @@ function ObjectManager:executeObjectFunction(name_function)
 end
 
 function ObjectManager:load()
-  self:addObjectBackground(Background('cloud', {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObjectBackground(Background('mount', {x=0.5, y=0.35}, CameraManager:getPosition()))
-  self:addObjectBackground(Background('far_woods', {x=0.5, y=0.35}, CameraManager:getPosition()))
-  self:addObject(Block(0, self:getList('objects'), {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(1, self:getList('objects'), {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(2, self:getList('objects'), {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(3, self:getList('objects'), {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(4, self:getList('objects'), {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-
-  self:addObject(Block(3, self:getList('objects'), {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-
+  self:addObjectBackground(Background('cloud', {x=0.5, y=0.25}, CameraManager:getPosition(), self))
+  self:addObjectBackground(Background('mount', {x=0.5, y=0.35}, CameraManager:getPosition(), self))
+  self:addObjectBackground(Background('far_woods', {x=0.5, y=0.35}, CameraManager:getPosition(), self))
+  self:addObject(Block(0, self:getList('objects'), self, {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(1, self:getList('objects'), self, {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(2, self:getList('objects'), self, {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(3, self:getList('objects'), self, {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(4, self:getList('objects'), self, {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(3, self:getList('objects'), self, {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Player(self:getList('objects'), self))
 end
 
