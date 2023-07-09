@@ -78,40 +78,49 @@ end
 -- tipo de colisão 1
 function Physics:collision(object)
   if self:inside_the_area_of_y(object) and self.main_object.trajectory.modified_position.x==false then
-    if (
-      self.main_object:getSide('right')<=object:getSide('left') and
-      self.main_object:getSide('right', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})>=object:getSide('left')
-    ) then
-      self.main_object:setPosition('x', (object:getSide('left')-(self.main_object.body.w/2))-1)
-      self.main_object.trajectory:setModifiedPosition('x')
-    elseif (
-      self.main_object:getSide('left')>=object:getSide('right') and
-      self.main_object:getSide('left', {x= self.main_object.trajectory:getCurrentMovement('x')+self.main_object.p.x})<=object:getSide('right')
-    ) then
-      self.main_object:setPosition('x', (object:getSide('right')+(self.main_object.body.w/2)+1))
-      self.main_object.trajectory:setModifiedPosition('x')
+
+    local readjustmentToSimulateCollisionInX=function(next_actual_position)
+      if (
+        self.main_object:getSide('right')<=object:getSide('left') and
+        self.main_object:getSide('right', {x= next_actual_position})>=object:getSide('left')
+      ) then
+        self.main_object:setPosition('x', (object:getSide('left')-(self.main_object.body.w/2))-1)
+        self.main_object.trajectory:setModifiedPosition('x')
+      elseif (
+        self.main_object:getSide('left')>=object:getSide('right') and
+        self.main_object:getSide('left', {x= next_actual_position})<=object:getSide('right')
+      ) then
+        self.main_object:setPosition('x', (object:getSide('right')+(self.main_object.body.w/2)+1))
+        self.main_object.trajectory:setModifiedPosition('x')
+      end
     end
+
+    readjustmentToSimulateCollisionInX(self.main_object.trajectory:getCurrentMovement('x')+self.main_object:realPosition().x)
   end
 
   if self:inside_the_area_of_x(object) and self.main_object.trajectory.modified_position.y==false then
-    if (
-      self.main_object:getSide('bottom')<=object:getSide('top') and
-      self.main_object:getSide('bottom', {y= self.main_object.trajectory:getCurrentMovement('y')+self.main_object.p.y})>=object:getSide('top')
-    ) then
 
-      self.drop_force_application_timer:start(self, function ()
-        self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
-      end)
-      self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2))
-      self.main_object.trajectory:setModifiedPosition('y')
-    elseif (
-      (self.main_object:getSide('top')>=object:getSide('bottom') and
-      self.main_object:getSide('top', {y= self.main_object.trajectory:getCurrentMovement('y')+self.main_object.p.y})<=object:getSide('bottom'))
-    ) then
-      self.force_acc.y= 0
-      self.main_object:setPosition('y', object:getSide('bottom')+(self.main_object.body.h/2))
-      self.main_object.trajectory:setModifiedPosition('y')
+    local readjustmentToSimulateCollisionInY=function(next_actual_position)
+      if (
+        self.main_object:getSide('bottom')<=object:getSide('top') and
+        self.main_object:getSide('bottom', {y= next_actual_position})>=object:getSide('top')
+      ) then
+        self.drop_force_application_timer:start(self, function ()
+          self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
+        end)
+        self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2))
+        self.main_object.trajectory:setModifiedPosition('y')
+      elseif (
+        (self.main_object:getSide('top')>=object:getSide('bottom') and
+        self.main_object:getSide('top', {y= next_actual_position})<=object:getSide('bottom'))
+      ) then
+        self.force_acc.y= 0
+        self.main_object:setPosition('y', object:getSide('bottom')+(self.main_object.body.h/2))
+        self.main_object.trajectory:setModifiedPosition('y')
+      end
     end
+
+    readjustmentToSimulateCollisionInY(self.main_object.trajectory:getCurrentMovement('y')+self.main_object:realPosition().y)
   end
 end
 

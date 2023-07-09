@@ -48,6 +48,18 @@ function ObjectManager:getList(name_list)
   local objects= {}
   if name_list=='objects' then objects= self.objects
   elseif name_list=='background_objects' then objects= self.objects
+  elseif name_list=='no_player' then
+    for _, object in pairs(self.objects) do
+      if object.name~='player' then
+        table.insert(objects, object)
+      end
+    end
+  elseif name_list=='no_fireball' then
+    for _, object in pairs(self.objects) do
+      if object.name~='fireball' then
+        table.insert(objects, object)
+      end
+    end
   end
   return objects
 end
@@ -58,16 +70,16 @@ function ObjectManager:executeObjectFunction(name_function)
 end
 
 function ObjectManager:load()
-  self:addObjectBackground(Background('cloud', {x=0.5, y=0.25}, CameraManager:getPosition(), self))
-  self:addObjectBackground(Background('mount', {x=0.5, y=0.35}, CameraManager:getPosition(), self))
-  self:addObjectBackground(Background('far_woods', {x=0.5, y=0.35}, CameraManager:getPosition(), self))
-  self:addObject(Block(0, self:getList('objects'), self, {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(1, self:getList('objects'), self, {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(2, self:getList('objects'), self, {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(3, self:getList('objects'), self, {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(4, self:getList('objects'), self, {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(3, self:getList('objects'), self, {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Player(self:getList('objects'), self))
+  self:addObjectBackground(Background(self, 'cloud', {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObjectBackground(Background(self, 'mount', {x=0.5, y=0.35}, CameraManager:getPosition()))
+  self:addObjectBackground(Background(self, 'far_woods', {x=0.5, y=0.35}, CameraManager:getPosition()))
+  self:addObject(Block(self, {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(self, {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(self, {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(self, {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(self, {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Block(self, {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(Player(self))
 end
 
 function ObjectManager:update()

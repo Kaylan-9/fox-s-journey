@@ -8,8 +8,8 @@ local metatable= {
     }
     local initial_position= {
       x= (owner.scale_factor.x==math.abs(owner.scale_factor.x) and
-        (body.w/2)+owner.p.x+(owner.body.w/2) or
-        (body.w/2)-owner.p.x-(owner.body.w/2)
+        (body.w/2)+owner.p.x+(owner.body.w/2)+1 or
+        (body.w/2)-owner.p.x-(owner.body.w/2)-1
       ),
       y= (owner.p.y)
     }
@@ -23,8 +23,8 @@ local metatable= {
         name= 'fireball',
         right_edge_image= 1,
         scale_factor= {
-          x= (owner.scale_factor.x/owner.scale_factor.x)*2,
-          y= 2
+          x= (owner.scale_factor.x/owner.scale_factor.x)*3,
+          y= 3
         },
       },
       body,
@@ -36,10 +36,10 @@ local metatable= {
         energy_preservation= 0.44,
         mass= 3.5,
         fixed= false,
-        objects= owner.physics.objects
+        objects= owner.objectManager:getList('no_player')
       },
       {
-        walking_speed= {min= 5, max= 10},
+        walking_speed= {min= 1, max= 2},
       }
     )
     setmetatable(fireball, {__index= self})

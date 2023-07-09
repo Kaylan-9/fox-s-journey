@@ -3,12 +3,11 @@ local Object= require('object.object')
 local Block= {}
 local metatable= {
   __index= Object,
-  __call= function(self, name, objects, objectManager, initial_position, p_reference, move_every)
-    name= 'block'..((type(name)=='number' or type(name)=='string') and name or '')
+  __call= function(self, objectManager, initial_position, p_reference, move_every)
     local block= Object(
       objectManager,
       {
-        name= name,
+        name= 'block',
         right_edge_image= 1,
         scale_factor= {x= 2, y= 2},
       },
@@ -25,7 +24,7 @@ local metatable= {
         energy_preservation= 0,
         mass= 10.5,
         fixed= true,
-        objects= objects,
+        objects= objectManager:getList('objects'),
       },
       {
         walking_speed= {min= 5, max= 15},

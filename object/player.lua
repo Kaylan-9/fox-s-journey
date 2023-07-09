@@ -7,7 +7,7 @@ local Object= require('object.object')
 local Player= {}
 local metatable= {
   __index= Object,
-  __call= function(self, objects, objectManager)
+  __call= function(self, objectManager)
     local player= Object(
       objectManager,
       {
@@ -30,7 +30,7 @@ local metatable= {
         energy_preservation= 0.44,
         mass= 3.5,
         fixed= false,
-        objects= objects
+        objects= objectManager:getList('no_fireball')
       },
       {
         walking_speed= {min= 8, max= 18},

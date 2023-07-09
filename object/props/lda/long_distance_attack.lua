@@ -28,6 +28,10 @@ function LongDistanceAttack:update()
   if self.timer:finish() then
     self.objectManager:removeObject(self.id)
   end
+
+  -- if self.physics.force_acc.y>-6 then
+  --   self.physics.force_acc.y= self.physics.force_acc.y-1
+  -- end
 end
 
 return LongDistanceAttack
