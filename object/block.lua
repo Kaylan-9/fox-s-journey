@@ -3,9 +3,10 @@ local Object= require('object.object')
 local Block= {}
 local metatable= {
   __index= Object,
-  __call= function(self, objectManager, initial_position, p_reference, move_every)
+  __call= function(self, new_blk)
+    -- new_blk contém: objectManager, initial_position, p_reference, move_every
     local block= Object(
-      objectManager,
+      new_blk.objectManager,
       {
         name= 'block',
         right_edge_image= 1,
@@ -15,7 +16,7 @@ local metatable= {
         w= 64,
         h= 64
       },
-      initial_position, p_reference, move_every,
+      new_blk.initial_position, new_blk.p_reference, new_blk.move_every,
       {
         static_frame= 41,
         tileset= tilesManager:get('map'),
@@ -24,7 +25,7 @@ local metatable= {
         energy_preservation= 0,
         mass= 10.5,
         fixed= true,
-        objects= objectManager:getList({}),
+        objects= new_blk.objectManager:getList({}),
       },
       {
         walking_speed= {min= 5, max= 15},

@@ -1,9 +1,4 @@
 local Player= require('object.player')
-local Background= require('object.background')
-local Block= require('object.block')
-local EnemyBat= require('object.enemys.bat')
-
-local CameraManager= require('manager.cameraManager')
 local ObjectManager= {
   objects= {},
   background_objects= {}
@@ -68,16 +63,6 @@ function ObjectManager:executeObjectFunction(name_function)
 end
 
 function ObjectManager:load()
-  self:addObjectBackground(Background(self, 'cloud', {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObjectBackground(Background(self, 'mount', {x=0.5, y=0.35}, CameraManager:getPosition()))
-  self:addObjectBackground(Background(self, 'far_woods', {x=0.5, y=0.35}, CameraManager:getPosition()))
-  self:addObject(Block(self, {x=500, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(self, {x=564, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(self, {x=628, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(self, {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(self, {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(Block(self, {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
-  self:addObject(EnemyBat(self, {x=600, y=400}, CameraManager:getPosition()))
   self:addObject(Player(self))
 end
 

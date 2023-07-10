@@ -1,5 +1,5 @@
 local tilesManager= require('manager.tilesManager')
-local Enemy= require('object.enemys.enemy')
+local Enemy= require('object.enemy.enemy')
 local Object= require('object.object')
 local EnemyBat= {}
 local metatable= {

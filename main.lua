@@ -1,3 +1,8 @@
+local Game= {
+  game_stage_n= 0,
+  current_screen= 'options'
+}
+
 _G.screen= {
   w= love.graphics.getWidth(),
   h= love.graphics.getHeight(),
@@ -11,12 +16,15 @@ local ScreenManager= require('manager.screenManager')
 local ObjectManager= require('manager.objectManager')
 local TilesManager= require('manager.tilesManager')
 local KeyboardMouseManager = require("manager.keyboardMouseManager")
+local Map= require('map.map')
+local map= Map()
 
 function love.load()
   love.graphics.setLineWidth(0.5)
   love.graphics.setDefaultFilter('nearest', 'nearest')
   TilesManager:load()
   ScreenManager:load()
+  map:load()
   ObjectManager:load()
 end
 
