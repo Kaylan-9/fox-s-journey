@@ -15,7 +15,7 @@ local metatable= {
     }
     if owner.name=='player' then
       initial_position.x= initial_position.x+(owner.cam.x*0.5)
-      initial_position.y= initial_position.y+(owner.cam.y*0.5)
+      initial_position.y= initial_position.y+(owner.cam.y*0.25)
     end
     local fireball= Object(
       owner.objectManager,
@@ -30,7 +30,7 @@ local metatable= {
       body,
       initial_position,
       CameraManager:getPosition(),
-      {x= 0.5, y= 0.5},
+      {x= 0.5, y= 0.25},
       love.graphics.newImage('assets/graphics/fireball.png'),
       {
         energy_preservation= 0.44,
@@ -39,7 +39,7 @@ local metatable= {
         objects= owner.objectManager:getList('no_player')
       },
       {
-        walking_speed= {min= 1, max= 2},
+        walking_speed= {min= 5, max= 7},
       }
     )
     setmetatable(fireball, {__index= self})

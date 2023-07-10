@@ -107,6 +107,7 @@ function Physics:collision(object)
       ) then
         self.drop_force_application_timer:start(self, function ()
           self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
+          self.main_object.can_jump= true
         end)
         self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2))
         self.main_object.trajectory:setModifiedPosition('y')
@@ -117,6 +118,7 @@ function Physics:collision(object)
         self.force_acc.y= 0
         self.main_object:setPosition('y', object:getSide('bottom')+(self.main_object.body.h/2))
         self.main_object.trajectory:setModifiedPosition('y')
+        self.main_object.can_jump= true
       end
     end
 

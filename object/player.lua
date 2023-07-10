@@ -66,7 +66,7 @@ function Player:releaseFireball()
   self.ranged_attack_timer:start()
   if self.ranged_attack_timer:finish() then
     self.ranged_attack_timer:reset()
-    self.objectManager:addObject(LongDistanceAttack('fireball', { duration= 1 }, self))
+    self.objectManager:addObject(LongDistanceAttack('fireball', { duration= 5 }, self))
   end
 end
 
@@ -106,8 +106,9 @@ end
 
 function Player:jumping()
   if KeyboardMouseManager:getKeyUsed('jump') then
-    if self.physics.force_acc.y>-6 then
-      self.physics.force_acc.y= self.physics.force_acc.y-2
+    if self.can_jump then
+      self.physics.force_acc.y= self.physics.force_acc.y-40
+      self.can_jump= false
     end
   end
 end

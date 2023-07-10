@@ -19,6 +19,7 @@ local metatable= {
       object.p.x= 0
       object.p.y= 500
       object.cam= initial_position
+      object.can_jump= true
     else
       object.p= initial_position
     end
@@ -136,12 +137,14 @@ function Object:setPosition(prop, new_value)
       end
 
     elseif prop=='y' then
+
       CameraManager:setPosition('y', new_value-self.p.y+self.cam.y)
+
     end
     return
   end
 
-  self.p[prop]= new_value
+  self.p[prop]= new_value+self.p_reference[prop]*self.move_every[prop]
 end
 
 
