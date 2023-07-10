@@ -1,0 +1,28 @@
+[
+  {
+    "map": {
+      "backgrounds": [
+        {
+          "name_img": "cloud",
+          "move_every": {"x":0.5, "y":0.15}
+        },
+        {
+          "name_img": "mount",
+          "move_every": {"x":0.5, "y":0.35}
+        },
+        {
+          "name_img": "far_woods",
+          "move_every": {"x":0.5, "y":0.25}
+        }
+      ],
+      "objects": [
+        {
+          "type": "block",
+          "initial_position": {"x": 500, "y": 550},
+          "move_every": {"x": 0.5, "y": 0.25},
+          "_repeat": {"x": 15, "y": 0}
+        }
+      ]
+    }
+  }
+]

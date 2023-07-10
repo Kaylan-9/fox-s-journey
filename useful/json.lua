@@ -151,7 +151,7 @@ function json.import(filename)
   local file= io.open(filename)
   local obj= {}
   if file then 
-    local text= file:read("*a") 
+    local text= file:read("*a")
     file:close()
     obj= json.parse(text)
   end

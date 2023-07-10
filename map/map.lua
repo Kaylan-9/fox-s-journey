@@ -15,17 +15,10 @@ local metatable= {
 
 setmetatable(Map, metatable)
 
-function Map:loadObject(type_object, StandardObject, args, initial_position, _repeat)
-  local new_obj
-  if type_object=='background' then
-    new_obj= StandardObject(args)
-    objectManager:addObjectBackground(new_obj)
-    return
-  end
-
+function Map:loadObjects(StandardObject, args, initial_position, _repeat)
   -- adicionando objeto padrão 
   args.initial_position= initial_position
-  new_obj= StandardObject(args)
+  local new_obj= StandardObject(args)
   objectManager:addObject(new_obj)
 
   -- repetindo objeto padrão em relação a "x" e ou "y"
@@ -44,42 +37,37 @@ function Map:loadObject(type_object, StandardObject, args, initial_position, _re
   end
 end
 
-function Map:load()
+function Map:loadBackground(props)
   objectManager:addObjectBackground(
     Background({
       objectManager= objectManager,
-      name_img= 'cloud',
-      move_every= {x=0.5, y=0.25},
-      p_reference= CameraManager:getPosition()
+      p_reference= CameraManager:getPosition(),
+      name_img= props.name_img,
+      move_every= props.move_every
     })
   )
-  objectManager:addObjectBackground(
-    Background({
-      objectManager= objectManager,
-      name_img= 'mount',
-      move_every= {x=0.5, y=0.35},
-      p_reference= CameraManager:getPosition()
-    })
-  )
-  objectManager:addObjectBackground(
-    Background({
-      objectManager= objectManager,
-      name_img= 'far_woods',
-      move_every= {x=0.5, y=0.35},
-      p_reference= CameraManager:getPosition()
-    })
-  )
-  self:loadObject(
-    'object',
-    Block,
-    {
-      objectManager= objectManager,
-      move_every= {x=0.5, y=0.25},
-      p_reference= CameraManager:getPosition()
-    },
-    {x=500, y=550},
-    {x=5, y=0}
-  )
+end
+
+function Map:load(elements)
+  self.elements= elements
+  for n, v in pairs(self.elements) do
+    if n=='backgrounds' then for i=1, #v do self:loadBackground(v[i]) end
+    elseif n=='objects' then 
+      for i=1, #v do       
+        self:loadObjects(
+          (v[i].type=='block' and Block),
+          {
+            objectManager= objectManager,
+            move_every= v[i].move_every,
+            p_reference= CameraManager:getPosition()
+          },
+          v[i].initial_position,
+          v[i]['_repeat']
+        )
+      end
+    end
+  end
+
   objectManager:addObject(EnemyBat(objectManager, {x=600, y=400}, CameraManager:getPosition()))
 end
 
