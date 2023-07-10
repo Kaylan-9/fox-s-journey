@@ -171,7 +171,6 @@ function Object:draw()
   if self.extraDraw then self:extraDraw() end
   local current_position= self:realPosition()
   if self.tileset then
-    
     love.graphics.draw(
       self.tileset.img,
       self.tileset.tiles[self.animate:getFrame()],
@@ -188,7 +187,7 @@ function Object:draw()
       (self.img:getWidth()/2), (self.img:getHeight()/2)
     )
   end
-  if self.body then self:lineCollisionDraw() end
+  -- if self.body then self:lineCollisionDraw() end
 end
 
 function Object:lineCollisionDraw()

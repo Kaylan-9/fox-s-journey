@@ -24,7 +24,7 @@ local metatable= {
         energy_preservation= 0,
         mass= 10.5,
         fixed= true,
-        objects= objectManager:getList('objects'),
+        objects= objectManager:getList({}),
       },
       {
         walking_speed= {min= 5, max= 15},

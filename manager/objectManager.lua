@@ -1,6 +1,7 @@
 local Player= require('object.player')
 local Background= require('object.background')
 local Block= require('object.block')
+local EnemyBat= require('object.enemys.bat')
 
 local CameraManager= require('manager.cameraManager')
 local ObjectManager= {
@@ -44,21 +45,18 @@ function ObjectManager:addObjectBackground(object)
   table.insert(self.background_objects, object)
 end
 
-function ObjectManager:getList(name_list)
+function ObjectManager:getList(not_list)
   local objects= {}
-  if name_list=='objects' then objects= self.objects
-  elseif name_list=='background_objects' then objects= self.objects
-  elseif name_list=='no_player' then
-    for _, object in pairs(self.objects) do
-      if object.name~='player' then
-        table.insert(objects, object)
+  for _, object in pairs(self.objects) do
+    local belongs_to_list= true
+    for i=1, #not_list do
+      if object.name==not_list[i] then
+        belongs_to_list= false
+        break
       end
     end
-  elseif name_list=='no_fireball' then
-    for _, object in pairs(self.objects) do
-      if object.name~='fireball' then
-        table.insert(objects, object)
-      end
+    if belongs_to_list then
+      table.insert(objects, object)
     end
   end
   return objects
@@ -79,6 +77,7 @@ function ObjectManager:load()
   self:addObject(Block(self, {x=692, y=525}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Block(self, {x=756, y=550}, {x=0.5, y=0.25}, CameraManager:getPosition()))
   self:addObject(Block(self, {x=724, y=653}, {x=0.5, y=0.25}, CameraManager:getPosition()))
+  self:addObject(EnemyBat(self, {x=600, y=400}, CameraManager:getPosition()))
   self:addObject(Player(self))
 end
 

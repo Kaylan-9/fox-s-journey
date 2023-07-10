@@ -30,7 +30,7 @@ local metatable= {
         energy_preservation= 0.44,
         mass= 3.5,
         fixed= false,
-        objects= objectManager:getList('no_fireball')
+        objects= objectManager:getList({'fireball'})
       },
       {
         walking_speed= {min= 8, max= 18},

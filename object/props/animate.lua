@@ -17,6 +17,9 @@ setmetatable(Animate, metatable)
 function Animate:update(active_animation)
   if active_animation then
     self.frame=self.frame+(self.frame_change*dt*100)
+    if self:getFrame()>self.animations[self.animation].frame.f then
+      self.frame= self.animations[self.animation].frame.i
+    end
   end
 end
 

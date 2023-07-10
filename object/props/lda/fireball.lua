@@ -3,8 +3,8 @@ local CameraManager= require('manager.cameraManager')
 local metatable= {
   __call= function(self, owner)
     local body= {
-      w= 32,
-      h= 32
+      w= 50,
+      h= 50
     }
     local initial_position= {
       x= (owner.scale_factor.x==math.abs(owner.scale_factor.x) and
@@ -23,8 +23,8 @@ local metatable= {
         name= 'fireball',
         right_edge_image= 1,
         scale_factor= {
-          x= (owner.scale_factor.x/owner.scale_factor.x)*3,
-          y= 3
+          x= (owner.scale_factor.x/owner.scale_factor.x)*5,
+          y= 5
         },
       },
       body,
@@ -36,7 +36,7 @@ local metatable= {
         energy_preservation= 0.44,
         mass= 3.5,
         fixed= false,
-        objects= owner.objectManager:getList('no_player')
+        objects= owner.objectManager:getList({'player'})
       },
       {
         walking_speed= {min= 5, max= 7},
