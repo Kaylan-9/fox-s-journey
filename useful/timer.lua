@@ -1,19 +1,23 @@
 local Timer= {}
 
-function Timer:new(duration, loop, parent, func)
+function Timer:new(timer)
   return {
-    duration= duration,
-    loop= (loop==nil and false or loop),
+    duration= timer.duration,
+    can_repeat= (timer.can_repeat==nil and false or timer.can_repeat),
     t_i= 0,
     t_f= 0,
-    parent= parent,
-    func= func,
-    start= function(self, parent, func)
-      self.parent= parent
-      self.func= func
-      if self.t_i==0 then
-        self.t_i= love.timer.getTime()
+    parent= timer.parent,
+    func= timer[1],
+    setTimeOut= function(self, timer)
+      self:start(timer)
+      self:finish()
+    end,
+    start= function(self, timer)
+      if timer~=nil then 
+        if not self.parent then self.parent= timer.parent end
+        if not self.func then self.func= timer[1] end
       end
+      if self.t_i==0 then self.t_i= love.timer.getTime() end
     end,
     reset= function(self)
       self.t_i= 0
@@ -28,7 +32,7 @@ function Timer:new(duration, loop, parent, func)
           if self.parent and self.func then
             self.func(self.parent) -- executa função se ela é passada com parâmetro e o que inclui o pai dela para que ela apresente o comportamento desejável com objeto que é desejável ser executada
           end
-          if self.loop then self:reset() end
+          if self.can_repeat then self:reset() end
         end
         return time_passed
       end

@@ -36,7 +36,11 @@ local metatable= {
         walking_speed= {min= 8, max= 18},
       }
     )
-    player.ranged_attack_timer= timer:new(0.1, false)
+    player.ranged_attack_timer= timer:new({
+      duration= 0.1,
+      can_repeat= true,
+      parent= self
+    })
     setmetatable(player, {__index= self})
     player:loadAnimationSettings()
     return player
@@ -63,11 +67,9 @@ function Player:attacking()
 end
 
 function Player:releaseFireball()
-  self.ranged_attack_timer:start()
-  if self.ranged_attack_timer:finish() then
-    self.ranged_attack_timer:reset()
+  self.ranged_attack_timer:setTimeOut({function ()
     self.objectManager:addObject(LongDistanceAttack('fireball', { duration= 5 }, self))
-  end
+  end})
 end
 
 function Player:update()

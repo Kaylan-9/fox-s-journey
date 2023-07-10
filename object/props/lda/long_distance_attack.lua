@@ -9,7 +9,11 @@ local metatable= {
     if name=='fireball' then long_distance_attack= Fireball(owner)
     end
     long_distance_attack.owner= owner
-    long_distance_attack.timer= timer:new(new_lda.duration, false)
+    long_distance_attack.timer= timer:new({
+      duration= new_lda.duration,
+      can_repeat= true,
+      parent= self
+    })
     if new_lda.effects_for_enemies then
       long_distance_attack.effects_for_enemies= new_lda.effects_for_enemies
     end

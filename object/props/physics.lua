@@ -5,7 +5,11 @@ local metatable= {
     physics.fixed= new_physics.fixed
     physics.objects= new_physics.objects
     physics.mass= new_physics.mass
-    physics.drop_force_application_timer= timer:new(0.01, true)
+    physics.drop_force_application_timer= timer:new({
+      duration= 0.01,
+      can_repeat=true,
+      parent= self
+    })
     physics.energy_preservation= new_physics.energy_preservation
     physics.force_acc= {
       y= 0,
@@ -105,10 +109,10 @@ function Physics:collision(object)
         self.main_object:getSide('bottom')<=object:getSide('top') and
         self.main_object:getSide('bottom', {y= next_actual_position})>=object:getSide('top')
       ) then
-        self.drop_force_application_timer:start(self, function ()
+        self.drop_force_application_timer:start({function ()
           self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
           self.main_object.can_jump= true
-        end)
+        end})
         self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2))
         self.main_object.trajectory:setModifiedPosition('y')
       elseif (
