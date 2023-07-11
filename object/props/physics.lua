@@ -152,10 +152,18 @@ function Physics:thereIsNoObjectBelowInTheFuture(func)
   local x_range, y_range
   for _, object in pairs(self.objects) do
     if self.main_object~=object then
-      x_range= (
-        self.main_object:getSide('right', {x= self.main_object:getSide('right')+(self.main_object.trajectory:getCurrentMovement('x')>0 and (self.main_object.body.w/2)+1 or -(self.main_object.body.w/2)-1)})>object:getSide('left')
-        and
-        self.main_object:getSide('left', {x= self.main_object:getSide('left')+(self.main_object.trajectory:getCurrentMovement('x')>0 and (self.main_object.body.w/2)+1 or -(self.main_object.body.w/2)-1)})<object:getSide('right'))
+      local calc_future_position_side= function(name_side)
+        local current_movement_x= self.main_object.trajectory:getCurrentMovement('x')
+        local signal= current_movement_x>0 and 1 or -1
+        local distance_to_calculate_the_floor= signal*((self.main_object.body.w))
+        if signal>0 then
+          distance_to_calculate_the_floor= distance_to_calculate_the_floor>current_movement_x and distance_to_calculate_the_floor or current_movement_x
+        elseif signal<0 then
+          distance_to_calculate_the_floor= distance_to_calculate_the_floor<current_movement_x and distance_to_calculate_the_floor or current_movement_x
+        end
+        return self.main_object:getSide(name_side, {x= self.main_object:getSide(name_side)+(distance_to_calculate_the_floor)})
+      end
+      x_range= (calc_future_position_side('right')>object:getSide('left') and calc_future_position_side('left')<object:getSide('right'))
       if x_range then
         y_range= (self.main_object:getSide('bottom')>object:getSide('top') and self.main_object:getSide('top')<object:getSide('bottom'))
         if y_range then

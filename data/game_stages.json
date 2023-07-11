@@ -18,13 +18,13 @@
       "objects": [
         {
           "type": "block",
-          "initial_position": {"x": 400, "y": 550},
+          "initial_position": {"x": 250, "y": 550},
           "move_every": {"x": 0.5, "y": 0.25},
-          "_repeat": {"x": 50, "y": 0}
+          "_repeat": {"x": 15, "y": 15}
         },
         {
           "type": "block",
-          "initial_position": {"x": 200, "y": 550},
+          "initial_position": {"x": 0, "y": 550},
           "move_every": {"x": 0.5, "y": 0.25}
         }
       ]
