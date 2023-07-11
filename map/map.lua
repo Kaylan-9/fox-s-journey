@@ -54,16 +54,25 @@ function Map:load(elements)
     if n=='backgrounds' then for i=1, #v do self:loadBackground(v[i]) end
     elseif n=='objects' then 
       for i=1, #v do       
-        self:loadObjects(
-          (v[i].type=='block' and Block),
-          {
+        if v[i]._repeat then
+          self:loadObjects(
+            (v[i].type=='block' and Block),
+            {
+              objectManager= objectManager,
+              move_every= v[i].move_every,
+              p_reference= CameraManager:getPosition()
+            },
+            v[i].initial_position,
+            v[i]['_repeat']
+          )
+        else
+          objectManager:addObject(Block({
             objectManager= objectManager,
             move_every= v[i].move_every,
-            p_reference= CameraManager:getPosition()
-          },
-          v[i].initial_position,
-          v[i]['_repeat']
-        )
+            p_reference= CameraManager:getPosition(),
+            initial_position= v[i].initial_position
+          }))
+        end
       end
     end
   end

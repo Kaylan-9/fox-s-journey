@@ -58,12 +58,21 @@ function ObjectManager:getList(not_list)
 end
 
 function ObjectManager:executeObjectFunction(name_function)
-  for _, background_object in pairs(self.background_objects) do background_object[name_function](background_object) end
-  for _, object in pairs(self.objects) do object[name_function](object) end
+  for _, background_object in pairs(self.background_objects) do
+    if type(background_object[name_function])=='function' then
+      background_object[name_function](background_object)
+    end
+  end
+  for _, object in pairs(self.objects) do
+    if type(object[name_function])=='function' then
+      object[name_function](object)
+    end
+  end
 end
 
 function ObjectManager:load()
   self:addObject(Player(self))
+  self:executeObjectFunction('load')
 end
 
 function ObjectManager:update()

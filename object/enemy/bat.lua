@@ -5,7 +5,7 @@ local EnemyBat= {}
 local metatable= {
   __index= Enemy,
   __call= function(self, objectManager, initial_position, p_reference)
-    local enemyBat= Enemy(objectManager, initial_position, p_reference, -1, tilesManager:get('bat'), {min= 1, max= 5})
+    local enemyBat= Enemy(objectManager, initial_position, p_reference, -1, tilesManager:get('bat'), {min= 3, max= 15})
     enemyBat.must_chase_the_player= false
     setmetatable(enemyBat, {__index= self})
     enemyBat:loadAnimationSettings()
@@ -14,6 +14,12 @@ local metatable= {
 }
 
 setmetatable(EnemyBat, metatable)
+
+function EnemyBat:load()
+  if self.to_be_chased==nil then 
+    self.to_be_chased= self.objectManager:get('player')
+  end 
+end
 
 function EnemyBat:loadAnimationSettings()
   self.animate:createAnimation('flying', 'normal', {i=1, f=6})
@@ -37,9 +43,6 @@ function EnemyBat:chasePlayer()
 end
 
 function Enemy:update()
-  if not self.to_be_chased then 
-    self.to_be_chased= self.objectManager:get('player')
-  end 
   self:chasePlayer()
   self:updateObjectBehavior(self.must_chase_the_player)
 end

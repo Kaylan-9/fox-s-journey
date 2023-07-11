@@ -13,7 +13,7 @@ local metatable= {
       },
       {
         w= 32,
-        h= 55
+        h= 50
       },
       initial_position,
       p_reference,
@@ -32,6 +32,7 @@ local metatable= {
         walking_speed= walking_speed,
       }
     )
+    enemy.does_not_go_through_bottomless_holes= true
     setmetatable(enemy, {__index= self})
     return enemy
   end

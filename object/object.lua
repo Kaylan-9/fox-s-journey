@@ -118,7 +118,7 @@ function Object:move(prop, value)
       end
       return
     end
-    self.p[prop]= self.p[prop]+value
+    self.p[prop]= math.ceil(self.p[prop]+value)
   end
 end
 
@@ -144,7 +144,7 @@ function Object:setPosition(prop, new_value)
     return
   end
 
-  self.p[prop]= new_value+self.p_reference[prop]*self.move_every[prop]
+  self.p[prop]= math.ceil(new_value+self.p_reference[prop]*self.move_every[prop])
 end
 
 

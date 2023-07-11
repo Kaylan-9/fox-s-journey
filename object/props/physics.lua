@@ -16,6 +16,14 @@ local metatable= {
       x= 0
     }
     physics.main_object= main_object
+
+    -- para mobs e inimigos do jogo
+    if physics.main_object.name~='player' and physics.main_object.does_not_go_through_bottomless_holes then
+      physics.future_force_acc= {
+        y= 0,
+        x= 0
+      }
+    end
     setmetatable(physics, {__index= self})
     return physics
   end
@@ -23,6 +31,17 @@ local metatable= {
 setmetatable(Physics, metatable)
 
 function Physics:update()
+
+  -- para mobs e inimigos do jogo
+  if self.main_object.name~='player' and self.main_object.does_not_go_through_bottomless_holes then
+    self:thereIsNoObjectBelowInTheFuture(
+      function()
+        self.main_object.trajectory:setModifiedPosition('x')
+      end
+    )
+  end
+
+
   if self.force_acc.y~=0 then
     self:aboveAndWithinTheRangeX(
       function(this, object)
@@ -51,8 +70,6 @@ function Physics:update()
   self.main_object.trajectory:resetModifiedPosition()
   self.main_object.trajectory:resetCurrentMovement()
   self.main_object.trajectory:resetNextPosition()
-
-  
   if self.fixed~=true then self:applicationOfForce() end
 end
 
@@ -88,13 +105,13 @@ function Physics:collision(object)
         self.main_object:getSide('right')<=object:getSide('left') and
         self.main_object:getSide('right', {x= next_actual_position})>=object:getSide('left')
       ) then
-        self.main_object:setPosition('x', (object:getSide('left')-(self.main_object.body.w/2))-1)
+        self.main_object:setPosition('x', (object:getSide('left')-(self.main_object.body.w/2)))
         self.main_object.trajectory:setModifiedPosition('x')
       elseif (
         self.main_object:getSide('left')>=object:getSide('right') and
         self.main_object:getSide('left', {x= next_actual_position})<=object:getSide('right')
       ) then
-        self.main_object:setPosition('x', (object:getSide('right')+(self.main_object.body.w/2)+1))
+        self.main_object:setPosition('x', (object:getSide('right')+(self.main_object.body.w/2)))
         self.main_object.trajectory:setModifiedPosition('x')
       end
     end
@@ -113,11 +130,11 @@ function Physics:collision(object)
           self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
           self.main_object.can_jump= true
         end})
-        self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2))
+        self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2)-1)
         self.main_object.trajectory:setModifiedPosition('y')
       elseif (
         (self.main_object:getSide('top')>=object:getSide('bottom') and
-        self.main_object:getSide('top', {y= next_actual_position})<=object:getSide('bottom'))
+        self.main_object:getSide('top', {y= next_actual_position})<=object:getSide('bottom')+1)
       ) then
         self.force_acc.y= 0
         self.main_object:setPosition('y', object:getSide('bottom')+(self.main_object.body.h/2))
@@ -129,6 +146,30 @@ function Physics:collision(object)
     readjustmentToSimulateCollisionInY(self.main_object.trajectory:getCurrentMovement('y')+self.main_object:realPosition().y)
   end
 end
+
+function Physics:thereIsNoObjectBelowInTheFuture(func)
+  local effect= true
+  local x_range, y_range
+  for _, object in pairs(self.objects) do
+    if self.main_object~=object then
+      x_range= (
+        self.main_object:getSide('right', {x= self.main_object:getSide('right')+(self.main_object.trajectory:getCurrentMovement('x')>0 and (self.main_object.body.w/2)+1 or -(self.main_object.body.w/2)-1)})>object:getSide('left')
+        and
+        self.main_object:getSide('left', {x= self.main_object:getSide('left')+(self.main_object.trajectory:getCurrentMovement('x')>0 and (self.main_object.body.w/2)+1 or -(self.main_object.body.w/2)-1)})<object:getSide('right'))
+      if x_range then
+        y_range= (self.main_object:getSide('bottom')>object:getSide('top') and self.main_object:getSide('top')<object:getSide('bottom'))
+        if y_range then
+          effect= false
+          break
+        end
+      end
+    end
+  end
+  if effect then
+    func(self)
+  end
+end
+
 
 function Physics:thereIsNoObjectBelow(func)
   local effect= true

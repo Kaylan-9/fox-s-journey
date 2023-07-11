@@ -109,7 +109,7 @@ end
 function Player:jumping()
   if KeyboardMouseManager:getKeyUsed('jump') then
     if self.can_jump then
-      self.physics.force_acc.y= self.physics.force_acc.y-40
+      self.physics.force_acc.y= self.physics.force_acc.y-50
       self.can_jump= false
     end
   end
