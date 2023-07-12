@@ -1,12 +1,12 @@
 local tilesManager= require('manager.tilesManager')
-local Object= require('object.object')
+local Obj= require('obj.obj')
 local Background= {}
 local metatable= {
-  __index= Object,
+  __index= Obj,
   __call= function(self, new_bg)
-    -- new_bg contém: objectManager, name_img, p_reference, move_every
-    local background= Object(
-      new_bg.objectManager,
+    -- new_bg contém: objManager, name_img, p_reference, move_every
+    local background= Obj(
+      new_bg.objManager,
       {
         name= 'background',
         right_edge_image= 1,

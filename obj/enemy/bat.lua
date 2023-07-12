@@ -1,12 +1,11 @@
 local tilesManager= require('manager.tilesManager')
-local Enemy= require('object.enemy.enemy')
-local Object= require('object.object')
+local Enemy= require('obj.enemy.enemy')
+local Obj= require('obj.obj')
 local EnemyBat= {}
 local metatable= {
   __index= Enemy,
-  __call= function(self, objectManager, initial_position, p_reference)
-    local enemyBat= Enemy(objectManager, initial_position, p_reference, -1, tilesManager:get('bat'), {min= 3, max= 15})
-    enemyBat.must_chase_the_player= false
+  __call= function(self, objManager, initial_position, p_reference)
+    local enemyBat= Enemy(objManager, initial_position, p_reference, -1, tilesManager:get('bat'), {min= 3, max= 15})
     setmetatable(enemyBat, {__index= self})
     enemyBat:loadAnimationSettings()
     return enemyBat
@@ -17,7 +16,7 @@ setmetatable(EnemyBat, metatable)
 
 function EnemyBat:load()
   if self.to_be_chased==nil then 
-    self.to_be_chased= self.objectManager:get('player')
+    self.to_be_chased= self.objManager:get('player')
   end 
 end
 
@@ -44,7 +43,7 @@ end
 
 function Enemy:update()
   self:chasePlayer()
-  self:updateObjectBehavior(self.must_chase_the_player)
+  self:updateObjBehavior(self.must_chase_the_player)
 end
 
 return EnemyBat

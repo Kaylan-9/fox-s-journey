@@ -9,7 +9,7 @@ _G.json= require('useful.json')
 _G.dt= 0
 
 local ScreenManager= require('manager.screenManager')
-local ObjectManager= require('manager.objectManager')
+local ObjManager= require('manager.objManager')
 local TilesManager= require('manager.tilesManager')
 local KeyboardMouseManager = require("manager.keyboardMouseManager")
 local Map= require('map.map')
@@ -33,7 +33,7 @@ function Game:load()
   TilesManager:load()
   ScreenManager:load()
   map:load(self.game_stage_data.map)
-  ObjectManager:load()
+  ObjManager:load()
 end
 
 function Game:keypressed(key)
@@ -43,11 +43,11 @@ end
 function Game:update(dt)
   _G.dt= dt
   KeyboardMouseManager:update()
-  ObjectManager:update()
+  ObjManager:update()
 end
 
 function Game:draw()
-  ObjectManager:draw()
+  ObjManager:draw()
 end
 
 function love.load() Game:load() end

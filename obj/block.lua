@@ -1,12 +1,12 @@
 local tilesManager= require('manager.tilesManager')
-local Object= require('object.object')
+local Obj= require('obj.obj')
 local Block= {}
 local metatable= {
-  __index= Object,
+  __index= Obj,
   __call= function(self, new_blk)
-    -- new_blk contém: objectManager, initial_position, p_reference, move_every
-    local block= Object(
-      new_blk.objectManager,
+    -- new_blk contém: objManager, initial_position, p_reference, move_every
+    local block= Obj(
+      new_blk.objManager,
       {
         name= 'block',
         right_edge_image= 1,
@@ -25,7 +25,7 @@ local metatable= {
         energy_preservation= 0,
         mass= 10.5,
         fixed= true,
-        objects= new_blk.objectManager:getList({}),
+        objs= new_blk.objManager:getList({}),
       },
       {
         walking_speed= {min= 5, max= 15},
@@ -38,7 +38,7 @@ local metatable= {
 setmetatable(Block, metatable)
 
 function Block:update()
-  self:updateObjectBehavior()
+  self:updateObjBehavior()
 end
 
 return Block

@@ -15,7 +15,7 @@
           "move_every": {"x":0.5, "y":0.25}
         }
       ],
-      "objects": [
+      "objs": [
         {
           "type": "block",
           "initial_position": {"x": 250, "y": 550},

@@ -1,9 +1,9 @@
-local Object= require('object.object')
-local Fireball= require('object.props.lda.fireball')
+local Obj= require('obj.obj')
+local Fireball= require('obj.props.lda.fireball')
 
 local LongDistanceAttack= {}
 local metatable= {
-  __index= Object,
+  __index= Obj,
   __call=function(self, name, new_lda, owner)
     local long_distance_attack
     if name=='fireball' then long_distance_attack= Fireball(owner)
@@ -27,10 +27,10 @@ setmetatable(LongDistanceAttack, metatable)
 function LongDistanceAttack:update()
   local direction= self.scale_factor.x/self.scale_factor.x
   self.trajectory:setCurrentMovement('x', direction*self.trajectory.walking_speed.min*dt*100)
-  self:updateObjectBehavior()
+  self:updateObjBehavior()
   self.timer:start()
   if self.timer:finish() then
-    self.objectManager:removeObject(self.id)
+    self.objManager:removeObj(self.id)
   end
   self:jumping()
 end

@@ -1,4 +1,4 @@
-local Object= require('object.object')
+local Obj= require('obj.obj')
 local CameraManager= require('manager.cameraManager')
 local metatable= {
   __call= function(self, owner)
@@ -17,8 +17,8 @@ local metatable= {
       initial_position.x= initial_position.x+(owner.cam.x*0.5)
       initial_position.y= initial_position.y+(owner.cam.y*0.25)
     end
-    local fireball= Object(
-      owner.objectManager,
+    local fireball= Obj(
+      owner.objManager,
       {
         name= 'fireball',
         right_edge_image= 1,
@@ -36,7 +36,7 @@ local metatable= {
         energy_preservation= 0.44,
         mass= 3.5,
         fixed= false,
-        objects= owner.objectManager:getList({'player'})
+        objs= owner.objManager:getList({'player'})
       },
       {
         walking_speed= {min= 5, max= 7},

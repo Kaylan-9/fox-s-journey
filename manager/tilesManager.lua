@@ -1,4 +1,4 @@
-local Tileset= require('object.props.tileset')
+local Tileset= require('obj.props.tileset')
 local TilesManager= {
   tilesets= {}
 }

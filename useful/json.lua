@@ -107,13 +107,13 @@ function json.parse(str, pos, end_delim)
   if pos > #str then error('Reached unexpected end of input.') end
   local pos = pos + #str:match('^%s*', pos)  -- Skip whitespace.
   local first = str:sub(pos, pos)
-  if first == '{' then  -- Parse an object.
+  if first == '{' then  -- Parse an obj.
     local obj, key, delim_found = {}, true, true
     pos = pos + 1
     while true do
       key, pos = json.parse(str, pos, '}')
       if key == nil then return obj, pos end
-      if not delim_found then error('Comma missing between object items.') end
+      if not delim_found then error('Comma missing between obj items.') end
       pos = skip_delim(str, pos, ':', true)  -- true -> error if missing.
       obj[key], pos = json.parse(str, pos)
       pos, delim_found = skip_delim(str, pos, ',')
@@ -132,7 +132,7 @@ function json.parse(str, pos, end_delim)
     return parse_str_val(str, pos + 1)
   elseif first == '-' or first:match('%d') then  -- Parse a number.
     return parse_num_val(str, pos)
-  elseif first == end_delim then  -- End of an object or array.
+  elseif first == end_delim then  -- End of an obj or array.
     return nil, pos + 1
   else  -- Parse true, false, or null.
     local literals = {['true'] = true, ['false'] = false, ['null'] = json.null}

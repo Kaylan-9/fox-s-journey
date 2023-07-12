@@ -1,52 +1,52 @@
-local Animate= require('object.props.animate')
-local Physics= require('object.props.physics')
-local Trajectory= require('object.props.trajectory')
+local Animate= require('obj.props.animate')
+local Physics= require('obj.props.physics')
+local Trajectory= require('obj.props.trajectory')
 local CameraManager= require('manager.cameraManager')
 
-local Object= {}
+local Obj= {}
 local metatable= {
   -- p_reference -> referência de posição
-  __call=function(self, objectManager, new_object, body, initial_position, p_reference, move_every, animate, physics, trajectory)
-    local object= {}
+  __call=function(self, objManager, new_obj, body, initial_position, p_reference, move_every, animate, physics, trajectory)
+    local obj= {}
 
-    object.objectManager= objectManager
-    object.name= new_object.name
-    object.right_edge_image= new_object.right_edge_image -- se é 1 a imagem aponta para a direita, caso se -1 para a esquerda
-    object.scale_factor= new_object.scale_factor -- right_edge_image é usado para posicionar corretamente o scale_factor, ou seja ele é usado no draw
-
-    if object.name=='player' then
-      object.p= {}
-      object.p.x= 0
-      object.p.y= 500
-      object.cam= initial_position
-      object.can_jump= true
+    obj.objManager= objManager
+    obj.name= new_obj.name
+    obj.right_edge_image= new_obj.right_edge_image -- se é 1 a imagem aponta para a direita, caso se -1 para a esquerda
+    obj.scale_factor= new_obj.scale_factor -- right_edge_image é usado para posicionar corretamente o scale_factor, ou seja ele é usado no draw
+    obj.is_not_flying= true
+    if obj.name=='player' then
+      obj.p= {}
+      obj.p.x= 0
+      obj.p.y= 500
+      obj.cam= initial_position
+      obj.can_jump= true
     else
-      object.p= initial_position
+      obj.p= initial_position
     end
 
-    object.move_every= (move_every and move_every or {x= 1, y= 1})
-    object.p_reference= (p_reference and p_reference or {x= 0, y= 0})
+    obj.move_every= (move_every and move_every or {x= 1, y= 1})
+    obj.p_reference= (p_reference and p_reference or {x= 0, y= 0})
 
-    if body then object.body= body end
-    if trajectory then object.trajectory= Trajectory(trajectory, object) end
+    if body then obj.body= body end
+    if trajectory then obj.trajectory= Trajectory(trajectory, obj) end
     if animate then
       if animate.tileset then
-        object.tileset= animate.tileset
-        object.animate= Animate(animate)
+        obj.tileset= animate.tileset
+        obj.animate= Animate(animate)
       else
-        object.img= animate
+        obj.img= animate
       end
     end
 
-    if physics then object.physics= Physics(physics, object) end
-    setmetatable(object, {__index=self})
-    object.id= object:newId()
-    return object
+    if physics then obj.physics= Physics(physics, obj) end
+    setmetatable(obj, {__index=self})
+    obj.id= obj:newId()
+    return obj
   end
 }
-setmetatable(Object, metatable)
+setmetatable(Obj, metatable)
 
-function Object:generateId()
+function Obj:generateId()
   local new_id= ''
   local chars= {'a', 'b', 'c', 'd', 'e', 'f'}
   for i=1, 9 do
@@ -59,12 +59,12 @@ function Object:generateId()
   return new_id
 end
 
-function Object:newId()
+function Obj:newId()
   local new_id= self:generateId()
   -- local its_new= true
   -- while its_new do
-  --   for _, object in pairs(self.objectManager.objects) do
-  --     if object.id==new_id then
+  --   for _, obj in pairs(self.objManager.objs) do
+  --     if obj.id==new_id then
   --       its_new= false
   --       break
   --     end
@@ -73,7 +73,7 @@ function Object:newId()
   return new_id
 end
 
-function Object:getSide(name_side, position)
+function Obj:getSide(name_side, position)
   local current_position= position and position or self:realPosition()
   local side= 0
   if name_side=='right' then side= current_position.x+(self.body.w/2)
@@ -84,7 +84,7 @@ function Object:getSide(name_side, position)
   return side
 end
 
-function Object:min_cam_move(prop)
+function Obj:min_cam_move(prop)
   local props= {
     x= 500,
     y= 0
@@ -92,7 +92,7 @@ function Object:min_cam_move(prop)
   return props[prop]
 end
 
-function Object:move(prop, value)
+function Obj:move(prop, value)
   if value~=0 then
     if self.name=='player' then
       if prop=='x' then
@@ -122,7 +122,7 @@ function Object:move(prop, value)
   end
 end
 
-function Object:setPosition(prop, new_value)
+function Obj:setPosition(prop, new_value)
   if self.name=='player' then
 
     if prop=='x' then
@@ -148,26 +148,28 @@ function Object:setPosition(prop, new_value)
 end
 
 
-function Object:realPosition()
-  return {
-    x= math.ceil(self.p.x-self.p_reference.x*self.move_every.x),
-    y= math.ceil(self.p.y-self.p_reference.y*self.move_every.y)
-  }
+function Obj:realPosition(prop)
+  return prop and 
+    math.ceil(self.p[prop]-self.p_reference[prop]*self.move_every[prop])
+    or ({
+      x= math.ceil(self.p.x-self.p_reference.x*self.move_every.x),
+      y= math.ceil(self.p.y-self.p_reference.y*self.move_every.y)
+    })
 end
 
-function Object:updateObjectBehavior(active_animation)
+function Obj:updateObjBehavior(active_animation)
   if active_animation then self.animate:update(active_animation) end
   if self.trajectory then self.trajectory:update(self:realPosition()) end
   if self.physics then self.physics:update(self:realPosition()) end
 end
 
-function Object:setPoint(name_side)
+function Obj:setPoint(name_side)
   if name_side=='left' then self.scale_factor.x= -math.abs(self.scale_factor.x)
   elseif name_side=='right' then self.scale_factor.x= math.abs(self.scale_factor.x)
   end
 end
 
-function Object:draw()
+function Obj:draw()
   if self.extraDraw then self:extraDraw() end
   local current_position= self:realPosition()
   if self.tileset then
@@ -187,11 +189,15 @@ function Object:draw()
       (self.img:getWidth()/2), (self.img:getHeight()/2)
     )
   end
-  -- if self.body then self:lineCollisionDraw() end
+  if self.body then self:lineCollisionDraw() end
 end
 
-function Object:lineCollisionDraw()
-  love.graphics.setColor(1, 0, 0)
+function Obj:lineCollisionDraw()
+  if self.name=='bat' or self.name=='player' then
+    love.graphics.setColor(0, 0, 1)
+  else 
+    love.graphics.setColor(1, 0, 0)
+  end
   love.graphics.polygon('line',
     self:getSide('left'), self:getSide('top'),
     self:getSide('right'), self:getSide('top'),
@@ -202,4 +208,4 @@ function Object:lineCollisionDraw()
   if self.trajectory then self.trajectory:draw() end
 end
 
-return Object
+return Obj

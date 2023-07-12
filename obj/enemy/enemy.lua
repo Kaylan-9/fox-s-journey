@@ -1,11 +1,11 @@
-local Object= require('object.object')
+local Obj= require('obj.obj')
 
 local Enemy= {}
 local metatable= {
-  __index= Object,
-  __call= function(self, objectManager, initial_position, p_reference, right_edge_image, tileset, walking_speed)
-    local enemy= Object(
-      objectManager,
+  __index= Obj,
+  __call= function(self, objManager, initial_position, p_reference, right_edge_image, tileset, walking_speed)
+    local enemy= Obj(
+      objManager,
       {
         name= 'enemy',
         right_edge_image= right_edge_image,
@@ -26,7 +26,7 @@ local metatable= {
         energy_preservation= 0.44,
         mass= 3.5,
         fixed= false,
-        objects= objectManager:getList({})
+        objs= objManager:getList({})
       },
       {
         walking_speed= walking_speed,
