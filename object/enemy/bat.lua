@@ -22,7 +22,7 @@ function EnemyBat:load()
 end
 
 function EnemyBat:loadAnimationSettings()
-  self.animate:createAnimation('flying', 'normal', {i=1, f=6})
+  self.animate:createAnimation('flying', 'normal', {i=1, f=5})
 end
 
 function EnemyBat:chasePlayer()

@@ -6,7 +6,7 @@ local metatable= {
     physics.objects= new_physics.objects
     physics.mass= new_physics.mass
     physics.drop_force_application_timer= timer:new({
-      duration= 0.01,
+      duration= 0.007,
       can_repeat=true,
       parent= self
     })
@@ -126,15 +126,17 @@ function Physics:collision(object)
         self.main_object:getSide('bottom')<=object:getSide('top') and
         self.main_object:getSide('bottom', {y= next_actual_position})>=object:getSide('top')
       ) then
-        self.drop_force_application_timer:start({function ()
-          self.force_acc.y= mathK:around((self.force_acc.y>0 and self.force_acc.y*-1 or self.force_acc.y)*self.energy_preservation)
+        self.drop_force_application_timer:start({function ()          
+          self.force_acc.y= mathK:around((self.force_acc.y>0 and -1 or 1)*self.force_acc.y*self.energy_preservation)
+          --ignora se força acumulada de y é igual a 1
+          self.force_acc.y= self.force_acc.y==1 and 0 or self.force_acc.y
           self.main_object.can_jump= true
         end})
-        self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2)-1)
+        self.main_object:setPosition('y', object:getSide('top')-(self.main_object.body.h/2))
         self.main_object.trajectory:setModifiedPosition('y')
       elseif (
         (self.main_object:getSide('top')>=object:getSide('bottom') and
-        self.main_object:getSide('top', {y= next_actual_position})<=object:getSide('bottom')+1)
+        self.main_object:getSide('top', {y= next_actual_position})<=object:getSide('bottom'))
       ) then
         self.force_acc.y= 0
         self.main_object:setPosition('y', object:getSide('bottom')+(self.main_object.body.h/2))

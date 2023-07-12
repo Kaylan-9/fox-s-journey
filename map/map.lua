@@ -77,7 +77,7 @@ function Map:load(elements)
     end
   end
 
-  objectManager:addObject(EnemyBat(objectManager, {x=600, y=400}, CameraManager:getPosition()))
+  objectManager:addObject(EnemyBat(objectManager, {x=600, y=-300}, CameraManager:getPosition()))
 end
 
 return Map
