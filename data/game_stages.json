@@ -24,6 +24,11 @@
         },
         {
           "type": "block",
+          "initial_position": {"x": 186, "y": 615},
+          "move_every": {"x": 0.5, "y": 0.25}
+        },
+        {
+          "type": "block",
           "initial_position": {"x": 0, "y": 550},
           "move_every": {"x": 0.5, "y": 0.25}
         }
